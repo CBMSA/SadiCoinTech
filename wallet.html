@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <title>Sadicoin Tech | Digital Financial Infrastructure</title>
-<meta name="description" content="Sadicoin Tech provides blockchain-powered financial services, wallets, governance, and transparency platforms." />
+<meta name="description" content="Sadicoin Tech provides blockchain-powered financial services, wallets, governance, transparency platforms, and the PhotoChat social marketplace." />
 
 <!--
 ARCHITECTURE NOTE
-Frontend: Single static HTML file (this file)
-Backend: Serverless (Vercel Functions / Edge)
+Frontend: Single static HTML file
+Backend: Vercel Serverless / Edge Functions
 Database: Supabase
 
-Environment variables (configured in Vercel):
+Vercel Environment Variables:
 - SUPABASE_URL
 - SUPABASE_ANON_KEY
 - SUPABASE_SERVICE_ROLE_KEY (server-side only)
 
-This frontend never exposes secrets directly.
+All secrets remain server-side.
 -->
 
 <style>
@@ -41,41 +41,27 @@ a{text-decoration:none;color:inherit}
 .container{max-width:1100px;margin:auto;padding:2rem}
 
 header{
-  position:sticky;
-  top:0;
-  z-index:100;
+  position:sticky;top:0;z-index:100;
   background:rgba(11,15,20,.9);
   backdrop-filter:blur(10px);
 }
 .nav{display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:700;font-size:1.1rem}
+.logo{font-weight:700}
 .logo span{color:var(--accent)}
-nav a{
-  margin-left:1.4rem;
-  color:var(--muted);
-  font-size:.95rem;
-}
+nav a{margin-left:1.2rem;color:var(--muted);font-size:.95rem}
 
 section{padding:5rem 0}
 .dark{background:var(--bg-alt)}
 
-.hero{
-  text-align:center;
-  padding:6rem 2rem;
-}
-.hero h1{font-size:2.8rem}
-.hero p{
-  color:var(--muted);
-  max-width:760px;
-  margin:1rem auto;
-}
+.hero{text-align:center;padding:6rem 2rem}
+.hero h1{font-size:2.6rem}
+.hero p{color:var(--muted);max-width:760px;margin:1rem auto}
 
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
   gap:1.5rem;
 }
-
 .card{
   background:var(--card);
   padding:1.6rem;
@@ -92,30 +78,9 @@ section{padding:5rem 0}
   color:var(--accent);
   margin:.4rem;
 }
-.primary{
-  background:var(--accent);
-  color:#000;
-}
+.primary{background:var(--accent);color:#000}
 
-.store{
-  background:var(--card);
-  border:1px solid #1f2937;
-  padding:1.2rem 1.6rem;
-  border-radius:12px;
-}
-.store span{
-  display:block;
-  font-size:.8rem;
-  color:var(--muted);
-  margin-top:.2rem;
-}
-
-footer{
-  text-align:center;
-  padding:2rem;
-  color:var(--muted);
-  font-size:.9rem;
-}
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:.9rem}
 </style>
 </head>
 
@@ -127,10 +92,9 @@ footer{
     <nav>
       <a href="#home">Home</a>
       <a href="#wallet">Wallet</a>
-      <a href="#dao">DAO</a>
-      <a href="#token">Token</a>
-      <a href="#transparency">Transparency</a>
+      <a href="#photochat">PhotoChat</a>
       <a href="#fsp">FSP</a>
+      <a href="#pricing">Pricing</a>
       <a href="#downloads">Apps</a>
     </nav>
   </div>
@@ -140,119 +104,123 @@ footer{
 <section id="home" class="hero">
   <h1>Secure Digital Financial Infrastructure</h1>
   <p>
-    Sadicoin Tech delivers blockchain-powered financial services,
-    governance systems, and transparency platforms designed
-    for real-world adoption.
+    Blockchain-powered wallets, financial services, governance,
+    transparency dashboards, and a social commerce platform.
   </p>
-  <a href="#wallet" class="btn primary">Explore Platform</a>
-  <a href="#downloads" class="btn">Download App</a>
+  <a href="#photochat" class="btn primary">Explore PhotoChat</a>
 </section>
 
-<!-- WALLET -->
-<section id="wallet">
+<!-- PHOTOCHAT LANDING -->
+<section id="photochat">
   <div class="container">
-    <h2>Sadicoin Wallet</h2>
-    <p style="color:var(--muted);max-width:720px;margin:.5rem 0 2rem;">
-      A secure, non-custodial digital wallet serving as the foundation
-      for payments, financial services, and decentralized governance.
+    <h2>PhotoChat 📷</h2>
+    <p style="color:var(--muted);max-width:760px;margin:.5rem 0 2rem;">
+      PhotoChat is a social media and digital marketplace platform
+      enabling creators, buyers, and donors to transact using
+      fiat and crypto with full transparency.
     </p>
 
     <div class="grid">
-      <div class="card"><h3>Non-Custodial</h3><p>Users control their keys and assets.</p></div>
-      <div class="card"><h3>Account-Based UX</h3><p>Wallets function as digital financial accounts.</p></div>
-      <div class="card"><h3>Multi-Asset</h3><p>Supports SDC and EVM-compatible tokens.</p></div>
-      <div class="card"><h3>DeFi Ready</h3><p>Liquidity, staking, and governance access.</p></div>
+      <div class="card"><h3>Social Media</h3><p>Share photos, content, and updates.</p></div>
+      <div class="card"><h3>Marketplace</h3><p>Buy & sell digital goods and services.</p></div>
+      <div class="card"><h3>Donations</h3><p>Support creators & causes transparently.</p></div>
+      <div class="card"><h3>Multi-Rail Payments</h3><p>Fiat ↔ Crypto ↔ Crypto ↔ Fiat.</p></div>
     </div>
   </div>
 </section>
 
-<!-- DAO -->
-<section id="dao" class="dark">
+<!-- PHOTOCHAT USER FLOWS -->
+<section class="dark">
   <div class="container">
-    <h2>DAO & Governance</h2>
-    <p style="color:var(--muted);max-width:720px;margin:.5rem 0 2rem;">
-      On-chain governance tools enabling transparent, auditable,
-      and community-driven decision-making.
-    </p>
+    <h2>PhotoChat User Flows</h2>
 
     <div class="grid">
-      <div class="card"><h3>Proposals</h3><p>Create and review governance proposals.</p></div>
-      <div class="card"><h3>Token Voting</h3><p>SDC-based voting rights.</p></div>
-      <div class="card"><h3>Immutable Records</h3><p>On-chain governance history.</p></div>
-      <div class="card"><h3>Accountability</h3><p>Clear decision ownership and outcomes.</p></div>
+      <div class="card">
+        <h3>Creator</h3>
+        <p>Post content → set price or donation → receive funds in wallet → withdraw or reinvest.</p>
+      </div>
+      <div class="card">
+        <h3>Buyer</h3>
+        <p>Discover content → pay with fiat or crypto → receive digital goods or access.</p>
+      </div>
+      <div class="card">
+        <h3>Donor</h3>
+        <p>Choose cause or creator → donate publicly or privately → track impact.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- TOKEN -->
-<section id="token">
+<!-- TRANSACTION STATES -->
+<section>
   <div class="container">
-    <h2>SDC Token</h2>
-    <p style="color:var(--muted);max-width:720px;margin:.5rem 0 2rem;">
-      SDC is the utility token powering payments, governance,
-      incentives, and ecosystem participation.
-    </p>
+    <h2>Transaction Lifecycle</h2>
 
     <div class="grid">
-      <div class="card"><h3>Payments</h3><p>Fast and low-cost digital transfers.</p></div>
-      <div class="card"><h3>Governance</h3><p>DAO voting and participation.</p></div>
-      <div class="card"><h3>Incentives</h3><p>Rewards for users and contributors.</p></div>
-      <div class="card"><h3>Polygon Network</h3><p>Scalable EVM-compatible infrastructure.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- TRANSPARENCY -->
-<section id="transparency" class="dark">
-  <div class="container">
-    <h2>Transparency Dashboard</h2>
-    <p style="color:var(--muted);max-width:720px;margin:.5rem 0 2rem;">
-      Public dashboards providing real-time visibility into transactions,
-      fund allocation, and program impact.
-    </p>
-
-    <div class="grid">
-      <div class="card"><h3>On-Chain Data</h3><p>Live blockchain transaction tracking.</p></div>
-      <div class="card"><h3>Fund Flows</h3><p>Transparent allocation and usage.</p></div>
-      <div class="card"><h3>Impact Metrics</h3><p>Measurable outcomes and reporting.</p></div>
-      <div class="card"><h3>Audit Ready</h3><p>Designed for compliance and review.</p></div>
+      <div class="card"><h3>Pending</h3><p>Transaction initiated, awaiting confirmation.</p></div>
+      <div class="card"><h3>Escrow</h3><p>Funds held securely until delivery or conditions met.</p></div>
+      <div class="card"><h3>Settled</h3><p>Funds released and recorded permanently.</p></div>
+      <div class="card"><h3>Refunded (Optional)</h3><p>Dispute resolution where applicable.</p></div>
     </div>
   </div>
 </section>
 
 <!-- FSP -->
-<section id="fsp">
+<section id="fsp" class="dark">
   <div class="container">
     <h2>Sadicoin Financial Services (FSP)</h2>
     <p style="color:var(--muted);max-width:760px;margin:.5rem 0 2rem;">
       Sadicoin Tech operates its own digital financial services platform,
-      providing secure, compliant, and transparent financial solutions
-      for individuals, businesses, and organizations.
+      enabling compliant fiat and crypto transactions across the ecosystem.
     </p>
 
     <div class="grid">
-      <div class="card"><h3>Digital Money Transfers</h3><p>Local and cross-border payments with traceability.</p></div>
-      <div class="card"><h3>Wallet-Based Accounts</h3><p>Receive, hold, and send funds digitally.</p></div>
-      <div class="card"><h3>Merchant & SME Payments</h3><p>Payment tools for businesses and service providers.</p></div>
-      <div class="card"><h3>NGO & Aid Disbursement</h3><p>Transparent program and relief payments.</p></div>
-      <div class="card"><h3>Compliance & Reporting</h3><p>Audit trails and governance oversight.</p></div>
-      <div class="card"><h3>Future Financial Products</h3><p>Savings, remittances, programmable money.</p></div>
+      <div class="card"><h3>Fiat ↔ Fiat</h3><p>Digital payments and transfers.</p></div>
+      <div class="card"><h3>Fiat ↔ Crypto</h3><p>On-ramp and off-ramp services.</p></div>
+      <div class="card"><h3>Crypto ↔ Crypto</h3><p>On-chain wallet transfers.</p></div>
+      <div class="card"><h3>Compliance Ready</h3><p>Audit trails and reporting.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPLIANCE -->
+<section>
+  <div class="container">
+    <h2>Compliance & Trust</h2>
+    <p style="color:var(--muted);max-width:760px;">
+      Sadicoin Tech applies customer due diligence measures including
+      FICA and KYC where applicable, depending on transaction size,
+      jurisdiction, and regulatory requirements.
+    </p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="dark">
+  <div class="container">
+    <h2>Pricing & Platform Fees</h2>
+
+    <div class="grid">
+      <div class="card"><h3>Creator Fees</h3><p>Low platform fee on sales & donations.</p></div>
+      <div class="card"><h3>Marketplace Fees</h3><p>Transparent transaction-based pricing.</p></div>
+      <div class="card"><h3>Withdrawal Fees</h3><p>Network and processing costs only.</p></div>
+      <div class="card"><h3>NGO Programs</h3><p>Discounted or zero-fee structures.</p></div>
     </div>
   </div>
 </section>
 
 <!-- DOWNLOADS -->
-<section id="downloads" class="dark">
+<section id="downloads">
   <div class="container" style="text-align:center">
-    <h2>App Downloads</h2>
+    <h2>PhotoChat App</h2>
     <p style="color:var(--muted);margin:.5rem 0 2rem;">
-      Mobile applications launching soon. Early testing available.
+      Available soon on mobile platforms. Early access supported.
     </p>
 
     <div class="grid">
-      <div class="store"><strong>Google Play Store</strong><span>Android – Coming Soon</span></div>
-      <div class="store"><strong>Apple App Store</strong><span>iOS – Coming Soon</span></div>
-      <div class="store"><strong>Expo Go</strong><span>Early Access & QA Builds</span></div>
+      <div class="card"><strong>Google Play</strong><p>Android – Coming Soon</p></div>
+      <div class="card"><strong>Apple App Store</strong><p>iOS – Coming Soon</p></div>
+      <div class="card"><strong>Expo Go</strong><p>Early Testing Builds</p></div>
     </div>
   </div>
 </section>
