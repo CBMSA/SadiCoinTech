@@ -1,272 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SACReserve Digital Currency – SadiCoin Tech Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sadicoin Tech | Secure Digital Infrastructure</title>
 
-<style>
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8fafc;
-  color: #2d3436;
-}
-header {
-  background: linear-gradient(90deg, #003366, #00509e);
-  color: white;
-  padding: 20px 40px;
-  text-align: center;
-}
-header img {
-  width: 100px;
-  border-radius: 50%;
-  margin-bottom: 10px;
-}
-header h1 { margin: 0; font-size: 26px; }
-header p { font-size: 15px; color: #dbeafe; }
+  <meta name="description" content="Sadicoin Tech builds secure, serverless blockchain platforms for payments, governance, and transparency." />
 
-nav {
-  background-color: #00264d;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 15px;
-  padding: 12px;
-}
-nav a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 6px;
-  transition: background 0.3s;
-}
-nav a:hover { background-color: #004b91; }
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-alt: #111827;
+      --card: #0f172a;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #00f6ff;
+    }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-h3 {
-  color: #003366;
-  margin-bottom: 10px;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      line-height: 1.6;
+    }
 
-#rates, #cryptoRates, #sdcRates, #etfRates {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px,1fr));
-  gap: 12px;
-}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-.rate-card {
-  background: #f1f5f9;
-  border-radius: 8px;
-  padding: 12px;
-  text-align: center;
-  font-weight: 500;
-}
-.rate-card span {
-  display: block;
-  color: #00509e;
-  font-weight: bold;
-}
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 2rem;
+    }
 
-.chart-container {
-  margin-top: 25px;
-  border-radius: 12px;
-  overflow: hidden;
-}
+    /* NAV */
+    header {
+      position: sticky;
+      top: 0;
+      background: rgba(11,15,20,0.9);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
 
-footer {
-  background-color: #0b0f19;
-  color: #b2bec3;
-  padding: 30px 10px;
-  text-align: center;
-  font-size: 0.9em;
-}
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-footer a { color: #2dd4bf; text-decoration: none; }
-footer a:hover { text-decoration: underline; }
+    .logo {
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
 
-@media (max-width:600px) {
-  header h1 { font-size: 20px; }
-}
-</style>
+    .logo span {
+      color: var(--accent);
+    }
+
+    nav a {
+      margin-left: 1.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .actions {
+      margin-top: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 0.75rem 1.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.95rem;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 4rem 0;
+    }
+
+    .dark {
+      background: var(--bg-alt);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 1.6rem;
+      border-radius: 10px;
+    }
+
+    .card h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* DOWNLOADS */
+    .downloads {
+      text-align: center;
+    }
+
+    .store-buttons {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .store {
+      background: var(--card);
+      border: 1px solid #1f2937;
+      padding: 1rem 1.6rem;
+      border-radius: 10px;
+      min-width: 220px;
+    }
+
+    .store span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* CONTACT */
+    form {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid #1f2937;
+      padding: 0.8rem;
+      border-radius: 6px;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 
 <body>
+
 <header>
-  <img src="https://www.sacreserve.africa/logo.png" alt="SadiCoin Tech Logo" onerror="this.style.display='none'"/>
-  <h1>SadiCoin TECH</h1>
-  <p>Official Digital Asset & Exchange Portal</p>
+  <div class="container nav">
+    <div class="logo">Sadicoin<span>Tech</span></div>
+    <nav>
+      <a href="#platform">Platform</a>
+      <a href="#downloads">Download</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
 </header>
 
-<nav>
-  <a href="index.html">Home</a>
-  <a href="citizenswallet.html">SDC Wallet</a>
-  <a href="creditdata.html">Debt & Investment</a>
-  <a href="photochatmeetings.html">Business Chat</a>
-  <a href="tradecbdc.html">SadiCoin Investment Data</a>
-  <a href="sadicoinenvV2.9.html">V2.9</a>
-  <a href="sadicoin_environmental_platform_v7.html">Weather Forecast & Analysis</a>
-  <a href="gee.html">Sadi Climate Change Alerts and Financing Valuation</a>
-</nav>
+<section class="hero">
+  <h1>Building Secure & Transparent Digital Infrastructure</h1>
+  <p>
+    Blockchain-powered, serverless platforms for payments, governance,
+    and real-world impact.
+  </p>
 
-<div class="container">
-  <section id="exchange">
-    <h3>🌍 Live Forex Rates</h3>
-    <div id="rates">Loading Forex...</div>
+  <div class="actions">
+    <a href="#platform" class="btn primary">Explore Platform</a>
+    <a href="#downloads" class="btn">Get the App</a>
+  </div>
+</section>
 
-    <h3 style="margin-top:25px;">💹 Crypto Market</h3>
-    <div id="cryptoRates">Loading Crypto...</div>
-
-    <h3 style="margin-top:25px;">🪙 SadiCoin (SDC) Live</h3>
-    <div id="sdcRates">Loading SDC...</div>
-
-    <h3 style="margin-top:25px;">📊 ETFs</h3>
-    <div id="etfRates">Loading ETFs...</div>
-
-    <!-- Chart Embed -->
-    <div class="chart-container">
-      <iframe src="https://dexscreener.com/polygon/0x3e6dB8977261B30Ea3Cc0408867912E8B6CeDC96" 
-        width="100%" height="500" style="border:0;" allowfullscreen></iframe>
+<section id="platform">
+  <div class="container grid">
+    <div class="card">
+      <h3>Blockchain Payments</h3>
+      <p>Low-cost, secure digital payments built for scale.</p>
     </div>
-  </section>
+    <div class="card">
+      <h3>Digital Wallets</h3>
+      <p>Non-custodial wallets with DeFi-ready architecture.</p>
+    </div>
+    <div class="card">
+      <h3>DAO Governance</h3>
+      <p>Transparent, on-chain decision-making tools.</p>
+    </div>
+    <div class="card">
+      <h3>Transparency Dashboards</h3>
+      <p>Real-time tracking of funds and impact.</p>
+    </div>
+  </div>
+</section>
 
-  <section id="contact" style="margin-top:40px; background:#0b0f19; color:#fff; padding:40px 20px; border-radius:10px; text-align:center;">
-    <h2>Contact & Official Channels</h2>
-    <p style="color:#ccc;">Verified SadiCoin Tech Project Information</p>
-    <div style="margin:15px 0;">
-      <a href="https://x.com/FaraiMuneri?s=09" target="_blank" style="color:#2dd4bf; margin:0 10px;">🐦 Twitter</a>
-      <a href="https://t.me/sadicoinofficial" target="_blank" style="color:#2dd4bf; margin:0 10px;">💬 Telegram</a>
-      <a href="https://instagram.com/sadicoin_official" target="_blank" style="color:#2dd4bf; margin:0 10px;">📸 Instagram</a>
+<section class="dark downloads" id="downloads">
+  <div class="container">
+    <h2>App Downloads</h2>
+    <p style="color: var(--muted); margin-top: 0.5rem;">
+      Mobile applications coming soon. Early access available via Expo Go.
+    </p>
+
+    <div class="store-buttons">
+      <a class="store" href="#" title="Coming Soon">
+        <strong>Google Play Store</strong>
+        <span>Android – Coming Soon</span>
+      </a>
+
+      <a class="store" href="#" title="Coming Soon">
+        <strong>Apple App Store</strong>
+        <span>iOS – Coming Soon</span>
+      </a>
+
+      <a class="store" href="#" title="Expo Go">
+        <strong>Expo Go</strong>
+        <span>Early access & testing</span>
+      </a>
     </div>
-    <div style="margin-bottom:10px;">
-      🌐 <a href="https://www.sacreserve.africa" target="_blank" style="color:#fff; text-decoration:underline;">www.sacreserve.africa</a>
-    </div>
-    <div>
-      🔗 Contract Address: <a href="https://polygonscan.com/token/0x3e6dB8977261B30Ea3Cc0408867912E8B6CeDC96" target="_blank" style="color:#2dd4bf;">0x3e6dB8977261B30Ea3Cc0408867912E8B6CeDC96</a>
-    </div>
-    <div style="margin-top:10px;">
-      📧 Email: <a href="mailto:muchbepvtltd@gmail.com" style="color:#fff;">muchbepvtltd@gmail.com</a><br>
-      📍 Polokwane, Limpopo, South Africa
-    </div>
-  </section>
-</div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <h2 style="text-align:center;">Get in Touch</h2>
+    <p style="text-align:center; color: var(--muted); margin-bottom: 2rem;">
+      Partnerships, integrations, or general enquiries.
+    </p>
+
+    <form onsubmit="submitForm(event)">
+      <input type="text" placeholder="Your Name" required />
+      <input type="email" placeholder="Your Email" required />
+      <textarea placeholder="Message"></textarea>
+      <button class="btn primary" type="submit">Send Message</button>
+    </form>
+
+    <p id="status" style="text-align:center; margin-top:1rem;"></p>
+  </div>
+</section>
 
 <footer>
-© 2025 SadiCoin Tech | <a href="https://www.sacreserve.africa">www.sacreserve.africa</a>
+  © Sadicoin Tech. All rights reserved.
 </footer>
 
 <script>
-// ---- Global USD/ZAR ----
-let usdZarRate = 0;
-
-// ---- Load Forex ----
-async function loadForex() {
-  const div = document.getElementById("rates");
-  div.innerHTML = "";
-  const pairs = [
-    { name:"USD/ZAR", base:"USD", target:"ZAR" },
-    { name:"BWP/ZAR", base:"BWP", target:"ZAR" },
-    { name:"MZN/ZAR", base:"MZN", target:"ZAR" },
-    { name:"XAU/USD", base:"XAU", target:"USD" }
-  ];
-  for (const p of pairs) {
-    try {
-      const res = await fetch(`https://open.er-api.com/v6/latest/${p.base}`);
-      const data = await res.json();
-      const rate = data?.rates?.[p.target];
-      if(p.base==="USD") usdZarRate = rate;
-      div.innerHTML += `<div class="rate-card"><span>${p.name}</span>${rate ? rate.toFixed(2) : "Error"}</div>`;
-    } catch {
-      div.innerHTML += `<div class="rate-card"><span>${p.name}</span>Error</div>`;
-    }
+  function submitForm(e) {
+    e.preventDefault();
+    document.getElementById("status").textContent =
+      "Message received. We’ll be in touch.";
   }
-}
-
-// ---- Load Crypto ----
-async function loadCrypto() {
-  const div = document.getElementById("cryptoRates");
-  div.innerHTML = "";
-  try {
-    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,matic-network&vs_currencies=usd");
-    const data = await res.json();
-    const list = [
-      { n:"BTC", id:"bitcoin" },
-      { n:"ETH", id:"ethereum" },
-      { n:"MATIC", id:"matic-network" }
-    ];
-    list.forEach(c=>{
-      div.innerHTML += `<div class="rate-card"><span>${c.n}/USD</span>$${data[c.id].usd.toLocaleString()}</div>`;
-    });
-  } catch { div.innerHTML = "Error loading crypto"; }
-}
-
-// ---- Load SDC (DexScreener) ----
-async function loadSDC() {
-  const div = document.getElementById("sdcRates");
-  div.innerHTML = "";
-  try {
-    const res = await fetch("https://api.dexscreener.com/latest/dex/tokens/0x3e6dB8977261B30Ea3Cc0408867912E8B6CeDC96");
-    const data = await res.json();
-    const pair = data.pairs?.[0];
-    if(!pair) { div.innerHTML="SDC data unavailable"; return; }
-
-    const priceUsd = Number(pair.priceUsd);
-    const priceZar = usdZarRate ? priceUsd * usdZarRate : null;
-    const change24h = pair.priceChange.h24;
-    const liquidity = pair.liquidity.usd;
-    const marketCap = pair.fdv;
-    const changeColor = change24h>=0?"#16a34a":"#dc2626";
-    const changeSign = change24h>=0?"+":"";
-
-    div.innerHTML = `
-      <div class="rate-card"><span>SDC/USD</span>$${priceUsd.toFixed(6)}</div>
-      <div class="rate-card"><span>SDC/ZAR</span>R${priceZar?priceZar.toFixed(4):"…"}</div>
-      <div class="rate-card"><span>24h Change</span><span style="color:${changeColor}">${changeSign}${change24h.toFixed(2)}%</span></div>
-      <div class="rate-card"><span>Market Cap</span>$${Number(marketCap).toLocaleString()}</div>
-      <div class="rate-card"><span>Liquidity</span>$${Number(liquidity).toLocaleString()}</div>
-    `;
-  } catch { div.innerHTML="Error loading SDC"; }
-}
-
-// ---- Load ETFs (EODHD) ----
-const EODHD_KEY = "67b2d451e5b8a8.90504186"; // replace with your key
-async function loadETFs() {
-  const div = document.getElementById("etfRates");
-  div.innerHTML="";
-  const etfs = [
-    {name:"SPY", symbol:"SPY.US"},
-    {name:"QQQ", symbol:"QQQ.US"},
-    {name:"GLD", symbol:"GLD.US"},
-    {name:"IWM", symbol:"IWM.US"}
-  ];
-  for(const e of etfs) {
-    try{
-      const res = await fetch(`https://eodhd.com/api/real-time/${e.symbol}?api_token=${EODHD_KEY}&fmt=json`);
-      const d = await res.json();
-      const zar = usdZarRate ? (d.close * usdZarRate).toFixed(2) : null;
-      div.innerHTML += `<div class="rate-card"><span>${e.name}</span>$${d.close.toFixed(2)}<div style="font-size:0.85em;color:#065f46">≈ R${zar}</div></div>`;
-    } catch {
-      div.innerHTML += `<div class="rate-card"><span>${e.name}</span>Error</div>`;
-    }
-  }
-}
-
-// ---- Init ----
-async function init() {
-  await loadForex();
-  await loadCrypto();
-  await loadSDC();
-  await loadETFs();
-}
-window.onload = init;
-setInterval(init, 60000); // refresh every 60s
 </script>
 
 </body>
