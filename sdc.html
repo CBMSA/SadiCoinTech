@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SadiCoin Tech | Web3 Climate Finance</title>
+
+<!-- Web3 libs -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+
+<style>
+:root{
+  --bg:#0b0f14;
+  --card:#111827;
+  --accent:#00f6ff;
+  --accent2:#22c55e;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  padding:1.5rem;
+  border-bottom:1px solid #1f2937;
+}
+header h1{margin:0;font-size:1.4rem}
+nav a{
+  color:var(--muted);
+  margin-right:1rem;
+  text-decoration:none;
+}
+section{
+  padding:2rem;
+}
+.grid{
+  display:grid;
+  gap:1rem;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+}
+.card{
+  background:var(--card);
+  padding:1.5rem;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.btn{
+  padding:.6rem 1rem;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+}
+.primary{background:var(--accent);color:#000}
+.secondary{background:#1f2937;color:var(--text)}
+small{color:var(--muted)}
+iframe{border:none;border-radius:12px}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>SadiCoin Tech</h1>
+  <nav>
+    <a href="#wallet">Wallet</a>
+    <a href="#dao">DAO</a>
+    <a href="#projects">Projects</a>
+    <a href="#audit">Impact Audit</a>
+  </nav>
+</header>
+
+<!-- WALLET -->
+<section id="wallet">
+  <h2>Wallet</h2>
+  <button class="btn primary" onclick="connectWallet()">Connect Wallet</button>
+  <div id="walletAddress"></div>
+  <div id="transactions" class="grid"></div>
+</section>
+
+<!-- DAO -->
+<section id="dao">
+  <h2>DAO Governance</h2>
+  <div id="daoProposals" class="grid"></div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <h2>Climate Finance Projects</h2>
+
+  <!-- Earth Engine -->
+  <iframe 
+    src="https://earthengine.google.com/iframes/timelapse_player.html"
+    width="100%" height="400">
+  </iframe>
+
+  <div id="projectList" class="grid"></div>
+</section>
+
+<!-- AUDIT -->
+<section id="audit">
+  <h2>Public Proof of Impact</h2>
+  <p class="muted">
+    All metrics below are independently verifiable via Supabase records and on-chain references.
+  </p>
+  <div id="impactAudit" class="grid"></div>
+</section>
+
+<script>
+/* =========================
+   SUPABASE CONFIG (VERCEL)
+========================= */
+const supabase = supabase.createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
+/* =========================
+   WALLET / ETHERS
+========================= */
+let provider, signer, userWallet;
+
+async function connectWallet(){
+  provider = new ethers.BrowserProvider(window.ethereum);
+  signer = await provider.getSigner();
+  userWallet = await signer.getAddress();
+  document.getElementById("walletAddress").innerHTML =
+    `<p><strong>Connected:</strong> ${userWallet}</p>`;
+  loadTransactions();
+}
+
+/* =========================
+   DAO
+========================= */
+const DAO_ABI = [
+  "function proposals(uint256) view returns (string description, uint256 forVotes, uint256 againstVotes)",
+  "function vote(uint256,bool)"
+];
+const DAO_ADDRESS = "0xDAO_CONTRACT_ADDRESS";
+
+let dao;
+
+async function loadDAO(){
+  dao = new ethers.Contract(DAO_ADDRESS, DAO_ABI, signer);
+  const container = document.getElementById("daoProposals");
+
+  for(let i=0;i<3;i++){
+    const p = await dao.proposals(i);
+    container.innerHTML += `
+      <div class="card">
+        <h3>Proposal #${i}</h3>
+        <p>${p.description}</p>
+        <p>For: ${p.forVotes}</p>
+        <p>Against: ${p.againstVotes}</p>
+        <button class="btn secondary" onclick="vote(${i},true)">Vote Yes</button>
+        <button class="btn secondary" onclick="vote(${i},false)">Vote No</button>
+      </div>`;
+  }
+}
+
+async function vote(id,support){
+  await dao.vote(id,support);
+}
+
+/* =========================
+   TRANSACTIONS (LIVE)
+========================= */
+async function loadTransactions(){
+  const {data} = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("wallet_address", userWallet)
+    .order("created_at",{ascending:false});
+
+  const el = document.getElementById("transactions");
+  el.innerHTML = "";
+
+  data.forEach(tx=>{
+    el.innerHTML += `
+      <div class="card">
+        <p><strong>Tx:</strong> ${tx.tx_hash}</p>
+        <p>${tx.amount} ${tx.token}</p>
+        <small>${new Date(tx.created_at).toLocaleString()}</small>
+      </div>`;
+  });
+}
+
+supabase
+  .channel("transactions")
+  .on("postgres_changes",
+    {event:"INSERT",schema:"public",table:"transactions"},
+    ()=>loadTransactions()
+  ).subscribe();
+
+/* =========================
+   PROJECTS
+========================= */
+async function loadProjects(){
+  const {data} = await supabase
+    .from("projects")
+    .select("*");
+
+  const el = document.getElementById("projectList");
+
+  data.forEach(p=>{
+    el.innerHTML += `
+      <div class="card">
+        <h3>${p.title}</h3>
+        <p><strong>Project UUID:</strong> ${p.id}</p>
+        <p>Impact Value: ${p.impact_value}</p>
+        <p>SDGs: ${p.sdg.join(", ")}</p>
+        <button class="btn primary">Fund This Project</button>
+      </div>`;
+  });
+}
+
+/* =========================
+   PUBLIC IMPACT AUDIT
+========================= */
+async function loadAudit(){
+  const {data} = await supabase
+    .from("projects")
+    .select("id,title,impact_value,sdg");
+
+  const el = document.getElementById("impactAudit");
+
+  data.forEach(p=>{
+    el.innerHTML += `
+      <div class="card">
+        <h3>${p.title}</h3>
+        <p>UUID: ${p.id}</p>
+        <p>Impact: ${p.impact_value}</p>
+        <p>SDGs: ${p.sdg.join(", ")}</p>
+      </div>`;
+  });
+}
+
+/* =========================
+   INIT
+========================= */
+loadProjects();
+loadAudit();
+</script>
+
+</body>
+</html>
