@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDC CBDC Virtual Card Portal</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+body { background:#0b0f14; color:#e5e7eb; font-family:sans-serif; padding:20px; }
+.card { background:#111827; padding:20px; margin-bottom:20px; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.5);}
+h2, h5 { color:#00f6ff; }
+.btn { margin-right:5px; }
+table { background:#1f2937; color:#e5e7eb; }
+thead { background:#111827; }
+input, select { margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<h2>SDC CBDC Virtual Card Portal</h2>
+
+<div class="card">
+<h5>1️⃣ Create Virtual Card</h5>
+<input type="email" id="email" class="form-control" placeholder="Enter user email">
+<button id="createCardBtn" class="btn btn-primary">Create Virtual Card</button>
+<p id="cardMsg" class="mt-2 text-success"></p>
+</div>
+
+<div class="card">
+<h5>2️⃣ Top-Up Virtual Card</h5>
+<input type="number" id="topUpAmount" class="form-control" placeholder="Amount of SDC">
+<select id="topUpCurrency" class="form-control">
+  <option value="USD">USD</option>
+  <option value="ZAR">ZAR</option>
+  <option value="GBP">GBP</option>
+</select>
+<button id="topUpCardBtn" class="btn btn-success">Top-Up Card</button>
+<p id="topUpMsg" class="mt-2 text-success"></p>
+</div>
+
+<div class="card">
+<h5>3️⃣ View Card Transactions</h5>
+<button id="fetchCardTxBtn" class="btn btn-info">Fetch Transactions</button>
+<table class="table table-striped mt-2">
+  <thead>
+    <tr>
+      <th>Reference</th>
+      <th>SDC Amount</th>
+      <th>Currency</th>
+      <th>Timestamp</th>
+    </tr>
+  </thead>
+  <tbody id="cardTransactionTable"></tbody>
+</table>
+</div>
+
+<script>
+const API_BASE = "https://YOUR_VERCEL_BACKEND_URL/api"; // Replace with your Vercel backend URL
+
+// ===== Create Virtual Card =====
+document.getElementById('createCardBtn').addEventListener('click', async () => {
+  const email = document.getElementById('email').value;
+  if(!email) return alert('Enter email');
+  const res = await fetch(`${API_BASE}/create-card`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ user_email: email })
+  });
+  const data = await res.json();
+  if(data.success) document.getElementById('cardMsg').innerText = `Virtual card created: ${data.card_id}`;
+  else document.getElementById('cardMsg').innerText = `Error creating card`;
+});
+
+// ===== Top-Up Card =====
+document.getElementById('topUpCardBtn').addEventListener('click', async () => {
+  const email = document.getElementById('email').value;
+  const amount = parseFloat(document.getElementById('topUpAmount').value);
+  const currency = document.getElementById('topUpCurrency').value;
+  if(!email || !amount) return alert('Enter all fields');
+
+  const res = await fetch(`${API_BASE}/topup-card`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ user_email: email, amount_sdc: amount, currency })
+  });
+  const data = await res.json();
+  if(data.success){
+    document.getElementById('topUpMsg').innerText = `Top-up successful! New card balance: ${data.card_balance} ${currency}`;
+    document.getElementById('topUpAmount').value = '';
+  } else document.getElementById('topUpMsg').innerText = `Error: ${data.error || 'Top-up failed'}`;
+});
+
+// ===== Fetch Transactions =====
+document.getElementById('fetchCardTxBtn').addEventListener('click', async () => {
+  const email = document.getElementById('email').value;
+  if(!email) return alert('Enter email');
+  const res = await fetch(`${API_BASE}/card-transactions/${email}`);
+  const data = await res.json();
+  const tbody = document.getElementById('cardTransactionTable');
+  tbody.innerHTML = '';
+  data.forEach(tx => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${tx.reference}</td><td>${tx.sdc_amount}</td><td>${tx.currency}</td><td>${new Date(tx.timestamp).toLocaleString()}</td>`;
+    tbody.appendChild(tr);
+  });
+});
+</script>
+
+</body>
+</html>
