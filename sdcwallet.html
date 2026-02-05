@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDC CBDC Portal</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4 bg-dark text-light">
+
+<h2>SDC CBDC Portal</h2>
+
+<!-- Admin: Issue/Burn -->
+<div class="card p-3 mb-3">
+  <h5>Admin: Issue / Burn SDC</h5>
+  <input type="text" id="wallet" class="form-control mb-1" placeholder="Wallet ID">
+  <input type="number" id="amount" class="form-control mb-1" placeholder="Amount">
+  <select id="action" class="form-control mb-1">
+    <option value="ISSUE">ISSUE</option>
+    <option value="BURN">BURN</option>
+  </select>
+  <button class="btn btn-primary" onclick="issueSDC()">Submit</button>
+  <p id="issueMsg"></p>
+</div>
+
+<!-- FX Rates -->
+<div class="card p-3 mb-3">
+  <h5>Live FX Rates</h5>
+  <button class="btn btn-info mb-2" onclick="getRates()">Fetch Rates</button>
+  <pre id="fxRates"></pre>
+</div>
+
+<!-- Virtual Card -->
+<div class="card p-3 mb-3">
+  <h5>Virtual Card</h5>
+  <input type="email" id="email" class="form-control mb-1" placeholder="User email">
+  <button class="btn btn-success mb-1" onclick="createCard()">Create Card</button>
+  <input type="number" id="cardAmount" class="form-control mb-1" placeholder="Top-up amount">
+  <select id="cardCurrency" class="form-control mb-1">
+    <option value="USD">USD</option>
+    <option value="ZAR">ZAR</option>
+    <option value="GBP">GBP</option>
+  </select>
+  <button class="btn btn-success" onclick="topUpCard()">Top-up Card</button>
+  <p id="cardMsg"></p>
+</div>
+
+<!-- Ledger -->
+<div class="card p-3 mb-3">
+  <h5>Ledger</h5>
+  <input type="text" id="ledgerWallet" class="form-control mb-1" placeholder="Wallet ID to fetch">
+  <button class="btn btn-info" onclick="fetchLedger()">Fetch Ledger</button>
+  <pre id="ledgerData"></pre>
+</div>
+
+<script>
+const API_BASE = "/api";
+
+// Issue/Burn
+async function issueSDC() {
+  const wallet = document.getElementById('wallet').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+  const action = document.getElementById('action').value;
+  const res = await fetch(`${API_BASE}/issue`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ wallet, amount, action })
+  });
+  const data = await res.json();
+  document.getElementById('issueMsg').innerText = JSON.stringify(data);
+}
+
+// FX Rates
+async function getRates() {
+  const res = await fetch(`${API_BASE}/rates`);
+  const data = await res.json();
+  document.getElementById('fxRates').innerText = JSON.stringify(data, null, 2);
+}
+
+// Virtual Card
+async function createCard() {
+  const email = document.getElementById('email').value;
+  const res = await fetch(`${API_BASE}/card`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ action:'create', email, currency:'USD' })
+  });
+  const data = await res.json();
+  document.getElementById('cardMsg').innerText = JSON.stringify(data);
+}
+
+async function topUpCard() {
+  const email = document.getElementById('email').value;
+  const amount = parseFloat(document.getElementById('cardAmount').value);
+  const currency = document.getElementById('cardCurrency').value;
+  const res = await fetch(`${API_BASE}/card`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ action:'topup', email, amount, currency })
+  });
+  const data = await res.json();
+  document.getElementById('cardMsg').innerText = JSON.stringify(data);
+}
+
+// Ledger
+async function fetchLedger() {
+  const wallet = document.getElementById('ledgerWallet').value;
+  const res = await fetch(`${API_BASE}/ledger?wallet=${wallet}`);
+  const data = await res.json();
+  document.getElementById('ledgerData').innerText = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
