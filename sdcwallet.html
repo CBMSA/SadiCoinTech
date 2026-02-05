@@ -45,6 +45,16 @@
   <p id="cardMsg"></p>
 </div>
 
+<!-- EcoCash Integration -->
+<div class="card p-3 mb-3">
+  <h5>EcoCash Integration</h5>
+  <input type="text" id="ecocashPhone" class="form-control mb-1" placeholder="Phone Number">
+  <input type="number" id="ecocashAmount" class="form-control mb-1" placeholder="Amount">
+  <button class="btn btn-success mb-1" onclick="topUpEcoCash()">Top-up SDC via EcoCash</button>
+  <button class="btn btn-warning" onclick="withdrawEcoCash()">Withdraw SDC to EcoCash</button>
+  <p id="ecocashMsg"></p>
+</div>
+
 <!-- Ledger -->
 <div class="card p-3 mb-3">
   <h5>Ledger</h5>
@@ -108,6 +118,35 @@ async function fetchLedger() {
   const res = await fetch(`${API_BASE}/ledger?wallet=${wallet}`);
   const data = await res.json();
   document.getElementById('ledgerData').innerText = JSON.stringify(data, null, 2);
+}
+
+// ---------------------
+// EcoCash Integration
+// ---------------------
+async function topUpEcoCash() {
+  const phone = document.getElementById('ecocashPhone').value;
+  const amount = parseFloat(document.getElementById('ecocashAmount').value);
+  const wallet = document.getElementById('wallet').value;
+  const res = await fetch(`${API_BASE}/ecocash`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ action:'topup', phone, amount, wallet })
+  });
+  const data = await res.json();
+  document.getElementById('ecocashMsg').innerText = JSON.stringify(data, null, 2);
+}
+
+async function withdrawEcoCash() {
+  const phone = document.getElementById('ecocashPhone').value;
+  const amount = parseFloat(document.getElementById('ecocashAmount').value);
+  const wallet = document.getElementById('wallet').value;
+  const res = await fetch(`${API_BASE}/ecocash`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ action:'withdraw', phone, amount, wallet })
+  });
+  const data = await res.json();
+  document.getElementById('ecocashMsg').innerText = JSON.stringify(data, null, 2);
 }
 </script>
 
