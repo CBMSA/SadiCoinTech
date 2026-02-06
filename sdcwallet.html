@@ -9,9 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
-.loading-screen { position:fixed; inset:0; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
-.loading-logo { font-size:28px; font-weight:700; color:#22c55e; margin-bottom:10px; }
+body { background:#05070d; color:#e5e7eb; font-family:system-ui; }
 .app { max-width:420px; margin:auto; height:100vh; display:flex; flex-direction:column; border:1px solid #111827; border-radius:12px; overflow:hidden; }
 .header { background:#0b0f1a; padding:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #111827; }
 .logo { font-weight:700; color:#22c55e; }
@@ -26,19 +24,16 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 .navbar-app button.active { background:#22c55e; color:#000; }
 .auth-box { padding:20px; background:#111827; }
 .shop-card { background:#1f2937; padding:10px; border-radius:14px; margin:8px 0; }
-.footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
+.loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#020617; color:#22c55e; font-size:20px; z-index:999; }
 </style>
 </head>
 
 <body>
 
-<!-- Loading Screen -->
-<div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo">SadiCoinTech</div>
-  <div>Loading PhotoChat...</div>
-</div>
+<div id="loadingScreen" class="loading">SadiCoinTech Loading...</div>
 
-<div class="app" style="display:none" id="appRoot">
+<div id="app" style="display:none">
+<div class="app">
 
 <div class="header">
 <div class="logo">PhotoChat</div>
@@ -65,12 +60,6 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 
 <div class="chat-feed" id="chatFeed"></div>
 
-<!-- AI Chatbot -->
-<div class="p-2">
-<input id="aiInput" class="form-control mb-1" placeholder="Ask SDC AI...">
-<button class="btn btn-success w-100" onclick="askAI()">Ask AI</button>
-</div>
-
 <!-- MARKETPLACE -->
 <div id="miniShop">
 <h6 class="ms-2">Marketplace</h6>
@@ -86,8 +75,8 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 </div>
 
 <div class="input-bar">
-<input id="msgInput" placeholder="Type message or amount">
-<button class="btn btn-success" onclick="sendMessage()">Send</button>
+<input id="msgInput" placeholder="Type amount to send">
+<button class="btn btn-success" onclick="sendMoney()">Send</button>
 </div>
 
 <div class="navbar-app">
@@ -97,25 +86,20 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 <button onclick="showTab('invoice')">Invoice</button>
 </div>
 
-<div class="footer">© <span id="year"></span> SadiCoinTech</div>
-
+</div>
 </div>
 </div>
 
 <script>
-const sb = supabase.createClient("https://ibafuiomapfhfhrtlrur.supabase.co"","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliYWZ1aW9tYXBmaGZocnRscnVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MjczNTUsImV4cCI6MjA4NTEwMzM1NX0.FldhksdJzalyibyaChWncFFY5WTTx6IJrPl3I6oXGcA");
-const OPENAI_API = "/api/ai"; // Vercel OpenAI endpoint
+const sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
 let currentUser=null;
 let lastTransaction=null;
 const FEE_PERCENT=2;
 
-document.getElementById("year").innerText = new Date().getFullYear();
-
-// Hide loading after short delay
-setTimeout(()=>{
+window.addEventListener("load",()=>{
   loadingScreen.style.display="none";
-  appRoot.style.display="flex";
-},1200);
+  app.style.display="block";
+});
 
 async function sendOTP(){
   const {error}=await sb.auth.signInWithOtp({phone:phone.value});
@@ -132,41 +116,25 @@ async function verifyOTP(){
   loadShop();
 }
 
-async function sendMessage(){
-  const val=Number(msgInput.value);
-  if(isNaN(val)) return;
+// DOUBLE-ENTRY LEDGER TRANSACTION
+async function sendMoney(){
+  const amount=Number(msgInput.value);
+  if(!amount) return;
 
-  const fee=val*FEE_PERCENT/100;
-  const total=val+fee;
+  const fee=amount*FEE_PERCENT/100;
+  const total=amount+fee;
 
-  const {data}=await sb.from("transactions").insert({
-    user_id:currentUser.id,
-    amount:val,
-    fee,
-    total,
-    status:"approved"
-  }).select().single();
-
-  lastTransaction=data;
-  alert(`Sent ${val}. Fee ${fee}. Total ${total}`);
-}
-
-async function askAI(){
-  const question = aiInput.value;
-  if(!question) return;
-
-  const res = await fetch(OPENAI_API, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ message: question })
+  const {data,error}=await sb.rpc("create_transaction",{
+    p_user:currentUser.id,
+    p_amount:amount,
+    p_fee:fee,
+    p_total:total
   });
 
-  const data = await res.json();
+  if(error) return alert(error.message);
 
-  const div = document.createElement("div");
-  div.className = "msg";
-  div.innerText = data.reply || "AI unavailable";
-  chatFeed.appendChild(div);
+  lastTransaction=data;
+  alert("Transaction approved");
 }
 
 async function uploadItem(){
@@ -176,30 +144,7 @@ async function uploadItem(){
 
 async function loadShop(){
   const {data}=await sb.from("shop_items").select("*");
-  shopItems.innerHTML=data?.map(i=>`
-    <div class='shop-card'>
-      <b>${i.title}</b><br>
-      ${i.price} ${i.currency}<br>
-      <button class='btn btn-sm btn-success' onclick='buyItem(${i.id})'>Buy</button>
-    </div>
-  `).join('');
-}
-
-async function buyItem(id){
-  const {data:item}=await sb.from("shop_items").select("*").eq("id",id).single();
-  const fee=item.price*FEE_PERCENT/100;
-
-  const {data}=await sb.from("transactions").insert({
-    buyer:currentUser.phone,
-    amount:item.price,
-    fee,
-    total:item.price+fee,
-    status:"approved",
-    item_id:id
-  }).select().single();
-
-  lastTransaction=data;
-  alert("Transaction approved");
+  shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}</div>`).join('');
 }
 
 function showTab(tab){
@@ -209,14 +154,7 @@ function showTab(tab){
 function downloadInvoice(){
   if(!lastTransaction) return alert("No transaction");
 
-  const text=`PHOTOCHAT RECEIPT\n
-Buyer: ${lastTransaction.buyer||currentUser.phone}
-Transaction ID: ${lastTransaction.id}
-Amount: ${lastTransaction.amount}
-Fee: ${lastTransaction.fee}
-Total: ${lastTransaction.total}
-Status: ${lastTransaction.status}
-Date: ${new Date().toLocaleString()}`;
+  const text=`PHOTOCHAT RECEIPT\n\nTransaction ID: ${lastTransaction.id}\nAmount: ${lastTransaction.amount}\nFee: ${lastTransaction.fee}\nTotal: ${lastTransaction.total}\nStatus: approved\nDate: ${new Date().toLocaleString()}\n© SadiCoinTech ${new Date().getFullYear()}`;
 
   const blob=new Blob([text],{type:"text/plain"});
   const a=document.createElement("a");
