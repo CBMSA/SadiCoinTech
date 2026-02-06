@@ -3,186 +3,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoChat – Marketplace & SDC App</title>
+<title>PhotoChat – Production Web3 Marketplace & SDC Super App</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { background: #05070d; color: #e5e7eb; font-family: system-ui; }
-.app { max-width: 420px; margin: auto; height: 100vh; display: flex; flex-direction: column; border: 1px solid #111827; border-radius: 12px; overflow: hidden; }
-.header { background: #0b0f1a; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #111827; }
-.logo { font-weight: 700; color: #22c55e; }
-.chat-feed { flex: 1; overflow-y: auto; background: #111827; padding: 10px; display: flex; flex-direction: column; }
-.msg { background: #1f2937; padding: 10px 14px; border-radius: 20px; margin: 6px 0; max-width: 70%; }
-.msg.me { background: #22c55e; color: #000; margin-left: auto; }
-.input-bar { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #111827; background: #0b0f1a; }
-.input-bar input { flex: 1; border-radius: 20px; padding: 10px; border: none; background: #1f2937; color: #e5e7eb; }
-.input-bar button { border-radius: 20px; }
-.virtual-card { background: linear-gradient(135deg,#111827,#020617); border-radius: 18px; padding: 16px; margin: 10px; color: #fff; text-align: center; }
-.video-box { background: #000; border-radius: 12px; height: 200px; display: flex; align-items: center; justify-content: center; margin: 10px; }
-.navbar-app { display: flex; gap: 6px; padding: 8px; background: #0b0f1a; }
-.navbar-app button { flex: 1; background: #111827; border: none; color: #9ca3af; padding: 8px; border-radius: 10px; }
-.navbar-app button.active { background: #22c55e; color: #000; }
-.auth-box { padding: 20px; background: #111827; }
-.shop-card { background: #1f2937; padding: 10px; border-radius: 14px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
+.loading-screen { position:fixed; inset:0; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
+.loading-logo { font-size:28px; font-weight:700; color:#22c55e; margin-bottom:10px; }
+.app { max-width:420px; margin:auto; height:100vh; display:flex; flex-direction:column; border:1px solid #111827; border-radius:12px; overflow:hidden; }
+.header { background:#0b0f1a; padding:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #111827; }
+.logo { font-weight:700; color:#22c55e; }
+.chat-feed { flex:1; overflow-y:auto; background:#111827; padding:10px; display:flex; flex-direction:column; }
+.msg { background:#1f2937; padding:10px 14px; border-radius:20px; margin:6px 0; max-width:70%; }
+.msg.me { background:#22c55e; color:#000; margin-left:auto; }
+.input-bar { display:flex; gap:8px; padding:10px; border-top:1px solid #111827; background:#0b0f1a; }
+.input-bar input { flex:1; border-radius:20px; padding:10px; border:none; background:#1f2937; color:#e5e7eb; }
+.virtual-card { background:linear-gradient(135deg,#111827,#020617); border-radius:18px; padding:16px; margin:10px; text-align:center; }
+.navbar-app { display:flex; gap:6px; padding:8px; background:#0b0f1a; }
+.navbar-app button { flex:1; background:#111827; border:none; color:#9ca3af; padding:8px; border-radius:10px; }
+.navbar-app button.active { background:#22c55e; color:#000; }
+.auth-box { padding:20px; background:#111827; }
+.shop-card { background:#1f2937; padding:10px; border-radius:14px; margin:8px 0; }
+.footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
 </style>
 </head>
 
 <body>
-<div class="app">
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">SadiCoinTech</div>
+  <div>Loading PhotoChat...</div>
+</div>
+
+<div class="app" style="display:none" id="appRoot">
 
 <div class="header">
 <div class="logo">PhotoChat</div>
 <div id="userLabel">Guest</div>
 </div>
 
-<!-- AUTH: Phone OTP Only -->
+<!-- PHONE OTP AUTH -->
 <div id="authSection" class="auth-box">
-<input id="phone" class="form-control mb-2" placeholder="Phone Number (+263...)">
+<input id="phone" class="form-control mb-2" placeholder="Phone Number (+263...)" />
 <button class="btn btn-success w-100 mb-2" onclick="sendOTP()">Send OTP</button>
-<input id="otp" class="form-control mb-2" placeholder="Enter OTP">
+<input id="otp" class="form-control mb-2" placeholder="Enter OTP" />
 <button class="btn btn-outline-light w-100" onclick="verifyOTP()">Verify OTP</button>
-<p id="authMsg" class="mt-2"></p>
+<p id="authMsg"></p>
 </div>
 
-<!-- APP CONTENT -->
+<!-- APP -->
 <div id="appContent" style="display:none; flex:1; flex-direction:column">
 
-<div class="virtual-card" id="virtualCard">
-<div>Virtual Card</div>
+<div class="virtual-card">
+<div>SDC Virtual Card</div>
 <h4 id="cardNumber">0000 •••• •••• ••••</h4>
-<small id="cardName">Unregistered User</small>
+<small id="cardName">Unregistered</small>
 </div>
 
 <div class="chat-feed" id="chatFeed"></div>
 
-<!-- Marketplace Upload & Feed -->
-<div id="miniShop">
-<h5 class="text-light ms-2">Marketplace</h5>
-<div class="mb-2">
-<input id="itemTitle" class="form-control mb-1" placeholder="Item Title">
-<input id="itemDesc" class="form-control mb-1" placeholder="Description">
-<input id="itemPrice" type="number" class="form-control mb-1" placeholder="Price (SDC)">
-<input id="itemLocation" class="form-control mb-1" placeholder="Your Location">
-<input type="file" id="itemImage" class="form-control mb-1">
-<button class="btn btn-success w-100" onclick="uploadItem()">Upload Item</button>
-<p id="shopMsg"></p>
+<!-- AI Chatbot -->
+<div class="p-2">
+<input id="aiInput" class="form-control mb-1" placeholder="Ask SDC AI...">
+<button class="btn btn-success w-100" onclick="askAI()">Ask AI</button>
 </div>
+
+<!-- MARKETPLACE -->
+<div id="miniShop">
+<h6 class="ms-2">Marketplace</h6>
+<input id="itemTitle" class="form-control mb-1" placeholder="Item title">
+<input id="itemPrice" type="number" class="form-control mb-1" placeholder="Price">
+<select id="currency" class="form-control mb-1">
+<option value="SDC">SDC</option>
+<option value="USD">USD</option>
+<option value="ZAR">ZAR</option>
+</select>
+<button class="btn btn-success w-100 mb-2" onclick="uploadItem()">Upload Item</button>
 <div id="shopItems"></div>
 </div>
 
 <div class="input-bar">
-<input id="msgInput" placeholder="Type a message or amount">
+<input id="msgInput" placeholder="Type message or amount">
 <button class="btn btn-success" onclick="sendMessage()">Send</button>
 </div>
 
 <div class="navbar-app">
 <button onclick="showTab('chat')" class="active">Chat</button>
 <button onclick="showTab('history')">History</button>
-<button onclick="showTab('fx')">FX</button>
-<button onclick="showTab('video')">Call</button>
-<button onclick="showTab('shop')">Marketplace</button>
-<button onclick="showTab('kyc')">KYC</button>
+<button onclick="showTab('shop')">Shop</button>
+<button onclick="showTab('invoice')">Invoice</button>
 </div>
+
+<div class="footer">© <span id="year"></span> SadiCoinTech</div>
 
 </div>
 </div>
 
 <script>
 const sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
-let currentUser = null;
+const OPENAI_API = "/api/ai"; // Vercel OpenAI endpoint
+let currentUser=null;
+let lastTransaction=null;
+const FEE_PERCENT=2;
+
+document.getElementById("year").innerText = new Date().getFullYear();
+
+// Hide loading after short delay
+setTimeout(()=>{
+  loadingScreen.style.display="none";
+  appRoot.style.display="flex";
+},1200);
 
 async function sendOTP(){
-  const {error} = await sb.auth.signInWithOtp({phone: phone.value});
-  authMsg.innerText = error ? error.message : "OTP sent to your phone";
+  const {error}=await sb.auth.signInWithOtp({phone:phone.value});
+  authMsg.innerText=error?error.message:"OTP sent";
 }
 
 async function verifyOTP(){
-  const {data, error} = await sb.auth.verifyOtp({phone: phone.value, token: otp.value, type: 'sms'});
-  if(error) return authMsg.innerText = error.message;
-  currentUser = data.user;
-  userLabel.innerText = currentUser.phone;
+  const {data,error}=await sb.auth.verifyOtp({phone:phone.value,token:otp.value,type:'sms'});
+  if(error) return authMsg.innerText=error.message;
+  currentUser=data.user;
+  userLabel.innerText=currentUser.phone;
   authSection.style.display="none";
   appContent.style.display="flex";
-  await loadCard();
   loadShop();
-  subscribeMessages();
-}
-
-async function loadCard(){
-  const {data} = await sb.from("cards").select("*").eq("user_id",currentUser.id).single();
-  if(data){
-    cardNumber.innerText = "1234 •••• •••• " + data.last4;
-    cardName.innerText = data.name;
-  }
 }
 
 async function sendMessage(){
-  if(!currentUser) return;
-  const text = msgInput.value.trim();
-  if(!text) return;
-  const amount = Number(text);
-  if(!isNaN(amount) && amount>0){
-    await sb.from("transactions").insert({sender:currentUser.id,amount});
-  }else{
-    await sb.from("messages").insert({user_id:currentUser.id,content:text});
-  }
-  msgInput.value="";
+  const val=Number(msgInput.value);
+  if(isNaN(val)) return;
+
+  const fee=val*FEE_PERCENT/100;
+  const total=val+fee;
+
+  const {data}=await sb.from("transactions").insert({
+    user_id:currentUser.id,
+    amount:val,
+    fee,
+    total,
+    status:"approved"
+  }).select().single();
+
+  lastTransaction=data;
+  alert(`Sent ${val}. Fee ${fee}. Total ${total}`);
 }
 
-function subscribeMessages(){
-  sb.channel("msgs")
-  .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
-    const m = payload.new;
-    const div = document.createElement("div");
-    div.className = "msg" + (m.user_id === currentUser.id ? " me" : "");
-    div.innerText = m.content;
-    chatFeed.appendChild(div);
-    chatFeed.scrollTop = chatFeed.scrollHeight;
-  })
-  .subscribe();
+async function askAI(){
+  const question = aiInput.value;
+  if(!question) return;
+
+  const res = await fetch(OPENAI_API, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ message: question })
+  });
+
+  const data = await res.json();
+
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.innerText = data.reply || "AI unavailable";
+  chatFeed.appendChild(div);
 }
 
 async function uploadItem(){
-  const file = itemImage.files[0];
-  if(!file) return shopMsg.innerText = "Please select an image";
-  const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
-  const {data:storageData, error:storageError} = await sb.storage.from('marketplace').upload(filePath, file);
-  if(storageError) return shopMsg.innerText = storageError.message;
-  const {publicUrl} = sb.storage.from('marketplace').getPublicUrl(filePath);
-  await sb.from('shop_items').insert({owner_id: currentUser.id,title: itemTitle.value,description: itemDesc.value,price_sdc: Number(itemPrice.value),location: itemLocation.value,image_url: publicUrl,status: 'available'});
-  shopMsg.innerText = "Item uploaded successfully";
+  await sb.from("shop_items").insert({title:itemTitle.value,price:itemPrice.value,currency:currency.value});
   loadShop();
 }
 
 async function loadShop(){
-  const {data} = await sb.from("shop_items").select("*").eq('status','available');
-  shopItems.innerHTML = data?.map(item=>`<div class='shop-card'><span>${item.title}</span><span>${item.price_sdc} SDC</span><button class='btn btn-sm btn-success' onclick='buyItem(${item.id})'>Buy</button></div>`).join('') || '<p class="text-light ms-2">No items available</p>';
+  const {data}=await sb.from("shop_items").select("*");
+  shopItems.innerHTML=data?.map(i=>`
+    <div class='shop-card'>
+      <b>${i.title}</b><br>
+      ${i.price} ${i.currency}<br>
+      <button class='btn btn-sm btn-success' onclick='buyItem(${i.id})'>Buy</button>
+    </div>
+  `).join('');
 }
 
-async function buyItem(itemId){
-  const {data:item} = await sb.from('shop_items').select('*').eq('id',itemId).single();
-  if(!item) return alert('Item not found');
-  await sb.from('transactions').insert({buyer_id:currentUser.id,seller_id:item.owner_id,item_id:itemId,amount_sdc:item.price_sdc,status:'pending'});
-  alert('Order created. Awaiting SDC payment approval.');
-}
+async function buyItem(id){
+  const {data:item}=await sb.from("shop_items").select("*").eq("id",id).single();
+  const fee=item.price*FEE_PERCENT/100;
 
-function loadHistory(){ /* Transaction history as chat bubbles */ }
-function loadFX(){ /* FX Rates UI */ }
-function loadVideo(){ /* Video call UI */ }
-function loadKYC(){ /* KYC upload UI */ }
+  const {data}=await sb.from("transactions").insert({
+    buyer:currentUser.phone,
+    amount:item.price,
+    fee,
+    total:item.price+fee,
+    status:"approved",
+    item_id:id
+  }).select().single();
+
+  lastTransaction=data;
+  alert("Transaction approved");
+}
 
 function showTab(tab){
-  document.querySelectorAll(".navbar-app button").forEach(b=>b.classList.remove("active"));
-  event.target.classList.add("active");
-  chatFeed.innerHTML='';
-  if(tab==='chat') chatFeed.style.display='flex';
-  if(tab==='history') loadHistory();
-  if(tab==='fx') loadFX();
-  if(tab==='video') loadVideo();
-  if(tab==='shop') loadShop();
-  if(tab==='kyc') loadKYC();
+  if(tab==='invoice') downloadInvoice();
+}
+
+function downloadInvoice(){
+  if(!lastTransaction) return alert("No transaction");
+
+  const text=`PHOTOCHAT RECEIPT\n
+Buyer: ${lastTransaction.buyer||currentUser.phone}
+Transaction ID: ${lastTransaction.id}
+Amount: ${lastTransaction.amount}
+Fee: ${lastTransaction.fee}
+Total: ${lastTransaction.total}
+Status: ${lastTransaction.status}
+Date: ${new Date().toLocaleString()}`;
+
+  const blob=new Blob([text],{type:"text/plain"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="receipt.txt";
+  a.click();
 }
 </script>
 
