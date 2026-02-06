@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoChat – Finance & Mini-Shop App</title>
+<title>PhotoChat – WhatsApp-style Web3 Marketplace & SDC App</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -37,12 +37,12 @@ body { background: #05070d; color: #e5e7eb; font-family: system-ui; }
 <div id="userLabel">Guest</div>
 </div>
 
-<!-- AUTH -->
+<!-- AUTH: Phone OTP Only -->
 <div id="authSection" class="auth-box">
-<input id="email" class="form-control mb-2" placeholder="Email">
-<input id="password" type="password" class="form-control mb-2" placeholder="Password">
-<button class="btn btn-success w-100 mb-2" onclick="login()">Login</button>
-<button class="btn btn-outline-light w-100" onclick="register()">Register</button>
+<input id="phone" class="form-control mb-2" placeholder="Phone Number (+263...)">
+<button class="btn btn-success w-100 mb-2" onclick="sendOTP()">Send OTP</button>
+<input id="otp" class="form-control mb-2" placeholder="Enter OTP">
+<button class="btn btn-outline-light w-100" onclick="verifyOTP()">Verify OTP</button>
 <p id="authMsg" class="mt-2"></p>
 </div>
 
@@ -57,8 +57,18 @@ body { background: #05070d; color: #e5e7eb; font-family: system-ui; }
 
 <div class="chat-feed" id="chatFeed"></div>
 
+<!-- Marketplace Upload & Feed -->
 <div id="miniShop">
-<h5 class="text-light ms-2">Mini Shop</h5>
+<h5 class="text-light ms-2">Marketplace</h5>
+<div class="mb-2">
+<input id="itemTitle" class="form-control mb-1" placeholder="Item Title">
+<input id="itemDesc" class="form-control mb-1" placeholder="Description">
+<input id="itemPrice" type="number" class="form-control mb-1" placeholder="Price (SDC)">
+<input id="itemLocation" class="form-control mb-1" placeholder="Your Location">
+<input type="file" id="itemImage" class="form-control mb-1">
+<button class="btn btn-success w-100" onclick="uploadItem()">Upload Item</button>
+<p id="shopMsg"></p>
+</div>
 <div id="shopItems"></div>
 </div>
 
@@ -72,7 +82,7 @@ body { background: #05070d; color: #e5e7eb; font-family: system-ui; }
 <button onclick="showTab('history')">History</button>
 <button onclick="showTab('fx')">FX</button>
 <button onclick="showTab('video')">Call</button>
-<button onclick="showTab('shop')">Shop</button>
+<button onclick="showTab('shop')">Marketplace</button>
 <button onclick="showTab('kyc')">KYC</button>
 </div>
 
@@ -83,28 +93,16 @@ body { background: #05070d; color: #e5e7eb; font-family: system-ui; }
 const sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
 let currentUser = null;
 
-async function login(){
-  const {error} = await sb.auth.signInWithPassword({email:email.value,password:password.value});
+async function sendOTP(){
+  const {error} = await sb.auth.signInWithOtp({phone: phone.value});
+  authMsg.innerText = error ? error.message : "OTP sent to your phone";
+}
+
+async function verifyOTP(){
+  const {data, error} = await sb.auth.verifyOtp({phone: phone.value, token: otp.value, type: 'sms'});
   if(error) return authMsg.innerText = error.message;
-  initApp();
-}
-
-async function register(){
-  const {error} = await sb.auth.signUp({email:email.value,password:password.value});
-  if(error) return authMsg.innerText = error.message;
-  authMsg.innerText = "Registration successful. You can login.";
-}
-
-async function logout(){
-  await sb.auth.signOut();
-  location.reload();
-}
-
-async function initApp(){
-  const {data:{user}} = await sb.auth.getUser();
-  if(!user) return;
-  currentUser = user;
-  userLabel.innerText = user.email;
+  currentUser = data.user;
+  userLabel.innerText = currentUser.phone;
   authSection.style.display="none";
   appContent.style.display="flex";
   await loadCard();
@@ -146,9 +144,28 @@ function subscribeMessages(){
   .subscribe();
 }
 
+async function uploadItem(){
+  const file = itemImage.files[0];
+  if(!file) return shopMsg.innerText = "Please select an image";
+  const filePath = `${currentUser.id}/${Date.now()}_${file.name}`;
+  const {data:storageData, error:storageError} = await sb.storage.from('marketplace').upload(filePath, file);
+  if(storageError) return shopMsg.innerText = storageError.message;
+  const {publicUrl} = sb.storage.from('marketplace').getPublicUrl(filePath);
+  await sb.from('shop_items').insert({owner_id: currentUser.id,title: itemTitle.value,description: itemDesc.value,price_sdc: Number(itemPrice.value),location: itemLocation.value,image_url: publicUrl,status: 'available'});
+  shopMsg.innerText = "Item uploaded successfully";
+  loadShop();
+}
+
 async function loadShop(){
-  const {data} = await sb.from("shop_items").select("*");
-  shopItems.innerHTML = data?.map(item=>`<div class='shop-card'><span>${item.name}</span><span>$${item.price}</span></div>`).join('') || '<p class="text-light ms-2">No items available</p>';
+  const {data} = await sb.from("shop_items").select("*").eq('status','available');
+  shopItems.innerHTML = data?.map(item=>`<div class='shop-card'><span>${item.title}</span><span>${item.price_sdc} SDC</span><button class='btn btn-sm btn-success' onclick='buyItem(${item.id})'>Buy</button></div>`).join('') || '<p class="text-light ms-2">No items available</p>';
+}
+
+async function buyItem(itemId){
+  const {data:item} = await sb.from('shop_items').select('*').eq('id',itemId).single();
+  if(!item) return alert('Item not found');
+  await sb.from('transactions').insert({buyer_id:currentUser.id,seller_id:item.owner_id,item_id:itemId,amount_sdc:item.price_sdc,status:'pending'});
+  alert('Order created. Awaiting SDC payment approval.');
 }
 
 function loadHistory(){ /* Transaction history as chat bubbles */ }
@@ -167,8 +184,6 @@ function showTab(tab){
   if(tab==='shop') loadShop();
   if(tab==='kyc') loadKYC();
 }
-
-initApp();
 </script>
 
 </body>
