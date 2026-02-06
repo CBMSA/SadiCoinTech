@@ -12,35 +12,10 @@
 body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 
 /* ===== LOADING SCREEN (PURE PAGE STYLE – NO BACKEND) ===== */
-.loading-screen {
-  position:fixed;
-  inset:0;
-  background:#020617;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-  animation: fadeIn 0.6s ease;
-}
-
-.loading-logo {
-  font-size:30px;
-  font-weight:700;
-  color:#22c55e;
-  margin-bottom:12px;
-  letter-spacing:1px;
-}
-
-.loading-sub {
-  font-size:14px;
-  color:#9ca3af;
-}
-
-@keyframes fadeIn {
-  from { opacity:0; }
-  to { opacity:1; }
-}
+.loading-screen { position:fixed; inset:0; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; animation: fadeIn 0.6s ease; }
+.loading-logo { font-size:30px; font-weight:700; color:#22c55e; margin-bottom:12px; letter-spacing:1px; }
+.loading-sub { font-size:14px; color:#9ca3af; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
 /* ===== APP LAYOUT ===== */
 .app { max-width:420px; margin:auto; height:100vh; display:flex; flex-direction:column; border:1px solid #111827; border-radius:12px; overflow:hidden; }
@@ -50,14 +25,22 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 .msg { background:#1f2937; padding:10px 14px; border-radius:20px; margin:6px 0; max-width:70%; }
 .input-bar { display:flex; gap:8px; padding:10px; border-top:1px solid #111827; background:#0b0f1a; }
 .input-bar input { flex:1; border-radius:20px; padding:10px; border:none; background:#1f2937; color:#e5e7eb; }
-.virtual-card { background:linear-gradient(135deg,#111827,#020617); border-radius:18px; padding:16px; margin:10px; text-align:center; }
 .navbar-app { display:flex; gap:6px; padding:8px; background:#0b0f1a; }
 .navbar-app button { flex:1; background:#111827; border:none; color:#9ca3af; padding:8px; border-radius:10px; }
-.auth-box { padding:20px; background:#111827; }
 .shop-card { background:#1f2937; padding:10px; border-radius:14px; margin:8px 0; }
 .footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
 .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
 .modal-box { background:#111827; padding:20px; border-radius:12px; width:90%; max-width:350px; }
+button.option-btn { background:#1f2937; border:none; color:#e5e7eb; width:100%; padding:8px; border-radius:12px; margin-top:4px; text-align:left; }
+button.option-btn:hover { background:#22c55e; color:#000; }
+
+/* ===== SADI PAY VIRTUAL CARD BLACK & GOLD DESIGN ===== */
+.virtual-card { background: linear-gradient(135deg, #000000, #1a1a1a); border-radius:18px; padding:20px; margin:10px; color: #FFD700; text-align:left; font-family: 'Courier New', Courier, monospace; position:relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.virtual-card .card-logo { font-weight:700; font-size:18px; color:#FFD700; margin-bottom:12px; }
+.virtual-card .card-number { font-size:20px; letter-spacing:3px; margin-bottom:10px; }
+.virtual-card .card-holder { display:flex; justify-content:space-between; font-size:12px; color:#FFD700; }
+.virtual-card .valid-thru { font-size:10px; color:#FFD700; }
+.virtual-card .small-text { position:absolute; bottom:10px; right:10px; font-size:10px; color:#FFD700; }
 </style>
 </head>
 
@@ -77,13 +60,18 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 <div id="userLabel">Guest</div>
 </div>
 
-<!-- PUBLIC CONTENT (NO LOGIN REQUIRED TO VIEW) -->
+<!-- PUBLIC CONTENT -->
 <div id="appContent" style="flex:1; display:flex; flex-direction:column">
 
+<!-- SADI PAY VIRTUAL CARD -->
 <div class="virtual-card">
-<div>SDC Virtual Card</div>
-<h4>•••• •••• •••• ••••</h4>
-<small>Login required for transactions</small>
+  <div class="card-logo">SadiPay</div>
+  <div class="card-number">•••• •••• •••• 1234</div>
+  <div class="card-holder">
+    <div>John Doe</div>
+    <div class="valid-thru">VALID THRU 12/26</div>
+  </div>
+  <div class="small-text">SDC Balance: 0.00</div>
 </div>
 
 <div class="chat-feed" id="chatFeed"></div>
@@ -114,11 +102,10 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 </div>
 
 <div class="footer">© <span id="year"></span> SadiCoinTech</div>
-
 </div>
 </div>
 
-<!-- AUTH MODAL (ONLY WHEN NEEDED) -->
+<!-- AUTH MODAL -->
 <div class="modal-bg" id="authModal">
   <div class="modal-box">
     <h5>Complete Verification</h5>
@@ -130,117 +117,49 @@ body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
 </div>
 
 <script>
-/* ===== OPTIONAL BACKEND (SAFE IF NOT CONNECTED) ===== */
 let sb;
-try {
-  sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
-} catch {
-  console.log("Supabase not connected — running in visual demo mode.");
-}
-
+try { sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY"); } catch { console.log("Supabase not connected — demo mode."); }
 const OPENAI_API = "/api/ai";
 let currentUser=null;
 let pendingAction=null;
 
-/* ===== AUTO YEAR ===== */
 document.getElementById("year").innerText = new Date().getFullYear();
 
-/* ===== PURE 3‑SECOND LOADER (NO BACKEND REQUIRED) ===== */
+/* 3-second loader */
 setTimeout(()=>{
   const loader = document.getElementById("loadingScreen");
   const app = document.getElementById("appRoot");
-
   if(loader) loader.style.display = "none";
   if(app) app.style.display = "flex";
 },3000);
 
-/* ===== AUTH ONLY WHEN USER TRIES TO TRANSACT ===== */
-function requireAuth(action){
-  if(!currentUser){
-    pendingAction = action;
-    authModal.style.display="flex";
-  } else {
-    action();
-  }
-}
+function requireAuth(action){ if(!currentUser){ pendingAction = action; authModal.style.display="flex"; } else { action(); } }
 
 async function saveUserDetails(){
-  if(!sb) {
-    currentUser = { phone: phone.value };
-    userLabel.innerText = phone.value;
-    authModal.style.display = "none";
-    if(pendingAction) pendingAction();
-    return;
-  }
-
-  const {data,error} = await sb.from("users").insert({
-    phone: phone.value,
-    bank_account: bank.value,
-    id_number: idnum.value
-  }).select().single();
-
+  if(!sb) { currentUser={ phone: phone.value }; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction(); return; }
+  const {data,error}=await sb.from("users").insert({ phone: phone.value, bank_account: bank.value, id_number: idnum.value }).select().single();
   if(error) return alert(error.message);
-
-  currentUser = data;
-  userLabel.innerText = phone.value;
-  authModal.style.display = "none";
-
-  if(pendingAction) pendingAction();
+  currentUser=data; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction();
 }
 
-async function sendMessage(){
-  alert("Secure transaction processing will run here (ledger integration).");
-}
+async function sendMessage(){ alert("Secure transaction processing will run here."); }
 
-/* ===== AI CHAT ===== */
 async function askAI(){
-  const question = aiInput.value;
+  const question=aiInput.value;
   if(!question) return;
-
-  try {
-    const res = await fetch(OPENAI_API, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ message: question })
-    });
-
-    const data = await res.json();
-
-    const div = document.createElement("div");
-    div.className = "msg";
-    div.innerText = data.reply || "AI unavailable";
-    chatFeed.appendChild(div);
-  } catch {
-    const div = document.createElement("div");
-    div.className = "msg";
-    div.innerText = "AI connection not configured.";
-    chatFeed.appendChild(div);
-  }
+  try{
+    const res=await fetch(OPENAI_API,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ message:question }) });
+    const data=await res.json();
+    const div=document.createElement("div"); div.className="msg"; div.innerText=data.reply||"AI unavailable"; chatFeed.appendChild(div);
+  } catch { const div=document.createElement("div"); div.className="msg"; div.innerText="AI connection not configured."; chatFeed.appendChild(div); }
 }
 
-/* ===== MARKETPLACE LOAD (SAFE WITHOUT BACKEND) ===== */
-async function loadShop(){
-  if(!sb) {
-    shopItems.innerHTML = "<div class='shop-card'>Demo item — connect database to enable real shop.</div>";
-    return;
-  }
-
-  const search = itemSearch.value || "";
+async function loadShop(){ if(!sb){ shopItems.innerHTML="<div class='shop-card'>Demo item — connect database to enable real shop.</div>"; return; }
+  const search=itemSearch.value||"";
   const {data}=await sb.from("shop_items").select("*").ilike("title",`%${search}%`);
-
-  shopItems.innerHTML=data?.map(i=>`
-    <div class='shop-card'>
-      <b>${i.title}</b><br>
-      ${i.price} ${i.currency}<br>
-      <button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button>
-    </div>
-  `).join('');
+  shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button></div>`).join('');
 }
-
-async function buyItem(id){
-  alert("Proceed to secure transaction flow.");
-}
-
+async function buyItem(id){ alert("Proceed to secure transaction flow."); }
 loadShop();
 </script>
 
