@@ -9,159 +9,239 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body { background:#05070d; color:#e5e7eb; font-family:system-ui; }
+body { background:#05070d; color:#e5e7eb; font-family:system-ui; margin:0; }
+
+/* ===== LOADING SCREEN (PURE PAGE STYLE – NO BACKEND) ===== */
+.loading-screen {
+  position:fixed;
+  inset:0;
+  background:#020617;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  animation: fadeIn 0.6s ease;
+}
+
+.loading-logo {
+  font-size:30px;
+  font-weight:700;
+  color:#22c55e;
+  margin-bottom:12px;
+  letter-spacing:1px;
+}
+
+.loading-sub {
+  font-size:14px;
+  color:#9ca3af;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+/* ===== APP LAYOUT ===== */
 .app { max-width:420px; margin:auto; height:100vh; display:flex; flex-direction:column; border:1px solid #111827; border-radius:12px; overflow:hidden; }
 .header { background:#0b0f1a; padding:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #111827; }
 .logo { font-weight:700; color:#22c55e; }
 .chat-feed { flex:1; overflow-y:auto; background:#111827; padding:10px; display:flex; flex-direction:column; }
 .msg { background:#1f2937; padding:10px 14px; border-radius:20px; margin:6px 0; max-width:70%; }
-.msg.me { background:#22c55e; color:#000; margin-left:auto; }
 .input-bar { display:flex; gap:8px; padding:10px; border-top:1px solid #111827; background:#0b0f1a; }
 .input-bar input { flex:1; border-radius:20px; padding:10px; border:none; background:#1f2937; color:#e5e7eb; }
 .virtual-card { background:linear-gradient(135deg,#111827,#020617); border-radius:18px; padding:16px; margin:10px; text-align:center; }
 .navbar-app { display:flex; gap:6px; padding:8px; background:#0b0f1a; }
 .navbar-app button { flex:1; background:#111827; border:none; color:#9ca3af; padding:8px; border-radius:10px; }
-.navbar-app button.active { background:#22c55e; color:#000; }
 .auth-box { padding:20px; background:#111827; }
 .shop-card { background:#1f2937; padding:10px; border-radius:14px; margin:8px 0; }
-.loading { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:#020617; color:#22c55e; font-size:20px; z-index:999; }
+.footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
+.modal-box { background:#111827; padding:20px; border-radius:12px; width:90%; max-width:350px; }
 </style>
 </head>
 
 <body>
 
-<div id="loadingScreen" class="loading">SadiCoinTech Loading...</div>
+<!-- ===== PURE VISUAL LOADING SCREEN (3 SECONDS) ===== -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">SadiCoinTech</div>
+  <div class="loading-sub">Opening PhotoChat...</div>
+</div>
 
-<div id="app" style="display:none">
-<div class="app">
+<!-- ===== MAIN APP ===== -->
+<div class="app" style="display:none" id="appRoot">
 
 <div class="header">
 <div class="logo">PhotoChat</div>
 <div id="userLabel">Guest</div>
 </div>
 
-<!-- PHONE OTP AUTH -->
-<div id="authSection" class="auth-box">
-<input id="phone" class="form-control mb-2" placeholder="Phone Number (+263...)" />
-<button class="btn btn-success w-100 mb-2" onclick="sendOTP()">Send OTP</button>
-<input id="otp" class="form-control mb-2" placeholder="Enter OTP" />
-<button class="btn btn-outline-light w-100" onclick="verifyOTP()">Verify OTP</button>
-<p id="authMsg"></p>
-</div>
-
-<!-- APP -->
-<div id="appContent" style="display:none; flex:1; flex-direction:column">
+<!-- PUBLIC CONTENT (NO LOGIN REQUIRED TO VIEW) -->
+<div id="appContent" style="flex:1; display:flex; flex-direction:column">
 
 <div class="virtual-card">
 <div>SDC Virtual Card</div>
-<h4 id="cardNumber">0000 •••• •••• ••••</h4>
-<small id="cardName">Unregistered</small>
+<h4>•••• •••• •••• ••••</h4>
+<small>Login required for transactions</small>
 </div>
 
 <div class="chat-feed" id="chatFeed"></div>
 
+<!-- AI CHATBOT -->
+<div class="p-2">
+<input id="aiInput" class="form-control mb-1" placeholder="Ask SDC AI anonymously...">
+<button class="btn btn-success w-100" onclick="askAI()">Ask AI</button>
+</div>
+
 <!-- MARKETPLACE -->
 <div id="miniShop">
 <h6 class="ms-2">Marketplace</h6>
-<input id="itemTitle" class="form-control mb-1" placeholder="Item title">
-<input id="itemPrice" type="number" class="form-control mb-1" placeholder="Price">
-<select id="currency" class="form-control mb-1">
-<option value="SDC">SDC</option>
-<option value="USD">USD</option>
-<option value="ZAR">ZAR</option>
-</select>
-<button class="btn btn-success w-100 mb-2" onclick="uploadItem()">Upload Item</button>
+<input id="itemSearch" class="form-control mb-2" placeholder="Search items..." oninput="loadShop()">
 <div id="shopItems"></div>
 </div>
 
 <div class="input-bar">
-<input id="msgInput" placeholder="Type amount to send">
-<button class="btn btn-success" onclick="sendMoney()">Send</button>
+<input id="msgInput" placeholder="Send money or message">
+<button class="btn btn-success" onclick="requireAuth(sendMessage)">Send</button>
 </div>
 
 <div class="navbar-app">
-<button onclick="showTab('chat')" class="active">Chat</button>
-<button onclick="showTab('history')">History</button>
-<button onclick="showTab('shop')">Shop</button>
-<button onclick="showTab('invoice')">Invoice</button>
+<button>Chat</button>
+<button>Trends</button>
+<button>News</button>
+<button>Finance</button>
 </div>
+
+<div class="footer">© <span id="year"></span> SadiCoinTech</div>
 
 </div>
 </div>
+
+<!-- AUTH MODAL (ONLY WHEN NEEDED) -->
+<div class="modal-bg" id="authModal">
+  <div class="modal-box">
+    <h5>Complete Verification</h5>
+    <input id="phone" class="form-control mb-2" placeholder="Phone number">
+    <input id="bank" class="form-control mb-2" placeholder="Bank account number">
+    <input id="idnum" class="form-control mb-2" placeholder="ID or Passport">
+    <button class="btn btn-success w-100" onclick="saveUserDetails()">Save & Continue</button>
+  </div>
 </div>
 
 <script>
-const sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
+/* ===== OPTIONAL BACKEND (SAFE IF NOT CONNECTED) ===== */
+let sb;
+try {
+  sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY");
+} catch {
+  console.log("Supabase not connected — running in visual demo mode.");
+}
+
+const OPENAI_API = "/api/ai";
 let currentUser=null;
-let lastTransaction=null;
-const FEE_PERCENT=2;
+let pendingAction=null;
 
-window.addEventListener("load",()=>{
-  loadingScreen.style.display="none";
-  app.style.display="block";
-});
+/* ===== AUTO YEAR ===== */
+document.getElementById("year").innerText = new Date().getFullYear();
 
-async function sendOTP(){
-  const {error}=await sb.auth.signInWithOtp({phone:phone.value});
-  authMsg.innerText=error?error.message:"OTP sent";
+/* ===== PURE 3‑SECOND LOADER (NO BACKEND REQUIRED) ===== */
+setTimeout(()=>{
+  const loader = document.getElementById("loadingScreen");
+  const app = document.getElementById("appRoot");
+
+  if(loader) loader.style.display = "none";
+  if(app) app.style.display = "flex";
+},3000);
+
+/* ===== AUTH ONLY WHEN USER TRIES TO TRANSACT ===== */
+function requireAuth(action){
+  if(!currentUser){
+    pendingAction = action;
+    authModal.style.display="flex";
+  } else {
+    action();
+  }
 }
 
-async function verifyOTP(){
-  const {data,error}=await sb.auth.verifyOtp({phone:phone.value,token:otp.value,type:'sms'});
-  if(error) return authMsg.innerText=error.message;
-  currentUser=data.user;
-  userLabel.innerText=currentUser.phone;
-  authSection.style.display="none";
-  appContent.style.display="flex";
-  loadShop();
-}
+async function saveUserDetails(){
+  if(!sb) {
+    currentUser = { phone: phone.value };
+    userLabel.innerText = phone.value;
+    authModal.style.display = "none";
+    if(pendingAction) pendingAction();
+    return;
+  }
 
-// DOUBLE-ENTRY LEDGER TRANSACTION
-async function sendMoney(){
-  const amount=Number(msgInput.value);
-  if(!amount) return;
-
-  const fee=amount*FEE_PERCENT/100;
-  const total=amount+fee;
-
-  const {data,error}=await sb.rpc("create_transaction",{
-    p_user:currentUser.id,
-    p_amount:amount,
-    p_fee:fee,
-    p_total:total
-  });
+  const {data,error} = await sb.from("users").insert({
+    phone: phone.value,
+    bank_account: bank.value,
+    id_number: idnum.value
+  }).select().single();
 
   if(error) return alert(error.message);
 
-  lastTransaction=data;
-  alert("Transaction approved");
+  currentUser = data;
+  userLabel.innerText = phone.value;
+  authModal.style.display = "none";
+
+  if(pendingAction) pendingAction();
 }
 
-async function uploadItem(){
-  await sb.from("shop_items").insert({title:itemTitle.value,price:itemPrice.value,currency:currency.value});
-  loadShop();
+async function sendMessage(){
+  alert("Secure transaction processing will run here (ledger integration).");
 }
 
+/* ===== AI CHAT ===== */
+async function askAI(){
+  const question = aiInput.value;
+  if(!question) return;
+
+  try {
+    const res = await fetch(OPENAI_API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ message: question })
+    });
+
+    const data = await res.json();
+
+    const div = document.createElement("div");
+    div.className = "msg";
+    div.innerText = data.reply || "AI unavailable";
+    chatFeed.appendChild(div);
+  } catch {
+    const div = document.createElement("div");
+    div.className = "msg";
+    div.innerText = "AI connection not configured.";
+    chatFeed.appendChild(div);
+  }
+}
+
+/* ===== MARKETPLACE LOAD (SAFE WITHOUT BACKEND) ===== */
 async function loadShop(){
-  const {data}=await sb.from("shop_items").select("*");
-  shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}</div>`).join('');
+  if(!sb) {
+    shopItems.innerHTML = "<div class='shop-card'>Demo item — connect database to enable real shop.</div>";
+    return;
+  }
+
+  const search = itemSearch.value || "";
+  const {data}=await sb.from("shop_items").select("*").ilike("title",`%${search}%`);
+
+  shopItems.innerHTML=data?.map(i=>`
+    <div class='shop-card'>
+      <b>${i.title}</b><br>
+      ${i.price} ${i.currency}<br>
+      <button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button>
+    </div>
+  `).join('');
 }
 
-function showTab(tab){
-  if(tab==='invoice') downloadInvoice();
+async function buyItem(id){
+  alert("Proceed to secure transaction flow.");
 }
 
-function downloadInvoice(){
-  if(!lastTransaction) return alert("No transaction");
-
-  const text=`PHOTOCHAT RECEIPT\n\nTransaction ID: ${lastTransaction.id}\nAmount: ${lastTransaction.amount}\nFee: ${lastTransaction.fee}\nTotal: ${lastTransaction.total}\nStatus: approved\nDate: ${new Date().toLocaleString()}\n© SadiCoinTech ${new Date().getFullYear()}`;
-
-  const blob=new Blob([text],{type:"text/plain"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="receipt.txt";
-  a.click();
-}
+loadShop();
 </script>
 
 </body>
