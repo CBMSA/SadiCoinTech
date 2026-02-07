@@ -3,163 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoChat – Stylish Web3 Marketplace & SadiPay Demo</title>
+<title>PhotoChat – SadiCoinTech Super App (Professional Demo)</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body { background:#0a0f1b; color:#e5e7eb; font-family:'Inter', system-ui; margin:0; }
-.loading-screen { position:fixed; inset:0; background:#010215; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
-.loading-logo { font-size:36px; font-weight:700; color:#FFD700; margin-bottom:16px; letter-spacing:2px; animation: pulse 1.5s infinite; }
-.loading-sub { font-size:14px; color:#9ca3af; }
-@keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.1);} }
-.app { max-width:440px; margin:auto; height:100vh; display:flex; flex-direction:column; border-radius:20px; overflow:hidden; box-shadow:0 6px 25px rgba(0,0,0,0.7); }
-.header { background:#0d1122; padding:16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1a1f2e; }
-.logo { font-weight:800; color:#FFD700; font-size:22px; letter-spacing:1px; }
-.chat-feed { flex:1; overflow-y:auto; background:#111828; padding:14px; display:flex; flex-direction:column; gap:8px; border-radius:0 0 0 0; }
-.msg { padding:12px 18px; border-radius:24px; max-width:75%; font-size:14px; line-height:1.4; position:relative; }
-.msg.user { background:linear-gradient(90deg,#FFD700,#e0c200); color:#000; align-self:flex-end; box-shadow:0 4px 12px rgba(255,215,0,0.3); }
-.msg.system { background:#1a1f2e; color:#e5e7eb; align-self:flex-start; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
-.msg-timestamp { font-size:10px; color:#9ca3af; margin-top:4px; text-align:right; }
-.input-bar { display:flex; gap:8px; padding:12px; border-top:1px solid #1a1f2e; background:#0d1122; }
-.input-bar input { flex:1; border-radius:28px; padding:14px; border:none; background:#1a1f2e; color:#e5e7eb; }
-.input-bar button { border:none; border-radius:28px; padding:0 18px; background:#FFD700; color:#000; font-weight:700; cursor:pointer; transition:0.3s; }
-.input-bar button:hover { background:#e0c200; }
-.navbar-app { display:flex; gap:8px; padding:10px; background:#0d1122; justify-content:space-around; border-top:1px solid #1a1f2e; }
-.navbar-app button { flex:1; background:#111828; border:none; color:#9ca3af; padding:12px 0; border-radius:14px; font-weight:600; transition:0.3s; }
-.navbar-app button:hover { background:#FFD700; color:#000; transform:scale(1.05); }
-.footer { text-align:center; padding:8px; font-size:12px; background:#010215; color:#6b7280; }
-.shop-card { background:#1a1f2e; padding:14px; border-radius:18px; margin:8px 0; transition:0.3s; display:flex; flex-direction:column; align-items:center; }
-.shop-card img { border-radius:14px; margin-bottom:10px; width:160px; height:160px; object-fit:cover; }
-.shop-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.6); }
-.virtual-card { background: linear-gradient(145deg,#000000,#1a1a1a); border-radius:24px; padding:24px 28px; margin:14px; color:#FFD700; font-family:'Courier New', monospace; position:relative; box-shadow:0 10px 28px rgba(0,0,0,0.8); perspective:1000px; transition:0.4s; cursor:pointer; }
-.virtual-card-inner { transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
-.virtual-card.flipped .virtual-card-inner { transform: rotateY(180deg); }
-.virtual-card-front, .virtual-card-back { backface-visibility: hidden; }
-.virtual-card-back { position:absolute; top:0; left:0; width:100%; height:100%; background:#111; border-radius:24px; color:#FFD700; display:flex; flex-direction:column; justify-content:center; align-items:center; transform: rotateY(180deg); }
-.virtual-card .card-logo { font-weight:800; font-size:22px; color:#FFD700; margin-bottom:18px; letter-spacing:2px; }
-.virtual-card .card-number { font-size:24px; letter-spacing:4px; margin-bottom:14px; }
-.virtual-card .card-holder { display:flex; justify-content:space-between; font-size:13px; color:#FFD700; }
-.virtual-card .valid-thru { font-size:11px; color:#FFD700; }
-.virtual-card .small-text { position:absolute; bottom:14px; right:14px; font-size:12px; color:#FFD700; }
+:root{
+  --bg:#05070d;
+  --panel:#0b0f1a;
+  --soft:#111827;
+  --card:#1f2937;
+  --green:#22c55e;
+  --gold:#FFD700;
+}
+
+body{margin:0;font-family:'Inter',system-ui;background:radial-gradient(circle at top,#0b1220,#020617 70%);color:#e5e7eb;}
+
+/* ===== LOADER ===== */
+.loading-screen{position:fixed;inset:0;background:#020617;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+.loading-logo{font-size:34px;font-weight:700;color:var(--green);animation:pulse 1.5s infinite;}
+.loading-sub{color:#9ca3af;margin-top:10px;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+
+/* ===== APP FRAME ===== */
+.app{max-width:430px;margin:auto;height:100vh;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);background:var(--panel);} 
+.header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:rgba(0,0,0,.25);backdrop-filter:blur(10px);border-bottom:1px solid #111827;}
+.logo{font-weight:700;color:var(--green);font-size:20px;}
+
+/* ===== CARD ===== */
+.virtual-card{margin:14px;background:linear-gradient(145deg,#000,#1a1a1a);border-radius:20px;padding:20px;color:var(--gold);box-shadow:0 10px 25px rgba(0,0,0,.7);} 
+.card-number{font-size:22px;letter-spacing:3px;margin:12px 0;}
+.card-row{display:flex;justify-content:space-between;font-size:12px;}
+.balance{font-size:13px;margin-top:8px;opacity:.9;}
+
+/* ===== CHAT ===== */
+.chat-feed{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(#0b1220,#020617);} 
+.msg{max-width:72%;padding:10px 14px;border-radius:18px;font-size:14px;animation:fade .25s ease;} 
+.msg.user{align-self:flex-end;background:linear-gradient(90deg,#22c55e,#16a34a);color:#000;} 
+.msg.bot{align-self:flex-start;background:#1f2937;} 
+.time{font-size:10px;color:#9ca3af;margin-top:2px;text-align:right;} 
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* ===== INPUT ===== */
+.input-bar{display:flex;gap:8px;padding:10px;background:#020617;border-top:1px solid #111827;} 
+.input-bar input{flex:1;border:none;border-radius:20px;padding:12px;background:#111827;color:#fff;} 
+.send-btn{background:var(--green);border:none;border-radius:20px;padding:0 18px;font-weight:600;}
+
+/* ===== SHOP ===== */
+.shop{padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#020617;} 
+.shop-card{background:#111827;border-radius:16px;padding:10px;text-align:center;transition:.2s;} 
+.shop-card:hover{transform:translateY(-3px);} 
+.shop-card img{width:100%;border-radius:12px;margin-bottom:6px;} 
+
+/* ===== NAV ===== */
+.navbar-app{display:flex;gap:6px;padding:8px;background:#020617;border-top:1px solid #111827;} 
+.navbar-app button{flex:1;border:none;border-radius:12px;padding:10px;background:#111827;color:#9ca3af;font-weight:600;} 
+.navbar-app button:hover{background:var(--green);color:#000;} 
+
+.footer{text-align:center;font-size:12px;color:#6b7280;padding:6px;background:#020617;}
+
+/* ===== GUIDE MODAL ===== */
+.guide{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:9998;}
+.guide-box{background:#0b0f1a;border:1px solid #1f2937;border-radius:18px;padding:20px;width:90%;max-width:380px;text-align:left;}
+.guide-box h5{color:var(--green);margin-bottom:10px;}
+.guide-box ul{padding-left:18px;color:#d1d5db;}
+.guide-box button{margin-top:12px;width:100%;}
 </style>
 </head>
+
 <body>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-logo">SadiCoinTech</div>
-  <div class="loading-sub">Opening PhotoChat Demo...</div>
+  <div class="loading-sub">Launching PhotoChat Demo…</div>
 </div>
 
-<div class="app" style="display:none" id="appRoot">
-<div class="header">
-<div class="logo">PhotoChat</div>
-<div id="userLabel">Guest</div>
-</div>
-<div id="appContent" style="flex:1; display:flex; flex-direction:column">
-
-<div class="virtual-card" onclick="flipCard()">
-  <div class="virtual-card-inner">
-    <div class="virtual-card-front">
-      <div class="card-logo">SadiPay</div>
-      <div class="card-number">•••• •••• •••• 1234</div>
-      <div class="card-holder">
-        <div>John Doe</div>
-        <div class="valid-thru">VALID THRU 12/26</div>
-      </div>
-      <div class="small-text" id="cardBalance">SDC Balance: 0.00</div>
-    </div>
-    <div class="virtual-card-back">
-      <div>Card Details</div>
-      <div id="cardTransactions">No transactions yet.</div>
-    </div>
+<div class="guide" id="guide">
+  <div class="guide-box">
+    <h5>How This Platform Works</h5>
+    <ul>
+      <li><b>Buyers</b> chat with businesses, order products, and pay using SDC wallet.</li>
+      <li><b>Suppliers</b> list goods like groceries, cars, or services in the marketplace.</li>
+      <li><b>Logistics</b> partners receive delivery requests from completed orders.</li>
+      <li><b>SadiPay Wallet</b> manages balance, transactions, and receipts.</li>
+    </ul>
+    <button class="btn btn-success" onclick="closeGuide()">Enter App</button>
   </div>
 </div>
 
-<div class="chat-feed" id="chatFeed"></div>
-<div class="p-2">
-<input id="aiInput" class="form-control mb-1" placeholder="Ask SDC AI anonymously...">
-<button class="btn btn-warning w-100" onclick="askAI()">Ask AI</button>
+<div class="app" id="appRoot" style="display:none">
+
+<div class="header">
+  <div class="logo">PhotoChat</div>
+  <div>Guest</div>
 </div>
 
-<div id="miniShop">
-<h6 class="ms-2" style="color:#FFD700;">Marketplace</h6>
-<div id="shopItems">
-<div class='shop-card'><img src='https://via.placeholder.com/150/000000/FFD700?text=Sadi+T-Shirt'><b>Sadi T-Shirt</b><br>100 SDC<br><button class='btn btn-sm btn-warning'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150/000000/FFD700?text=Sadi+Hoodie'><b>Sadi Hoodie</b><br>150 SDC<br><button class='btn btn-sm btn-warning'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150/000000/FFD700?text=Sadi+Mug'><b>Sadi Mug</b><br>50 SDC<br><button class='btn btn-sm btn-warning'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150/000000/FFD700?text=Sadi+Cap'><b>Sadi Cap</b><br>80 SDC<br><button class='btn btn-sm btn-warning'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150/000000/FFD700?text=Sadi+NFT+Art'><b>Sadi NFT Art</b><br>500 SDC<br><button class='btn btn-sm btn-warning'>Buy</button></div>
+<div class="virtual-card">
+  <div>SadiPay Virtual Card</div>
+  <div class="card-number">•••• •••• •••• 1234</div>
+  <div class="card-row"><span>John Doe</span><span>12/26</span></div>
+  <div class="balance" id="bal">SDC Balance: 0.00</div>
 </div>
-</div>
+
+<div class="chat-feed" id="chat"></div>
 
 <div class="input-bar">
-<input id="msgInput" placeholder="Send money or message">
-<button onclick="sendMessage()">Send</button>
+  <input id="msg" placeholder="Type message, order, or amount…">
+  <button class="send-btn" onclick="sendMsg()">Send</button>
+</div>
+
+<div class="shop">
+  <div class="shop-card"><img src="https://via.placeholder.com/200?text=T-Shirt"><b>Sadi T‑Shirt</b><div>100 SDC</div></div>
+  <div class="shop-card"><img src="https://via.placeholder.com/200?text=Hoodie"><b>Sadi Hoodie</b><div>150 SDC</div></div>
+  <div class="shop-card"><img src="https://via.placeholder.com/200?text=Mug"><b>Sadi Mug</b><div>50 SDC</div></div>
+  <div class="shop-card"><img src="https://via.placeholder.com/200?text=Cap"><b>Sadi Cap</b><div>80 SDC</div></div>
 </div>
 
 <div class="navbar-app">
-<button>Chat</button>
-<button>Trends</button>
-<button>News</button>
-<button>Finance</button>
+  <button>Chat</button>
+  <button>Wallet</button>
+  <button>Shop</button>
+  <button onclick="openGuide()">Guide</button>
 </div>
 
 <div class="footer">© <span id="year"></span> SadiCoinTech</div>
-</div>
+
 </div>
 
 <script>
-document.getElementById("year").innerText = new Date().getFullYear();
+document.getElementById('year').innerText=new Date().getFullYear();
 
-/* 3-second loader only, no backend */
-document.addEventListener("DOMContentLoaded", function() {
-  setTimeout(()=>{
-    document.getElementById("loadingScreen").style.display="none";
-    document.getElementById("appRoot").style.display="flex";
-  },3000);
+/* loader */
+document.addEventListener('DOMContentLoaded',()=>{
+ setTimeout(()=>{
+  loadingScreen.style.display='none';
+  guide.style.display='flex';
+ },2500);
 });
 
-function flipCard(){ document.querySelector('.virtual-card').classList.toggle('flipped'); }
-
-let balance = 0;
-function updateBalance(amount){ balance += amount; document.getElementById('cardBalance').innerText = `SDC Balance: ${balance.toFixed(2)}`; }
-
-function sendMessage(){
-  const msg = msgInput.value.trim();
-  if(!msg) return;
-  const timestamp = new Date().toLocaleTimeString();
-  const div = document.createElement('div');
-  div.className='msg user';
-  div.innerHTML = msg + `<div class='msg-timestamp'>${timestamp}</div>`;
-  chatFeed.appendChild(div);
-  msgInput.value='';
-  chatFeed.scrollTop=chatFeed.scrollHeight;
-  setTimeout(()=>{
-    const botDiv = document.createElement('div');
-    botDiv.className='msg system';
-    botDiv.innerHTML = 'SDC Demo Bot: This is a stylish demo reply.' + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
-    chatFeed.appendChild(botDiv);
-    chatFeed.scrollTop=chatFeed.scrollHeight;
-  },1000);
+function closeGuide(){
+ guide.style.display='none';
+ appRoot.style.display='flex';
 }
 
-function askAI(){
-  const question = aiInput.value.trim();
-  if(!question) return;
-  const div = document.createElement('div');
-  div.className='msg user';
-  div.innerHTML = question + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
-  chatFeed.appendChild(div);
-  aiInput.value='';
-  setTimeout(()=>{
-    const botDiv = document.createElement('div');
-    botDiv.className='msg system';
-    botDiv.innerHTML = 'AI Demo: This is a stylish AI reply.' + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
-    chatFeed.appendChild(botDiv);
-    chatFeed.scrollTop=chatFeed.scrollHeight;
-  },1000);
+function openGuide(){
+ guide.style.display='flex';
+}
+
+/* chat demo */
+function bubble(text,type){
+ const d=document.createElement('div');
+ d.className='msg '+type;
+ const t=new Date().toLocaleTimeString();
+ d.innerHTML=text+`<div class='time'>${t}</div>`;
+ chat.appendChild(d);
+ chat.scrollTop=chat.scrollHeight;
+}
+
+function sendMsg(){
+ const v=msg.value.trim();
+ if(!v) return;
+ bubble(v,'user');
+ msg.value='';
+
+ setTimeout(()=>{
+  bubble('Business bot: Your order or message was received. Suppliers and logistics will respond here.','bot');
+ },800);
 }
 </script>
 
