@@ -135,7 +135,38 @@ const {data,error}=await sb.from("users").insert({ phone: phone.value, bank_acco
 if(error) return alert(error.message);
 currentUser=data; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction(); }
 
-async function sendMessage(){ const timestamp = new Date().toLocaleTimeString(); const div = document.createElement("div"); div.className="msg user"; div.innerHTML=msgInput.value+`<div class='msg-timestamp'>${timestamp}</div>`; chatFeed.appendChild(div); msgInput.value=''; chatFeed.scrollTop=chatFeed.scrollHeight; }
+async function sendMessage(){
+  const text = msgInput.value.trim();
+  if(!text) return;
+
+  const timestamp = new Date().toLocaleTimeString();
+
+  // USER MESSAGE
+  const userDiv = document.createElement("div");
+  userDiv.className = "msg user";
+  userDiv.innerHTML = text + `<div class='msg-timestamp'>${timestamp}</div>`;
+  chatFeed.appendChild(userDiv);
+
+  msgInput.value = '';
+  chatFeed.scrollTop = chatFeed.scrollHeight;
+
+  // SIMULATED RECEIVER / SYSTEM REPLY (so chat doesn't feel like talking to yourself)
+  setTimeout(()=>{
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "msg system";
+
+    let replyText = "Message received ✔";
+
+    if(text.toLowerCase().includes("send")) replyText = "Processing secure transfer…";
+    if(text.toLowerCase().includes("hello") || text.toLowerCase().includes("hi")) replyText = "Hello 👋 How can I assist you today?";
+    if(text.toLowerCase().includes("balance")) replyText = `Your SDC balance is ${balance.toFixed(2)}.`;
+
+    replyDiv.innerHTML = replyText + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
+
+    chatFeed.appendChild(replyDiv);
+    chatFeed.scrollTop = chatFeed.scrollHeight;
+  }, 900);
+}</div>`; chatFeed.appendChild(div); msgInput.value=''; chatFeed.scrollTop=chatFeed.scrollHeight; }
 
 async function askAI(){ const question=aiInput.value; if(!question) return; try{ const res=await fetch(OPENAI_API,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ message:question }) }); const data=await res.json(); const div=document.createElement("div"); div.className="msg system"; div.innerHTML=data.reply||"AI unavailable"; div.innerHTML += `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`; chatFeed.appendChild(div); chatFeed.scrollTop=chatFeed.scrollHeight; } catch { const div=document.createElement("div"); div.className="msg system"; div.innerText="AI connection not configured."; chatFeed.appendChild(div); } }
 
