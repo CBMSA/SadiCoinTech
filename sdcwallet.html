@@ -43,13 +43,10 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 .virtual-card .card-holder { display:flex; justify-content:space-between; font-size:12px; color:#FFD700; }
 .virtual-card .valid-thru { font-size:10px; color:#FFD700; }
 .virtual-card .small-text { position:absolute; bottom:12px; right:12px; font-size:12px; color:#FFD700; }
-.ai-button { position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:#22c55e; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:0.2s; z-index:10000; }
-.ai-button:hover { background:#16a34a; transform:scale(1.1); }
-.ai-button img { width:28px; height:28px; }
 </style>
 </head>
-
 <body>
+
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-logo">SadiCoinTech</div>
   <div class="loading-sub">Opening PhotoChat...</div>
@@ -81,6 +78,10 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </div>
 
 <div class="chat-feed" id="chatFeed"></div>
+<div class="p-2">
+<input id="aiInput" class="form-control mb-1" placeholder="Ask SDC AI anonymously...">
+<button class="btn btn-success w-100" onclick="askAI()">Ask AI</button>
+</div>
 
 <div id="miniShop">
 <h6 class="ms-2">Marketplace</h6>
@@ -104,10 +105,6 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </div>
 </div>
 
-<div class="ai-button" onclick="scrollToAI()">
-<img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="AI">
-</div>
-
 <div class="modal-bg" id="authModal">
   <div class="modal-box">
     <h5>Complete Verification</h5>
@@ -124,9 +121,15 @@ try { sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY"); } cat
 const OPENAI_API = "/api/ai";
 let currentUser=null;
 let pendingAction=null;
-
 document.getElementById("year").innerText = new Date().getFullYear();
-setTimeout(()=>{ document.getElementById("loadingScreen").style.display="none"; document.getElementById("appRoot").style.display="flex"; },3000);
+
+/* 3-second loader FIX */
+document.addEventListener("DOMContentLoaded", function() {
+  const loader = document.getElementById("loadingScreen");
+  const app = document.getElementById("appRoot");
+  if(!loader || !app) return;
+  setTimeout(() => { loader.style.display = "none"; app.style.display = "flex"; }, 3000);
+});
 
 function requireAuth(action){ if(!currentUser){ pendingAction = action; authModal.style.display="flex"; } else { action(); } }
 
@@ -135,64 +138,24 @@ const {data,error}=await sb.from("users").insert({ phone: phone.value, bank_acco
 if(error) return alert(error.message);
 currentUser=data; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction(); }
 
-async function sendMessage(){
-  const text = msgInput.value.trim();
-  if(!text) return;
-
-  const timestamp = new Date().toLocaleTimeString();
-
-  // USER MESSAGE
-  const userDiv = document.createElement("div");
-  userDiv.className = "msg user";
-  userDiv.innerHTML = text + `<div class='msg-timestamp'>${timestamp}</div>`;
-  chatFeed.appendChild(userDiv);
-
-  msgInput.value = '';
-  chatFeed.scrollTop = chatFeed.scrollHeight;
-
-  // SIMULATED RECEIVER / SYSTEM REPLY (so chat doesn't feel like talking to yourself)
-  setTimeout(()=>{
-    const replyDiv = document.createElement("div");
-    replyDiv.className = "msg system";
-
-    let replyText = "Message received ✔";
-
-    if(text.toLowerCase().includes("send")) replyText = "Processing secure transfer…";
-    if(text.toLowerCase().includes("hello") || text.toLowerCase().includes("hi")) replyText = "Hello 👋 How can I assist you today?";
-    if(text.toLowerCase().includes("balance")) replyText = `Your SDC balance is ${balance.toFixed(2)}.`;
-
-    replyDiv.innerHTML = replyText + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
-
-    chatFeed.appendChild(replyDiv);
-    chatFeed.scrollTop = chatFeed.scrollHeight;
-  }, 900);
-}</div>`; chatFeed.appendChild(div); msgInput.value=''; chatFeed.scrollTop=chatFeed.scrollHeight; }
+async function sendMessage(){ const timestamp = new Date().toLocaleTimeString(); const div = document.createElement("div"); div.className="msg user"; div.innerHTML=msgInput.value+`<div class='msg-timestamp'>${timestamp}</div>`; chatFeed.appendChild(div); msgInput.value=''; chatFeed.scrollTop=chatFeed.scrollHeight; }
 
 async function askAI(){ const question=aiInput.value; if(!question) return; try{ const res=await fetch(OPENAI_API,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ message:question }) }); const data=await res.json(); const div=document.createElement("div"); div.className="msg system"; div.innerHTML=data.reply||"AI unavailable"; div.innerHTML += `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`; chatFeed.appendChild(div); chatFeed.scrollTop=chatFeed.scrollHeight; } catch { const div=document.createElement("div"); div.className="msg system"; div.innerText="AI connection not configured."; chatFeed.appendChild(div); } }
 
 function flipCard(){ document.querySelector('.virtual-card').classList.toggle('flipped'); }
+
 let balance = 0;
 function updateBalance(amount){ balance += amount; document.getElementById('cardBalance').innerText = `SDC Balance: ${balance.toFixed(2)}`; }
 
-function loadShop(){
-  shopItems.innerHTML = "";
-  const demoItems = [
-    {title:'Sadi T-Shirt', price:50, currency:'SDC'},
-    {title:'Sadi Hoodie', price:120, currency:'SDC'},
-    {title:'Sadi Mug', price:25, currency:'SDC'},
-    {title:'Sadi Cap', price:30, currency:'SDC'},
-    {title:'Sadi NFT Art', price:500, currency:'SDC'}
-  ];
-  demoItems.forEach(i=>{
-    const div = document.createElement('div');
-    div.className='shop-card';
-    div.innerHTML = `<b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(0))'>Buy</button>`;
-    shopItems.appendChild(div);
-  });
-}
+async function loadShop(){ if(!sb){ shopItems.innerHTML=`<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+T-Shirt'><b>Sadi T-Shirt</b><br>100 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(1))'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Hoodie'><b>Sadi Hoodie</b><br>150 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(2))'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Mug'><b>Sadi Mug</b><br>50 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(3))'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Cap'><b>Sadi Cap</b><br>80 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(4))'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+NFT+Art'><b>Sadi NFT Art</b><br>500 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(5))'>Buy</button></div>`; return; }
+const search=itemSearch.value||"";
+const {data}=await sb.from("shop_items").select("*").ilike("title",`%${search}%`);
+shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button></div>`).join(''); }
 async function buyItem(id){ alert("Proceed to secure transaction flow."); updateBalance(10); }
-function scrollToAI(){ aiInput.scrollIntoView({behavior:'smooth'}); aiInput.focus(); }
-
 loadShop();
 </script>
 
