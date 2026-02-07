@@ -11,14 +11,10 @@
 
 <style>
 body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin:0; }
-
-/* LOADING SCREEN */
 .loading-screen { position:fixed; inset:0; background:#020617; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; }
 .loading-logo { font-size:32px; font-weight:700; color:#22c55e; margin-bottom:16px; letter-spacing:1px; animation: pulse 1.5s infinite; }
 .loading-sub { font-size:14px; color:#9ca3af; }
 @keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.1);} }
-
-/* APP LAYOUT */
 .app { max-width:420px; margin:auto; height:100vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.6); }
 .header { background:#0b0f1a; padding:14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #111827; }
 .logo { font-weight:700; color:#22c55e; font-size:20px; }
@@ -31,16 +27,12 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 .input-bar input { flex:1; border-radius:24px; padding:12px; border:none; background:#1f2937; color:#e5e7eb; }
 .input-bar button { border:none; border-radius:24px; padding:0 16px; background:#22c55e; color:#000; font-weight:600; cursor:pointer; transition:0.2s; }
 .input-bar button:hover { background:#16a34a; }
-
 .navbar-app { display:flex; gap:6px; padding:8px; background:#0b0f1a; justify-content:space-around; border-top:1px solid #111827; }
 .navbar-app button { flex:1; background:#111827; border:none; color:#9ca3af; padding:10px 0; border-radius:12px; font-weight:600; transition:0.2s; }
 .navbar-app button:hover { background:#22c55e; color:#000; transform:scale(1.05); }
-
 .footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
 .shop-card { background:#1f2937; padding:12px; border-radius:16px; margin:6px 0; transition:0.2s; }
 .shop-card:hover { transform:translateY(-3px); box-shadow:0 6px 12px rgba(0,0,0,0.5); }
-
-/* SADI PAY VIRTUAL CARD */
 .virtual-card { background: linear-gradient(145deg, #000000, #1a1a1a); border-radius:20px; padding:20px 24px; margin:12px; color:#FFD700; font-family:'Courier New', Courier, monospace; position:relative; box-shadow:0 8px 20px rgba(0,0,0,0.7); perspective:1000px; transition:0.3s; cursor:pointer; }
 .virtual-card-inner { transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
 .virtual-card.flipped .virtual-card-inner { transform: rotateY(180deg); }
@@ -51,8 +43,6 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 .virtual-card .card-holder { display:flex; justify-content:space-between; font-size:12px; color:#FFD700; }
 .virtual-card .valid-thru { font-size:10px; color:#FFD700; }
 .virtual-card .small-text { position:absolute; bottom:12px; right:12px; font-size:12px; color:#FFD700; }
-
-/* AI FLOAT BUTTON */
 .ai-button { position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:#22c55e; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.5); transition:0.2s; z-index:10000; }
 .ai-button:hover { background:#16a34a; transform:scale(1.1); }
 .ai-button img { width:28px; height:28px; }
@@ -60,14 +50,11 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </head>
 
 <body>
-
-<!-- LOADING SCREEN -->
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-logo">SadiCoinTech</div>
   <div class="loading-sub">Opening PhotoChat...</div>
 </div>
 
-<!-- MAIN APP -->
 <div class="app" style="display:none" id="appRoot">
 <div class="header">
 <div class="logo">PhotoChat</div>
@@ -75,7 +62,6 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </div>
 <div id="appContent" style="flex:1; display:flex; flex-direction:column">
 
-<!-- SADI PAY VIRTUAL CARD -->
 <div class="virtual-card" onclick="flipCard()">
   <div class="virtual-card-inner">
     <div class="virtual-card-front">
@@ -96,7 +82,6 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 
 <div class="chat-feed" id="chatFeed"></div>
 
-<!-- MARKETPLACE -->
 <div id="miniShop">
 <h6 class="ms-2">Marketplace</h6>
 <input id="itemSearch" class="form-control mb-2" placeholder="Search items..." oninput="loadShop()">
@@ -119,12 +104,10 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </div>
 </div>
 
-<!-- AI FLOAT BUTTON -->
 <div class="ai-button" onclick="scrollToAI()">
 <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="AI">
 </div>
 
-<!-- AUTH MODAL -->
 <div class="modal-bg" id="authModal">
   <div class="modal-box">
     <h5>Complete Verification</h5>
@@ -143,7 +126,6 @@ let currentUser=null;
 let pendingAction=null;
 
 document.getElementById("year").innerText = new Date().getFullYear();
-
 setTimeout(()=>{ document.getElementById("loadingScreen").style.display="none"; document.getElementById("appRoot").style.display="flex"; },3000);
 
 function requireAuth(action){ if(!currentUser){ pendingAction = action; authModal.style.display="flex"; } else { action(); } }
@@ -160,12 +142,24 @@ async function askAI(){ const question=aiInput.value; if(!question) return; try{
 function flipCard(){ document.querySelector('.virtual-card').classList.toggle('flipped'); }
 let balance = 0;
 function updateBalance(amount){ balance += amount; document.getElementById('cardBalance').innerText = `SDC Balance: ${balance.toFixed(2)}`; }
-async function loadShop(){ if(!sb){ shopItems.innerHTML="<div class='shop-card'>Demo item — connect database to enable real shop.</div>"; return; }
-const search=itemSearch.value||"";
-const {data}=await sb.from("shop_items").select("*").ilike("title",`%${search}%`);
-shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button></div>`).join(''); }
-async function buyItem(id){ alert("Proceed to secure transaction flow."); updateBalance(10); }
 
+function loadShop(){
+  shopItems.innerHTML = "";
+  const demoItems = [
+    {title:'Sadi T-Shirt', price:50, currency:'SDC'},
+    {title:'Sadi Hoodie', price:120, currency:'SDC'},
+    {title:'Sadi Mug', price:25, currency:'SDC'},
+    {title:'Sadi Cap', price:30, currency:'SDC'},
+    {title:'Sadi NFT Art', price:500, currency:'SDC'}
+  ];
+  demoItems.forEach(i=>{
+    const div = document.createElement('div');
+    div.className='shop-card';
+    div.innerHTML = `<b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(0))'>Buy</button>`;
+    shopItems.appendChild(div);
+  });
+}
+async function buyItem(id){ alert("Proceed to secure transaction flow."); updateBalance(10); }
 function scrollToAI(){ aiInput.scrollIntoView({behavior:'smooth'}); aiInput.focus(); }
 
 loadShop();
