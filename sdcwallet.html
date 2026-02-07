@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhotoChat – Web3 Marketplace & SadiPay Super App</title>
+<title>PhotoChat – Web3 Marketplace & SadiPay Super App (Demo)</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -31,7 +30,8 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 .navbar-app button { flex:1; background:#111827; border:none; color:#9ca3af; padding:10px 0; border-radius:12px; font-weight:600; transition:0.2s; }
 .navbar-app button:hover { background:#22c55e; color:#000; transform:scale(1.05); }
 .footer { text-align:center; padding:6px; font-size:12px; background:#020617; color:#6b7280; }
-.shop-card { background:#1f2937; padding:12px; border-radius:16px; margin:6px 0; transition:0.2s; }
+.shop-card { background:#1f2937; padding:12px; border-radius:16px; margin:6px 0; transition:0.2s; display:flex; flex-direction:column; align-items:center; }
+.shop-card img { border-radius:12px; margin-bottom:8px; width:150px; height:150px; object-fit:cover; }
 .shop-card:hover { transform:translateY(-3px); box-shadow:0 6px 12px rgba(0,0,0,0.5); }
 .virtual-card { background: linear-gradient(145deg, #000000, #1a1a1a); border-radius:20px; padding:20px 24px; margin:12px; color:#FFD700; font-family:'Courier New', Courier, monospace; position:relative; box-shadow:0 8px 20px rgba(0,0,0,0.7); perspective:1000px; transition:0.3s; cursor:pointer; }
 .virtual-card-inner { transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
@@ -49,7 +49,7 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 
 <div class="loading-screen" id="loadingScreen">
   <div class="loading-logo">SadiCoinTech</div>
-  <div class="loading-sub">Opening PhotoChat...</div>
+  <div class="loading-sub">Opening PhotoChat Demo...</div>
 </div>
 
 <div class="app" style="display:none" id="appRoot">
@@ -85,13 +85,18 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 
 <div id="miniShop">
 <h6 class="ms-2">Marketplace</h6>
-<input id="itemSearch" class="form-control mb-2" placeholder="Search items..." oninput="loadShop()">
-<div id="shopItems"></div>
+<div id="shopItems">
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+T-Shirt'><b>Sadi T-Shirt</b><br>100 SDC<br><button class='btn btn-sm btn-success'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Hoodie'><b>Sadi Hoodie</b><br>150 SDC<br><button class='btn btn-sm btn-success'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Mug'><b>Sadi Mug</b><br>50 SDC<br><button class='btn btn-sm btn-success'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Cap'><b>Sadi Cap</b><br>80 SDC<br><button class='btn btn-sm btn-success'>Buy</button></div>
+<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+NFT+Art'><b>Sadi NFT Art</b><br>500 SDC<br><button class='btn btn-sm btn-success'>Buy</button></div>
+</div>
 </div>
 
 <div class="input-bar">
 <input id="msgInput" placeholder="Send money or message">
-<button onclick="requireAuth(sendMessage)">Send</button>
+<button onclick="sendMessage()">Send</button>
 </div>
 
 <div class="navbar-app">
@@ -105,58 +110,58 @@ body { background:#05070d; color:#e5e7eb; font-family:'Inter', system-ui; margin
 </div>
 </div>
 
-<div class="modal-bg" id="authModal">
-  <div class="modal-box">
-    <h5>Complete Verification</h5>
-    <input id="phone" class="form-control mb-2" placeholder="Phone number">
-    <input id="bank" class="form-control mb-2" placeholder="Bank account number">
-    <input id="idnum" class="form-control mb-2" placeholder="ID or Passport">
-    <button class="btn btn-success w-100" onclick="saveUserDetails()">Save & Continue</button>
-  </div>
-</div>
-
 <script>
-let sb;
-try { sb = supabase.createClient("YOUR_SUPABASE_URL","YOUR_SUPABASE_KEY"); } catch { console.log("Supabase not connected — demo mode."); }
-const OPENAI_API = "/api/ai";
-let currentUser=null;
-let pendingAction=null;
 document.getElementById("year").innerText = new Date().getFullYear();
 
-/* 3-second loader FIX */
+/* 3-second loader only, no backend */
 document.addEventListener("DOMContentLoaded", function() {
-  const loader = document.getElementById("loadingScreen");
-  const app = document.getElementById("appRoot");
-  if(!loader || !app) return;
-  setTimeout(() => { loader.style.display = "none"; app.style.display = "flex"; }, 3000);
+  setTimeout(()=>{
+    document.getElementById("loadingScreen").style.display="none";
+    document.getElementById("appRoot").style.display="flex";
+  },3000);
 });
-
-function requireAuth(action){ if(!currentUser){ pendingAction = action; authModal.style.display="flex"; } else { action(); } }
-
-async function saveUserDetails(){ if(!sb){ currentUser={ phone: phone.value }; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction(); return; }
-const {data,error}=await sb.from("users").insert({ phone: phone.value, bank_account: bank.value, id_number: idnum.value }).select().single();
-if(error) return alert(error.message);
-currentUser=data; userLabel.innerText=phone.value; authModal.style.display="none"; if(pendingAction) pendingAction(); }
-
-async function sendMessage(){ const timestamp = new Date().toLocaleTimeString(); const div = document.createElement("div"); div.className="msg user"; div.innerHTML=msgInput.value+`<div class='msg-timestamp'>${timestamp}</div>`; chatFeed.appendChild(div); msgInput.value=''; chatFeed.scrollTop=chatFeed.scrollHeight; }
-
-async function askAI(){ const question=aiInput.value; if(!question) return; try{ const res=await fetch(OPENAI_API,{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ message:question }) }); const data=await res.json(); const div=document.createElement("div"); div.className="msg system"; div.innerHTML=data.reply||"AI unavailable"; div.innerHTML += `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`; chatFeed.appendChild(div); chatFeed.scrollTop=chatFeed.scrollHeight; } catch { const div=document.createElement("div"); div.className="msg system"; div.innerText="AI connection not configured."; chatFeed.appendChild(div); } }
 
 function flipCard(){ document.querySelector('.virtual-card').classList.toggle('flipped'); }
 
 let balance = 0;
 function updateBalance(amount){ balance += amount; document.getElementById('cardBalance').innerText = `SDC Balance: ${balance.toFixed(2)}`; }
 
-async function loadShop(){ if(!sb){ shopItems.innerHTML=`<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+T-Shirt'><b>Sadi T-Shirt</b><br>100 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(1))'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Hoodie'><b>Sadi Hoodie</b><br>150 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(2))'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Mug'><b>Sadi Mug</b><br>50 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(3))'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+Cap'><b>Sadi Cap</b><br>80 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(4))'>Buy</button></div>
-<div class='shop-card'><img src='https://via.placeholder.com/150?text=Sadi+NFT+Art'><b>Sadi NFT Art</b><br>500 SDC<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(5))'>Buy</button></div>`; return; }
-const search=itemSearch.value||"";
-const {data}=await sb.from("shop_items").select("*").ilike("title",`%${search}%`);
-shopItems.innerHTML=data?.map(i=>`<div class='shop-card'><b>${i.title}</b><br>${i.price} ${i.currency}<br><button class='btn btn-sm btn-success' onclick='requireAuth(()=>buyItem(${i.id}))'>Buy</button></div>`).join(''); }
-async function buyItem(id){ alert("Proceed to secure transaction flow."); updateBalance(10); }
-loadShop();
+function sendMessage(){
+  const msg = msgInput.value.trim();
+  if(!msg) return;
+  const timestamp = new Date().toLocaleTimeString();
+  const div = document.createElement('div');
+  div.className='msg user';
+  div.innerHTML = msg + `<div class='msg-timestamp'>${timestamp}</div>`;
+  chatFeed.appendChild(div);
+  msgInput.value='';
+  chatFeed.scrollTop=chatFeed.scrollHeight;
+  // demo bot reply
+  setTimeout(()=>{
+    const botDiv = document.createElement('div');
+    botDiv.className='msg system';
+    botDiv.innerHTML = 'SDC Demo Bot: This is a demo reply.' + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
+    chatFeed.appendChild(botDiv);
+    chatFeed.scrollTop=chatFeed.scrollHeight;
+  },1000);
+}
+
+function askAI(){
+  const question = aiInput.value.trim();
+  if(!question) return;
+  const div = document.createElement('div');
+  div.className='msg user';
+  div.innerHTML = question + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
+  chatFeed.appendChild(div);
+  aiInput.value='';
+  setTimeout(()=>{
+    const botDiv = document.createElement('div');
+    botDiv.className='msg system';
+    botDiv.innerHTML = 'AI Demo: This is a demo AI reply.' + `<div class='msg-timestamp'>${new Date().toLocaleTimeString()}</div>`;
+    chatFeed.appendChild(botDiv);
+    chatFeed.scrollTop=chatFeed.scrollHeight;
+  },1000);
+}
 </script>
 
 </body>
