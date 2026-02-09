@@ -171,5 +171,209 @@ function changeSport() {
 loadTables();
 </script>
 
+
+
+<!-- PLAYER PROFILE MODAL -->
+<div class="modal fade" id="playerModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title brand">Player Profile</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="playerProfile"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ================= PLAYER PROFILE DATA =================
+const profiles = {
+  football: { name: "Blessing", position: "Forward", goals: 12, assists: 5, matches: 18 },
+  basketball: { name: "T. Jordan", position: "Guard", ppg: 24.5, rpg: 6.2, apg: 5.1 },
+  cricket: { name: "A. Khan", role: "Batsman", average: 54.2, strikeRate: 91.3 },
+  rugby: { name: "S. Nkosi", role: "Wing", tackles: 32, tries: 6, points: 35 },
+  tennis: { name: "B. Nadal", ranking: 2, winRate: "82%", titles: 22 }
+};
+
+// ================= SHOW PROFILE =================
+function showProfile(sport) {
+  const p = profiles[sport];
+  let html = `<h4 class='brand'>${p.name}</h4>`;
+
+  if (sport === "football") {
+    html += `<p>Position: ${p.position}</p><p>Goals: ${p.goals}</p><p>Assists: ${p.assists}</p><p>Matches: ${p.matches}</p>`;
+  }
+
+  if (sport === "basketball") {
+    html += `<p>Position: ${p.position}</p><p>PPG: ${p.ppg}</p><p>RPG: ${p.rpg}</p><p>APG: ${p.apg}</p>`;
+  }
+
+  if (sport === "cricket") {
+    html += `<p>Role: ${p.role}</p><p>Average: ${p.average}</p><p>Strike Rate: ${p.strikeRate}</p>`;
+  }
+
+  if (sport === "rugby") {
+    html += `<p>Role: ${p.role}</p><p>Tackles: ${p.tackles}</p><p>Tries: ${p.tries}</p><p>Points: ${p.points}</p>`;
+  }
+
+  if (sport === "tennis") {
+    html += `<p>World Ranking: ${p.ranking}</p><p>Win Rate: ${p.winRate}</p><p>Grand Slam Titles: ${p.titles}</p>`;
+  }
+
+  document.getElementById("playerProfile").innerHTML = html;
+  new bootstrap.Modal(document.getElementById("playerModal")).show();
+}
+
+// ================= ADD CLICK EVENTS TO TABLES =================
+document.querySelectorAll(".sport-section table tbody").forEach((tbody, index) => {
+  const sports = ["football", "basketball", "cricket", "rugby", "tennis"];
+  tbody.addEventListener("click", () => showProfile(sports[index]));
+});
+</script>
+
+
+
+<!-- SCOUTING DASHBOARD -->
+<div class="container pb-5">
+  <div class="card bg-dark glow mt-4">
+    <div class="card-body">
+      <h3 class="brand">Club Scouting Dashboard</h3>
+
+      <input type="text" id="searchPlayer" class="form-control mb-3" placeholder="Search player by name..." onkeyup="filterPlayers()" />
+
+      <table class="table table-dark table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Sport</th>
+            <th>Talent Score</th>
+          </tr>
+        </thead>
+        <tbody id="scoutTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= TALENT POTENTIAL MODEL =================
+function talentScore(stats) {
+  let score = 0;
+
+  if (stats.goals) score += stats.goals * 4;
+  if (stats.assists) score += stats.assists * 3;
+  if (stats.ppg) score += stats.ppg * 1.5;
+  if (stats.average) score += stats.average * 0.5;
+  if (stats.points) score += stats.points * 0.3;
+  if (stats.winRate) score += parseInt(stats.winRate) * 0.2;
+
+  return Math.round(score);
+}
+
+// ================= SCOUT DATA =================
+const scoutPlayers = [
+  { name: "Blessing", sport: "Football", goals: 12, assists: 5 },
+  { name: "T. Jordan", sport: "Basketball", ppg: 24.5 },
+  { name: "A. Khan", sport: "Cricket", average: 54.2 },
+  { name: "S. Nkosi", sport: "Rugby", points: 35 },
+  { name: "B. Nadal", sport: "Tennis", winRate: "82%" }
+];
+
+function loadScoutTable(list = scoutPlayers) {
+  const table = document.getElementById("scoutTable");
+  table.innerHTML = "";
+
+  list.forEach(p => {
+    const score = talentScore(p);
+    table.innerHTML += `<tr><td>${p.name}</td><td>${p.sport}</td><td class='brand'>${score}</td></tr>`;
+  });
+}
+
+function filterPlayers() {
+  const q = document.getElementById("searchPlayer").value.toLowerCase();
+  const filtered = scoutPlayers.filter(p => p.name.toLowerCase().includes(q));
+  loadScoutTable(filtered);
+}
+
+loadScoutTable();
+</script>
+
+
+
+<!-- TEAM / CLUB MANAGEMENT DASHBOARD -->
+<div class="container pb-5">
+  <div class="card bg-dark glow mt-4">
+    <div class="card-body">
+      <h3 class="brand">Team / Club Management</h3>
+      <p class="text-secondary">Track squad value, average talent, and scouting readiness across all sports.</p>
+      <div id="clubSummary" class="mt-3"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================= TRANSFER VALUE AI =================
+function transferValue(player) {
+  let base = talentScore(player) * 10000; // base currency unit
+
+  if (player.age && player.age < 21) base *= 1.5;
+  if (player.age && player.age > 30) base *= 0.7;
+
+  return Math.round(base);
+}
+
+// Extend scout players with ages
+scoutPlayers.forEach((p, i) => {
+  const ages = [19, 24, 27, 22, 31];
+  p.age = ages[i];
+  p.value = transferValue(p);
+});
+
+// ================= CLUB SUMMARY =================
+function renderClubSummary() {
+  const totalValue = scoutPlayers.reduce((sum, p) => sum + p.value, 0);
+  const avgTalent = Math.round(scoutPlayers.reduce((s, p) => s + talentScore(p), 0) / scoutPlayers.length);
+
+  document.getElementById("clubSummary").innerHTML = `
+    <p><strong>Total Squad Market Value:</strong> $${totalValue.toLocaleString()}</p>
+    <p><strong>Average Talent Score:</strong> ${avgTalent}</p>
+    <p><strong>Players Tracked:</strong> ${scoutPlayers.length}</p>
+  `;
+}
+
+renderClubSummary();
+
+// ================= LIVE SCOUTING PDF REPORT =================
+function generateScoutReport() {
+  let report = "SCOUTING REPORT
+
+";
+
+  scoutPlayers.forEach(p => {
+    report += `${p.name} (${p.sport})
+`;
+    report += `Talent Score: ${talentScore(p)}
+`;
+    report += `Market Value: $${p.value.toLocaleString()}
+
+`;
+  });
+
+  const blob = new Blob([report], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "scouting_report.txt";
+  link.click();
+}
+</script>
+
+<!-- REPORT BUTTON -->
+<div class="container pb-5 text-center">
+  <button class="btn btn-success btn-lg" onclick="generateScoutReport()">Download Live Scouting Report</button>
+</div>
+
 </body>
 </html>
