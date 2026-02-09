@@ -375,5 +375,57 @@ function generateScoutReport() {
   <button class="btn btn-success btn-lg" onclick="generateScoutReport()">Download Live Scouting Report</button>
 </div>
 
+
+
+<!-- PLAYER PERFORMANCE ANALYTICS -->
+<div class="container pb-5">
+  <div class="card bg-dark glow mt-4">
+    <div class="card-body">
+      <h3 class="brand">Player Performance Analysis</h3>
+      <canvas id="performanceChart" height="120"></canvas>
+      <div id="performanceInsights" class="mt-3 text-secondary"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ================= SAMPLE PERFORMANCE DATA =================
+const performanceHistory = [12, 18, 15, 22, 27, 25];
+const performanceLabels = ["Match 1", "Match 2", "Match 3", "Match 4", "Match 5", "Match 6"];
+
+// ================= DRAW PERFORMANCE GRAPH =================
+const ctx = document.getElementById('performanceChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: performanceLabels,
+    datasets: [{
+      label: 'Performance Rating',
+      data: performanceHistory,
+      tension: 0.3,
+      fill: false
+    }]
+  },
+  options: {
+    plugins: { legend: { labels: { color: 'white' } } },
+    scales: {
+      x: { ticks: { color: 'white' } },
+      y: { ticks: { color: 'white' } }
+    }
+  }
+});
+
+// ================= PERFORMANCE ANALYSIS =================
+function analyzePerformance(data) {
+  const avg = data.reduce((a, b) => a + b, 0) / data.length;
+  const trend = data[data.length - 1] > data[0] ? "improving" : "declining";
+
+  return `Average Rating: ${avg.toFixed(1)} | Trend: ${trend.toUpperCase()}`;
+}
+
+document.getElementById("performanceInsights").innerText = analyzePerformance(performanceHistory);
+</script>
+
 </body>
 </html>
