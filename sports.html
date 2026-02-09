@@ -5,177 +5,170 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SadiCoinTech Sports Analytics</title>
 
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     body { background: #0b0f19; }
     .card { border-radius: 18px; }
     .brand { color: #00ffc3; font-weight: bold; }
     .glow { box-shadow: 0 0 20px rgba(0,255,195,0.15); }
+    .hidden { display: none; }
   </style>
 </head>
 <body class="text-light">
 
 <div class="container py-4">
   <h1 class="text-center mb-2 brand">SadiCoinTech Sports Analytics</h1>
-  <p class="text-center text-secondary mb-4">AI‑Powered African Sports Intelligence Platform</p>
+  <p class="text-center text-secondary mb-4">Multi‑Sport AI Intelligence Platform</p>
 
-  <!-- League Table -->
+  <!-- SPORT SELECTOR -->
   <div class="card bg-dark glow mb-4">
-    <div class="card-body">
-      <h3 class="brand">League Table</h3>
-      <table class="table table-dark table-striped">
-        <thead>
-          <tr><th>#</th><th>Team</th><th>Points</th><th>Goals</th><th>Form</th></tr>
-        </thead>
-        <tbody id="leagueTable"></tbody>
-      </table>
+    <div class="card-body text-center">
+      <h4 class="brand mb-3">Select Sport</h4>
+      <select id="sportSelector" class="form-select w-50 mx-auto" onchange="changeSport()">
+        <option value="football">Football</option>
+        <option value="basketball">Basketball</option>
+        <option value="cricket">Cricket</option>
+        <option value="rugby">Rugby</option>
+        <option value="tennis">Tennis</option>
+      </select>
     </div>
   </div>
 
-  <!-- Player Stats -->
-  <div class="card bg-dark glow mb-4">
-    <div class="card-body">
-      <h3 class="brand">Top Players</h3>
-      <table class="table table-dark table-striped">
-        <thead>
-          <tr><th>Name</th><th>Team</th><th>Goals</th><th>Assists</th><th>Rating</th></tr>
-        </thead>
-        <tbody id="playerTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Prediction Panel -->
-  <div class="card bg-dark glow mb-4">
-    <div class="card-body">
-      <h3 class="brand">AI Match Prediction</h3>
-
-      <div class="row g-3">
-        <div class="col-md-4">
-          <input type="text" id="homeTeam" class="form-control" placeholder="Home Team" />
-        </div>
-        <div class="col-md-4">
-          <input type="text" id="awayTeam" class="form-control" placeholder="Away Team" />
-        </div>
-        <div class="col-md-4">
-          <button class="btn btn-success w-100" onclick="predictMatch()">Run AI Prediction</button>
-        </div>
+  <!-- FOOTBALL DASHBOARD -->
+  <div id="football" class="sport-section">
+    <div class="card bg-dark glow mb-4">
+      <div class="card-body">
+        <h3 class="brand">Football League Table</h3>
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr><th>#</th><th>Team</th><th>Points</th></tr>
+          </thead>
+          <tbody id="footballTable"></tbody>
+        </table>
       </div>
+    </div>
+  </div>
 
-      <div class="mt-4" id="predictionResult"></div>
+  <!-- BASKETBALL DASHBOARD -->
+  <div id="basketball" class="sport-section hidden">
+    <div class="card bg-dark glow mb-4">
+      <div class="card-body">
+        <h3 class="brand">Basketball Team Stats</h3>
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr><th>Team</th><th>Points Per Game</th></tr>
+          </thead>
+          <tbody id="basketballTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRICKET DASHBOARD -->
+  <div id="cricket" class="sport-section hidden">
+    <div class="card bg-dark glow mb-4">
+      <div class="card-body">
+        <h3 class="brand">Cricket Batting Averages</h3>
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr><th>Player</th><th>Average</th></tr>
+          </thead>
+          <tbody id="cricketTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUGBY DASHBOARD -->
+  <div id="rugby" class="sport-section hidden">
+    <div class="card bg-dark glow mb-4">
+      <div class="card-body">
+        <h3 class="brand">Rugby Points Contribution</h3>
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr><th>Player</th><th>Points</th></tr>
+          </thead>
+          <tbody id="rugbyTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TENNIS DASHBOARD -->
+  <div id="tennis" class="sport-section hidden">
+    <div class="card bg-dark glow mb-4">
+      <div class="card-body">
+        <h3 class="brand">Tennis Win Ratios</h3>
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr><th>Player</th><th>Win %</th></tr>
+          </thead>
+          <tbody id="tennisTable"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ================= SUPABASE CONNECTION =================
-// Replace with your real Supabase URL + anon key later
-const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
-const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-// ================= SAMPLE DATA (Fallback) =================
-const leagueData = [
-  { team: "Sadi FC", points: 42, goals: 30, form: "WWDLW" },
-  { team: "Ubuntu United", points: 39, goals: 28, form: "WDWWW" },
-  { team: "Cape Town Stars", points: 35, goals: 22, form: "LWWDW" }
+// ================= SAMPLE DATA =================
+const footballData = [
+  { team: "Sadi FC", points: 42 },
+  { team: "Ubuntu United", points: 39 }
 ];
 
-const playerData = [
-  { name: "Blessing", team: "Sadi FC", goals: 12, assists: 5, rating: 8.5 },
-  { name: "Thabo", team: "Ubuntu United", goals: 10, assists: 7, rating: 8.2 },
-  { name: "Sipho", team: "Cape Town Stars", goals: 9, assists: 4, rating: 7.9 }
+const basketballData = [
+  { team: "Jozi Hoops", ppg: 102 },
+  { team: "Cape Dunkers", ppg: 98 }
+];
+
+const cricketData = [
+  { player: "A Khan", avg: 54.2 },
+  { player: "T Moyo", avg: 47.8 }
+];
+
+const rugbyData = [
+  { player: "S Nkosi", pts: 35 },
+  { player: "D Smith", pts: 28 }
+];
+
+const tennisData = [
+  { player: "B Nadal", win: "82%" },
+  { player: "L Federer", win: "79%" }
 ];
 
 // ================= LOAD TABLES =================
 function loadTables() {
-  const leagueTable = document.getElementById("leagueTable");
-  leagueTable.innerHTML = "";
-
-  leagueData.forEach((t, i) => {
-    leagueTable.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${t.team}</td>
-        <td>${t.points}</td>
-        <td>${t.goals}</td>
-        <td>${t.form}</td>
-      </tr>`;
+  footballData.forEach((t, i) => {
+    footballTable.innerHTML += `<tr><td>${i+1}</td><td>${t.team}</td><td>${t.points}</td></tr>`;
   });
 
-  const playerTable = document.getElementById("playerTable");
-  playerTable.innerHTML = "";
+  basketballData.forEach(t => {
+    basketballTable.innerHTML += `<tr><td>${t.team}</td><td>${t.ppg}</td></tr>`;
+  });
 
-  playerData.forEach(p => {
-    playerTable.innerHTML += `
-      <tr>
-        <td>${p.name}</td>
-        <td>${p.team}</td>
-        <td>${p.goals}</td>
-        <td>${p.assists}</td>
-        <td>${p.rating}</td>
-      </tr>`;
+  cricketData.forEach(p => {
+    cricketTable.innerHTML += `<tr><td>${p.player}</td><td>${p.avg}</td></tr>`;
+  });
+
+  rugbyData.forEach(p => {
+    rugbyTable.innerHTML += `<tr><td>${p.player}</td><td>${p.pts}</td></tr>`;
+  });
+
+  tennisData.forEach(p => {
+    tennisTable.innerHTML += `<tr><td>${p.player}</td><td>${p.win}</td></tr>`;
   });
 }
 
-// ================= SIMPLE AI MODEL =================
-// Uses goal averages to estimate win probability (Poisson‑style logic)
-function predictMatch() {
-  const home = document.getElementById("homeTeam").value.trim();
-  const away = document.getElementById("awayTeam").value.trim();
-
-  if (!home || !away) {
-    alert("Enter both teams");
-    return;
-  }
-
-  const homeTeam = leagueData.find(t => t.team.toLowerCase() === home.toLowerCase());
-  const awayTeam = leagueData.find(t => t.team.toLowerCase() === away.toLowerCase());
-
-  if (!homeTeam || !awayTeam) {
-    document.getElementById("predictionResult").innerHTML = "<p class='text-warning'>Team not found in dataset.</p>";
-    return;
-  }
-
-  const homeStrength = homeTeam.goals / homeTeam.points;
-  const awayStrength = awayTeam.goals / awayTeam.points;
-
-  const total = homeStrength + awayStrength;
-
-  const homeProb = Math.round((homeStrength / total) * 100);
-  const awayProb = 100 - homeProb;
-
-  const winner = homeProb > awayProb ? home : away;
-
-  document.getElementById("predictionResult").innerHTML = `
-    <h4>${home} vs ${away}</h4>
-    <p>Home Win Probability: <strong>${homeProb}%</strong></p>
-    <p>Away Win Probability: <strong>${awayProb}%</strong></p>
-    <p class='brand'>Predicted Winner: ${winner}</p>`;
-}
-
-// ================= FUTURE: LOAD FROM SUPABASE =================
-async function loadFromSupabase() {
-  try {
-    const { data, error } = await supabase.from("teams").select("*");
-
-    if (!error && data && data.length > 0) {
-      leagueData.length = 0;
-      data.forEach(t => leagueData.push(t));
-      loadTables();
-    }
-  } catch (err) {
-    console.log("Supabase not connected yet — using demo data.");
-  }
+// ================= SPORT SWITCHING =================
+function changeSport() {
+  const selected = document.getElementById("sportSelector").value;
+  document.querySelectorAll(".sport-section").forEach(sec => sec.classList.add("hidden"));
+  document.getElementById(selected).classList.remove("hidden");
 }
 
 loadTables();
-// loadFromSupabase(); // enable after Supabase setup
 </script>
 
 </body>
