@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SadiCoinTech Sports AI Platform</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -21,26 +21,25 @@ canvas{background:#fff;border-radius:12px;padding:10px}
 footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
 </style>
 </head>
-
 <body>
 
 <header>⚽🏏 SadiCoinTech Sports AI Platform</header>
 
 <div class="container">
 
-<!-- MATCH INPUT -->
+<!-- PRACTICE MATCH INPUT -->
 <div class="card">
-<h2>Add Match Record</h2>
+<h2>Add Practice / Match Record</h2>
 <input id="player" placeholder="Player Name">
 <input id="runs" type="number" placeholder="Runs">
 <input id="balls" type="number" placeholder="Balls">
 <input id="wickets" type="number" placeholder="Wickets">
 <input id="overs" type="number" step="0.1" placeholder="Overs Bowled">
 <input id="runsConceded" type="number" placeholder="Runs Conceded">
-<button onclick="addMatch()">Add Match</button>
+<button onclick="addMatch()">Add Record</button>
 </div>
 
-<!-- CAREER TABLE -->
+<!-- CAREER STATISTICS -->
 <div class="card">
 <h2>Career Statistics</h2>
 <table>
@@ -54,7 +53,7 @@ footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
 </table>
 </div>
 
-<!-- CHART -->
+<!-- PERFORMANCE CHARTS -->
 <div class="card">
 <h2>Runs per Match</h2>
 <canvas id="runsChart"></canvas>
@@ -74,37 +73,33 @@ footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
 <p id="bowlingSummary"></p>
 </div>
 
-<!-- SDC HUMANITARIAN MODULE -->
+<!-- LIVE MATCH FETCH + SDC TOKEN PREDICTIONS -->
 <div class="card">
-<h2>SDC Humanitarian Match Prediction</h2>
-
-<input id="teamA" placeholder="Team A">
-<input id="teamB" placeholder="Team B">
+<h2>Live CricData Match & SDC Predictions</h2>
 
 <input id="user" placeholder="User Name">
 <input id="stake" type="number" placeholder="SDC Tokens">
-
 <select id="prediction">
 <option value="A">Team A Win</option>
 <option value="B">Team B Win</option>
 <option value="D">Draw</option>
 </select>
 
-<button onclick="addPrediction()">Add Prediction</button>
+<button onclick="addPrediction()">Predict Match Outcome</button>
 
-<hr>
+<h3>Current Match</h3>
+<p id="liveMatch">Fetching live match...</p>
 
 <select id="result">
 <option value="A">Team A Won</option>
 <option value="B">Team B Won</option>
 <option value="D">Draw</option>
 </select>
-
-<button onclick="calculateRewards()">Distribute SDC</button>
+<button onclick="calculateRewards()">Distribute SDC Rewards</button>
 <pre id="rewardOutput"></pre>
 </div>
 
-<!-- PDF -->
+<!-- PDF EXPORT -->
 <div class="card">
 <button onclick="downloadPDF()">Download Full PDF Report</button>
 </div>
@@ -114,15 +109,15 @@ footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
 <footer>© SadiCoinTech Humanitarian Sports Intelligence</footer>
 
 <script>
-/* ---------- CAREER ENGINE ---------- */
-const matches=[];
-const career={};
+// ---------------------- CAREER STATS ----------------------
+const matches = [];
+const career = {};
 
 function addMatch(){
-const player=playerEl.value.trim();
-if(!player)return alert("Enter player");
+const player = playerEl.value.trim();
+if(!player)return alert("Enter Player");
 
-const data={
+const data = {
 runs:+runsEl.value||0,
 balls:+ballsEl.value||0,
 wickets:+wicketsEl.value||0,
@@ -135,17 +130,11 @@ matches.push({player,runs:data.runs});
 if(!career[player]){
 career[player]={matches:0,runs:0,balls:0,wickets:0,overs:0,runsConceded:0};
 }
-
 const c=career[player];
-c.matches++;
-c.runs+=data.runs;
-c.balls+=data.balls;
-c.wickets+=data.wickets;
-c.overs+=data.overs;
-c.runsConceded+=data.runsConceded;
+c.matches++; c.runs+=data.runs; c.balls+=data.balls;
+c.wickets+=data.wickets; c.overs+=data.overs; c.runsConceded+=data.runsConceded;
 
-renderCareer();
-renderChart();
+renderCareer(); renderChart();
 }
 
 const playerEl=document.getElementById("player");
@@ -156,19 +145,15 @@ const oversEl=document.getElementById("overs");
 const runsConcededEl=document.getElementById("runsConceded");
 
 function renderCareer(){
-const tbody=document.getElementById("careerTable");
-tbody.innerHTML="";
-
+const tbody=document.getElementById("careerTable"); tbody.innerHTML="";
 Object.keys(career).forEach(name=>{
 const c=career[name];
-
 const avg=c.matches?(c.runs/c.matches).toFixed(1):0;
 const sr=c.balls?((c.runs/c.balls)*100).toFixed(1):0;
 const bowlAvg=c.wickets?(c.runsConceded/c.wickets).toFixed(1):"-";
 const eco=c.overs?(c.runsConceded/c.overs).toFixed(2):0;
 
-tbody.innerHTML+=`
-<tr>
+tbody.innerHTML+=`<tr>
 <td>${name}</td><td>${c.matches}</td><td>${c.runs}</td>
 <td>${avg}</td><td>${sr}</td><td>${c.wickets}</td>
 <td>${bowlAvg}</td><td>${eco}</td>
@@ -176,22 +161,17 @@ tbody.innerHTML+=`
 });
 }
 
-/* ---------- CHART ---------- */
+// ---------------------- PERFORMANCE CHART ----------------------
 let chart;
 function renderChart(){
 const ctx=document.getElementById("runsChart");
 if(chart)chart.destroy();
-
-chart=new Chart(ctx,{
-type:"line",
-data:{
-labels:matches.map((_,i)=>"Match "+(i+1)),
-datasets:[{label:"Runs",data:matches.map(m=>m.runs)}]
-}
+chart=new Chart(ctx,{type:"line",
+data:{labels:matches.map((_,i)=>"Match "+(i+1)),datasets:[{label:"Runs",data:matches.map(m=>m.runs)}]}
 });
 }
 
-/* ---------- BOWLING EXTRAS ---------- */
+// ---------------------- BOWLING EXTRAS ----------------------
 function addBowling(){
 const overs=+bOvers.value||0;
 const runs=+bRuns.value||0;
@@ -201,29 +181,37 @@ const economy=overs?((runs+extras)/overs).toFixed(2):0;
 bowlingSummary.innerText=`Extras: ${extras} | Economy: ${economy}`;
 }
 
-/* ---------- SDC HUMANITARIAN ---------- */
+const bOvers=document.getElementById("bOvers");
+const bRuns=document.getElementById("bRuns");
+const wides=document.getElementById("wides");
+const noballs=document.getElementById("noballs");
+const byes=document.getElementById("byes");
+const legbyes=document.getElementById("legbyes");
+const bowlingSummary=document.getElementById("bowlingSummary");
+
+// ---------------------- SDC PREDICTIONS ----------------------
 const predictions=[];
+const user=document.getElementById("user");
+const stake=document.getElementById("stake");
+const prediction=document.getElementById("prediction");
+const rewardOutput=document.getElementById("rewardOutput");
 
 function addPrediction(){
-const userVal=user.value;
-const stakeVal=+stake.value;
-const pick=prediction.value;
-if(!userVal||!stakeVal)return alert("Invalid");
-
-predictions.push({user:userVal,stake:stakeVal,pick});
-alert("Prediction added to humanitarian pool");
+const u=user.value.trim();
+const s=+stake.value;
+const p=prediction.value;
+if(!u||!s)return alert("Invalid Prediction");
+predictions.push({user:u,stake:s,pick:p});
+alert("Prediction added to pool!");
 }
 
 function calculateRewards(){
-const res=result.value;
+const res=document.getElementById("result").value;
 const total=predictions.reduce((s,p)=>s+p.stake,0);
 const winners=predictions.filter(p=>p.pick===res);
 const correct=winners.reduce((s,p)=>s+p.stake,0);
 
-if(!correct){
-rewardOutput.textContent="No winners. Pool → Humanitarian Aid.";
-return;
-}
+if(!correct){rewardOutput.textContent="No correct predictions. Full pool → Humanitarian Fund"; return;}
 
 const aid=total*0.1;
 let text=`Total Pool: ${total} SDC\nAid Fund: ${aid.toFixed(2)} SDC\n\n`;
@@ -236,16 +224,29 @@ text+=`${w.user} → ${reward} SDC\n`;
 rewardOutput.textContent=text;
 }
 
-/* ---------- PDF ---------- */
+// ---------------------- LIVE MATCH FETCH (CRICDATA) ----------------------
+const liveMatch=document.getElementById("liveMatch");
+
+async function fetchLiveMatch(){
+try{
+const resp=await fetch(`https://cricapi.com/api/matches?apikey=YOUR_CRICDATA_API_KEY`);
+const data=await resp.json();
+if(data.matches&&data.matches.length){
+const m=data.matches[0]; // latest match
+liveMatch.innerText=`${m['team-1']} ${m['score']||0} - ${m['team-2']} ${m['score']||0}`;
+}
+}catch(e){liveMatch.innerText="Unable to fetch live match";}
+}
+setInterval(fetchLiveMatch,30000);
+fetchLiveMatch();
+
+// ---------------------- PDF EXPORT ----------------------
 async function downloadPDF(){
 const {jsPDF}=window.jspdf;
 const pdf=new jsPDF();
-
 pdf.text("SadiCoinTech Sports AI Report",20,20);
-
 const img=document.getElementById("runsChart").toDataURL("image/png");
 pdf.addImage(img,"PNG",15,30,180,80);
-
 pdf.text("© SadiCoinTech Humanitarian Platform",40,200);
 pdf.save("SadiCoinTech_Report.pdf");
 }
