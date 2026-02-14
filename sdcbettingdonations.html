@@ -1,256 +1,219 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SadiCoinTech Sports AI Platform</title>
+<title>SadiCoinTech Cricket SDC Betting</title>
 
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{font-family:Arial;margin:0;background:#0f172a;color:#e5e7eb}
-header{background:#020617;padding:18px;text-align:center;font-size:24px;font-weight:bold}
-.container{padding:20px;max-width:1200px;margin:auto}
-.card{background:#020617;border-radius:16px;padding:20px;margin-bottom:20px}
-input,select,button{padding:10px;margin:6px 0;border-radius:10px;border:none;width:100%}
-button{background:#22c55e;color:#fff;font-weight:bold;cursor:pointer}
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border:1px solid #334155;padding:8px;text-align:center}
-canvas{background:#fff;border-radius:12px;padding:10px}
-footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
+body {
+  margin:0; font-family:Arial; background:#0b0f2c; color:#e5e7eb;
+  transition: background 0.5s;
+}
+header {background:#020617; padding:18px; font-size:24px; font-weight:bold; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.5);}
+nav {display:flex; gap:15px; justify-content:center; padding:10px; background:#0f1225; border-bottom:1px solid #1c1f3a;}
+nav a {color:#22c55e; text-decoration:none; font-weight:bold; transition: color 0.3s;}
+nav a:hover {color:#2563eb;}
+.container {display:flex; flex-wrap:wrap; padding:20px; gap:20px; max-width:1200px; margin:auto;}
+.card {background:#11162c; border-radius:16px; padding:20px; flex:1 1 350px; box-shadow:0 10px 25px rgba(0,0,0,0.4); transition: transform 0.3s, box-shadow 0.3s;}
+.card:hover {transform: translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.6);}
+button {background:#22c55e; color:white; border:none; border-radius:10px; padding:10px; cursor:pointer; font-weight:bold; width:100%; transition: transform 0.2s;}
+button:hover {opacity:0.9; transform: scale(1.05);}
+input,select {padding:10px; border-radius:10px; border:none; margin:6px 0; width:100%;}
+table {width:100%; border-collapse:collapse; margin-top:10px;}
+th,td{border:1px solid #334155; padding:8px; text-align:center;}
+footer{text-align:center; padding:20px; font-size:14px; opacity:0.7;}
+.match-card {background:#1a1f3f; border-radius:12px; padding:15px; margin-bottom:15px; box-shadow:0 5px 15px rgba(0,0,0,0.4); transition: transform 0.3s;}
+.match-card:hover {transform:scale(1.02);}
+.match-header {display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+.match-teams {font-weight:bold; font-size:16px; color:#22c55e;}
+.live-score {font-weight:bold; color:#ffb86b; transition: color 0.5s;}
+.countdown {font-size:14px; color:#888;}
 </style>
 </head>
 <body>
 
-<header>⚽🏏 SadiCoinTech Sports AI Platform</header>
+<header>🏏 SadiCoinTech Cricket SDC Betting Dashboard</header>
+<nav>
+<a href="#live">Live Matches</a>
+<a href="#leaderboard">Leaderboard</a>
+<a href="#pdf">PDF Report</a>
+</nav>
 
 <div class="container">
 
-<!-- PRACTICE MATCH INPUT -->
-<div class="card">
-<h2>Add Practice / Match Record</h2>
-<input id="player" placeholder="Player Name">
-<input id="runs" type="number" placeholder="Runs">
-<input id="balls" type="number" placeholder="Balls">
-<input id="wickets" type="number" placeholder="Wickets">
-<input id="overs" type="number" step="0.1" placeholder="Overs Bowled">
-<input id="runsConceded" type="number" placeholder="Runs Conceded">
-<button onclick="addMatch()">Add Record</button>
+<!-- LIVE MATCH PANEL -->
+<div class="card" id="live">
+<h2>Live Matches & SDC Predictions</h2>
+<div id="matchesContainer">Loading live matches...</div>
 </div>
 
-<!-- CAREER STATISTICS -->
-<div class="card">
-<h2>Career Statistics</h2>
+<!-- LEADERBOARD -->
+<div class="card" id="leaderboard">
+<h2>Prediction Leaderboard</h2>
 <table>
-<thead>
-<tr>
-<th>Player</th><th>Matches</th><th>Runs</th><th>Average</th>
-<th>Strike Rate</th><th>Wickets</th><th>Bowl Avg</th><th>Economy</th>
-</tr>
-</thead>
-<tbody id="careerTable"></tbody>
+<thead><tr><th>User</th><th>Correct Predictions</th><th>SDC Won</th></tr></thead>
+<tbody id="leaderboardTable"></tbody>
 </table>
 </div>
 
-<!-- PERFORMANCE CHARTS -->
-<div class="card">
-<h2>Runs per Match</h2>
-<canvas id="runsChart"></canvas>
-</div>
-
-<!-- BOWLING EXTRAS -->
-<div class="card">
-<h2>Bowling Extras Tracker</h2>
-<input id="bowler" placeholder="Bowler Name">
-<input id="bOvers" type="number" step="0.1" placeholder="Overs">
-<input id="bRuns" type="number" placeholder="Runs Conceded">
-<input id="wides" type="number" placeholder="Wides">
-<input id="noballs" type="number" placeholder="No Balls">
-<input id="byes" type="number" placeholder="Byes">
-<input id="legbyes" type="number" placeholder="Leg Byes">
-<button onclick="addBowling()">Add Bowling Record</button>
-<p id="bowlingSummary"></p>
-</div>
-
-<!-- LIVE MATCH FETCH + SDC TOKEN PREDICTIONS -->
-<div class="card">
-<h2>Live CricData Match & SDC Predictions</h2>
-
-<input id="user" placeholder="User Name">
-<input id="stake" type="number" placeholder="SDC Tokens">
-<select id="prediction">
-<option value="A">Team A Win</option>
-<option value="B">Team B Win</option>
-<option value="D">Draw</option>
-</select>
-
-<button onclick="addPrediction()">Predict Match Outcome</button>
-
-<h3>Current Match</h3>
-<p id="liveMatch">Fetching live match...</p>
-
-<select id="result">
-<option value="A">Team A Won</option>
-<option value="B">Team B Won</option>
-<option value="D">Draw</option>
-</select>
-<button onclick="calculateRewards()">Distribute SDC Rewards</button>
-<pre id="rewardOutput"></pre>
-</div>
-
 <!-- PDF EXPORT -->
-<div class="card">
-<button onclick="downloadPDF()">Download Full PDF Report</button>
+<div class="card" id="pdf">
+<button onclick="downloadPDF()">Download Betting Report PDF</button>
 </div>
 
 </div>
-
-<footer>© SadiCoinTech Humanitarian Sports Intelligence</footer>
+<footer>© SadiCoinTech Humanitarian Cricket Platform</footer>
 
 <script>
-// ---------------------- CAREER STATS ----------------------
-const matches = [];
-const career = {};
+// ---------------------- DATA ----------------------
+const matches = []; 
+const predictions = []; 
 
-function addMatch(){
-const player = playerEl.value.trim();
-if(!player)return alert("Enter Player");
+// ---------------------- LIVE MATCH FETCH ----------------------
+const matchesContainer = document.getElementById("matchesContainer");
 
-const data = {
-runs:+runsEl.value||0,
-balls:+ballsEl.value||0,
-wickets:+wicketsEl.value||0,
-overs:+oversEl.value||0,
-runsConceded:+runsConcededEl.value||0
-};
-
-matches.push({player,runs:data.runs});
-
-if(!career[player]){
-career[player]={matches:0,runs:0,balls:0,wickets:0,overs:0,runsConceded:0};
+// Replace YOUR_CRICDATA_API_KEY with actual API key
+async function fetchLiveMatches() {
+  try {
+    const resp = await fetch(`https://cricapi.com/api/matches?apikey=YOUR_CRICDATA_API_KEY`);
+    const data = await resp.json();
+    matches.length = 0;
+    if (data.matches && data.matches.length) {
+      data.matches.forEach(m => matches.push({
+        id:m.unique_id, teamA:m['team-1'], teamB:m['team-2'], date:new Date(m.date), liveScore:"N/A", started:false
+      }));
+      renderMatches();
+    } else matchesContainer.innerHTML="No live matches currently.";
+  } catch(e) { matchesContainer.innerHTML="Unable to fetch live matches.";}
 }
-const c=career[player];
-c.matches++; c.runs+=data.runs; c.balls+=data.balls;
-c.wickets+=data.wickets; c.overs+=data.overs; c.runsConceded+=data.runsConceded;
+fetchLiveMatches();
+setInterval(fetchLiveMatches,15000);
 
-renderCareer(); renderChart();
-}
-
-const playerEl=document.getElementById("player");
-const runsEl=document.getElementById("runs");
-const ballsEl=document.getElementById("balls");
-const wicketsEl=document.getElementById("wickets");
-const oversEl=document.getElementById("overs");
-const runsConcededEl=document.getElementById("runsConceded");
-
-function renderCareer(){
-const tbody=document.getElementById("careerTable"); tbody.innerHTML="";
-Object.keys(career).forEach(name=>{
-const c=career[name];
-const avg=c.matches?(c.runs/c.matches).toFixed(1):0;
-const sr=c.balls?((c.runs/c.balls)*100).toFixed(1):0;
-const bowlAvg=c.wickets?(c.runsConceded/c.wickets).toFixed(1):"-";
-const eco=c.overs?(c.runsConceded/c.overs).toFixed(2):0;
-
-tbody.innerHTML+=`<tr>
-<td>${name}</td><td>${c.matches}</td><td>${c.runs}</td>
-<td>${avg}</td><td>${sr}</td><td>${c.wickets}</td>
-<td>${bowlAvg}</td><td>${eco}</td>
-</tr>`;
-});
-}
-
-// ---------------------- PERFORMANCE CHART ----------------------
-let chart;
-function renderChart(){
-const ctx=document.getElementById("runsChart");
-if(chart)chart.destroy();
-chart=new Chart(ctx,{type:"line",
-data:{labels:matches.map((_,i)=>"Match "+(i+1)),datasets:[{label:"Runs",data:matches.map(m=>m.runs)}]}
-});
+// ---------------------- RENDER MATCHES ----------------------
+function renderMatches() {
+  matchesContainer.innerHTML="";
+  matches.forEach(match => {
+    const div=document.createElement("div");
+    div.className="match-card";
+    div.innerHTML=`
+      <div class="match-header">
+        <div class="match-teams">${match.teamA} vs ${match.teamB}</div>
+        <div class="countdown" id="countdown-${match.id}"></div>
+      </div>
+      <div class="live-score" id="liveScore-${match.id}">${match.liveScore}</div>
+      <input placeholder="User Name" class="userName" ${match.started?"disabled":""}>
+      <input type="number" placeholder="SDC Tokens" class="userStake" ${match.started?"disabled":""}>
+      <select class="userPick" ${match.started?"disabled":""}>
+        <option value="A">${match.teamA} Win</option>
+        <option value="B">${match.teamB} Win</option>
+        <option value="D">Draw</option>
+      </select>
+      <button onclick="addPrediction('${match.id}', this)" ${match.started?"disabled":""}>Place Prediction</button>
+      <div class="matchRewardOutput" style="margin-top:10px;"></div>
+    `;
+    matchesContainer.appendChild(div);
+    startCountdown(match);
+  });
 }
 
-// ---------------------- BOWLING EXTRAS ----------------------
-function addBowling(){
-const overs=+bOvers.value||0;
-const runs=+bRuns.value||0;
-const extras=(+wides.value||0)+(+noballs.value||0)+(+byes.value||0)+(+legbyes.value||0);
-const economy=overs?((runs+extras)/overs).toFixed(2):0;
-
-bowlingSummary.innerText=`Extras: ${extras} | Economy: ${economy}`;
+// ---------------------- COUNTDOWN ----------------------
+function startCountdown(match){
+  const cdEl=document.getElementById(`countdown-${match.id}`);
+  const timer=setInterval(()=>{
+    const now=new Date();
+    let diff=Math.floor((match.date-now)/1000);
+    if(diff<=0){ cdEl.textContent="LIVE"; match.started=true; clearInterval(timer); updateMatchInputs(match.id,false); return;}
+    const h=Math.floor(diff/3600), m=Math.floor((diff%3600)/60), s=diff%60;
+    cdEl.textContent=`Starts in ${h}h ${m}m ${s}s`;
+  },1000);
 }
 
-const bOvers=document.getElementById("bOvers");
-const bRuns=document.getElementById("bRuns");
-const wides=document.getElementById("wides");
-const noballs=document.getElementById("noballs");
-const byes=document.getElementById("byes");
-const legbyes=document.getElementById("legbyes");
-const bowlingSummary=document.getElementById("bowlingSummary");
-
-// ---------------------- SDC PREDICTIONS ----------------------
-const predictions=[];
-const user=document.getElementById("user");
-const stake=document.getElementById("stake");
-const prediction=document.getElementById("prediction");
-const rewardOutput=document.getElementById("rewardOutput");
-
-function addPrediction(){
-const u=user.value.trim();
-const s=+stake.value;
-const p=prediction.value;
-if(!u||!s)return alert("Invalid Prediction");
-predictions.push({user:u,stake:s,pick:p});
-alert("Prediction added to pool!");
+// Disable/enable inputs when match starts
+function updateMatchInputs(matchId, enabled){
+  const card=document.querySelector(`[onclick="addPrediction('${matchId}', this)"]`).parentElement;
+  card.querySelectorAll("input,select,button").forEach(el=>el.disabled=!enabled);
 }
 
-function calculateRewards(){
-const res=document.getElementById("result").value;
-const total=predictions.reduce((s,p)=>s+p.stake,0);
-const winners=predictions.filter(p=>p.pick===res);
-const correct=winners.reduce((s,p)=>s+p.stake,0);
-
-if(!correct){rewardOutput.textContent="No correct predictions. Full pool → Humanitarian Fund"; return;}
-
-const aid=total*0.1;
-let text=`Total Pool: ${total} SDC\nAid Fund: ${aid.toFixed(2)} SDC\n\n`;
-
-winners.forEach(w=>{
-const reward=((w.stake/correct)*(total-aid)).toFixed(2);
-text+=`${w.user} → ${reward} SDC\n`;
-});
-
-rewardOutput.textContent=text;
+// ---------------------- ADD PREDICTION ----------------------
+function addPrediction(matchId, btn){
+  const card=btn.parentElement;
+  const user=card.querySelector(".userName").value.trim();
+  const stake=+card.querySelector(".userStake").value;
+  const pick=card.querySelector(".userPick").value;
+  const output=card.querySelector(".matchRewardOutput");
+  if(!user||!stake){ alert("Enter valid user and stake"); return;}
+  predictions.push({matchId,user,stake,pick,reward:0});
+  output.textContent=`Prediction placed: ${user} → ${pick} (${stake} SDC)`;
+  renderLeaderboard();
 }
 
-// ---------------------- LIVE MATCH FETCH (CRICDATA) ----------------------
-const liveMatch=document.getElementById("liveMatch");
+// ---------------------- SIMULATE MATCH RESULTS ----------------------
+// In real app, this should come from CricAPI live score & result endpoint
+function simulateMatchResult(matchId){
+  const match=Math.random()>0.5 ? 'A':'B'; // simulate random winner
+  distributeRewards(matchId,match);
+}
 
-async function fetchLiveMatch(){
-try{
-const resp=await fetch(`https://cricapi.com/api/matches?apikey=YOUR_CRICDATA_API_KEY`);
-const data=await resp.json();
-if(data.matches&&data.matches.length){
-const m=data.matches[0]; // latest match
-liveMatch.innerText=`${m['team-1']} ${m['score']||0} - ${m['team-2']} ${m['score']||0}`;
+// ---------------------- DISTRIBUTE REWARDS ----------------------
+function distributeRewards(matchId,result){
+  const matchPredictions=predictions.filter(p=>p.matchId===matchId);
+  const totalPool=matchPredictions.reduce((s,p)=>s+p.stake,0);
+  const winners=matchPredictions.filter(p=>p.pick===result);
+  const correctTotal=winners.reduce((s,p)=>s+p.stake,0);
+  const aidFund=totalPool*0.1;
+  winners.forEach(w=>{
+    w.reward=((w.stake/correctTotal)*(totalPool-aidFund)).toFixed(2);
+  });
+  renderLeaderboard();
 }
-}catch(e){liveMatch.innerText="Unable to fetch live match";}
+
+// ---------------------- LEADERBOARD ----------------------
+function renderLeaderboard(){
+  const tbody=document.getElementById("leaderboardTable");
+  tbody.innerHTML="";
+  const userStats={};
+  predictions.forEach(p=>{
+    if(!userStats[p.user]) userStats[p.user]={correct:0,SDC:0};
+    if(p.reward>0){ userStats[p.user].correct++; userStats[p.user].SDC+=+p.reward;}
+  });
+  Object.keys(userStats).forEach(u=>{
+    tbody.innerHTML+=`<tr><td>${u}</td><td>${userStats[u].correct}</td><td>${userStats[u].SDC.toFixed(2)}</td></tr>`;
+  });
 }
-setInterval(fetchLiveMatch,30000);
-fetchLiveMatch();
 
 // ---------------------- PDF EXPORT ----------------------
 async function downloadPDF(){
-const {jsPDF}=window.jspdf;
-const pdf=new jsPDF();
-pdf.text("SadiCoinTech Sports AI Report",20,20);
-const img=document.getElementById("runsChart").toDataURL("image/png");
-pdf.addImage(img,"PNG",15,30,180,80);
-pdf.text("© SadiCoinTech Humanitarian Platform",40,200);
-pdf.save("SadiCoinTech_Report.pdf");
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF();
+  pdf.text("SadiCoinTech Cricket Betting Report",20,20);
+  pdf.text("Matches & Predictions:",20,30);
+  let y=40;
+  matches.forEach(m=>{
+    pdf.text(`${m.teamA} vs ${m.teamB}`,20,y); y+=6;
+    predictions.filter(p=>p.matchId===m.id).forEach(p=>{
+      pdf.text(`  ${p.user} → ${p.pick} (${p.stake} SDC) Reward: ${p.reward}`,25,y); y+=6;
+    });
+  });
+  pdf.text("Leaderboard:",20,y+10);
+  const leaderboardRows=document.querySelectorAll("#leaderboardTable tr");
+  let ly=y+20;
+  leaderboardRows.forEach(row=>{
+    const cols=row.querySelectorAll("td");
+    if(cols.length>0){
+      pdf.text(`${cols[0].innerText} | Correct: ${cols[1].innerText} | SDC Won: ${cols[2].innerText}`,20,ly);
+      ly+=6;
+    }
+  });
+  pdf.text("© SadiCoinTech Humanitarian Cricket Platform",50,280);
+  pdf.save("SadiCoinTech_Betting_Report.pdf");
 }
 </script>
-
 </body>
 </html>
