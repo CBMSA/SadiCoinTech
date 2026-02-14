@@ -1,236 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SadiCoinTech Sports AI Dashboard</title>
 
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #0f172a;
-      color: #e5e7eb;
-    }
-
-    header {
-      background: #020617;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
-    .container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .card {
-      background: #020617;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
-
-    input, select, button {
-      padding: 10px;
-      margin: 6px 0;
-      border-radius: 10px;
-      border: none;
-      width: 100%;
-      font-size: 14px;
-    }
-
-    button {
-      background: #22c55e;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    canvas {
-      background: white;
-      border-radius: 12px;
-      padding: 10px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 14px;
-      opacity: 0.7;
-    }
+    body { font-family: Arial; margin:0; background:#0f172a; color:#e5e7eb; }
+    header { background:#020617; padding:20px; text-align:center; font-size:24px; font-weight:bold; }
+    .container { padding:20px; max-width:1200px; margin:auto; }
+    .card { background:#020617; border-radius:16px; padding:20px; margin-bottom:20px; }
+    input, button { padding:10px; margin:6px 0; border-radius:10px; border:none; width:100%; }
+    button { background:#22c55e; color:white; font-weight:bold; cursor:pointer; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #334155; padding:8px; text-align:center; }
+    canvas { background:white; border-radius:12px; padding:10px; }
+    footer { text-align:center; padding:20px; font-size:14px; opacity:0.7; }
   </style>
 </head>
 
 <body>
-  <header>⚽🏏 SadiCoinTech Sports AI Dashboard</header>
 
-  <div class="container">
+<header>⚽🏏 SadiCoinTech Sports AI Dashboard</header>
 
-    <!-- PLAYER INPUT -->
-    <div class="card">
-      <h2>Add Practice Batting Session</h2>
-      <input id="player" placeholder="Player Name" />
-      <input id="balls" type="number" placeholder="Balls Faced" />
-      <input id="runs" type="number" placeholder="Runs Scored" />
-      <input id="fours" type="number" placeholder="Fours" />
-      <input id="sixes" type="number" placeholder="Sixes" />
+<div class="container">
 
-      <select id="dismissal">
-        <option>Not Out</option>
-        <option>Bowled</option>
-        <option>Caught</option>
-        <option>Caught Behind</option>
-        <option>Caught & Bowled</option>
-        <option>LBW</option>
-        <option>Run Out</option>
-      </select>
-
-      <button onclick="addBatting()">Add Batting Record</button>
-    </div>
-
-
-    <!-- BOWLING INPUT -->
-    <div class="card">
-      <h2>Add Practice Bowling Session</h2>
-      <input id="bowler" placeholder="Bowler Name" />
-      <input id="overs" type="number" step="0.1" placeholder="Overs Bowled" />
-      <input id="runsConceded" type="number" placeholder="Runs Conceded" />
-      <input id="wickets" type="number" placeholder="Wickets Taken" />
-
-      <button onclick="addBowling()">Add Bowling Record</button>
-    </div>
-
-
-    <!-- CHARTS -->
-    <div class="card">
-      <h2>Batting Performance Graph</h2>
-      <canvas id="batChart"></canvas>
-    </div>
-
-    <div class="card">
-      <h2>Bowling Performance Graph</h2>
-      <canvas id="bowlChart"></canvas>
-    </div>
-
-
-    <!-- PDF EXPORT -->
-    <div class="card">
-      <button onclick="downloadPDF()">Download Full Report PDF</button>
-    </div>
-
+  <!-- MATCH INPUT -->
+  <div class="card">
+    <h2>Add Match Record</h2>
+    <input id="player" placeholder="Player Name"/>
+    <input id="runs" type="number" placeholder="Runs Scored"/>
+    <input id="balls" type="number" placeholder="Balls Faced"/>
+    <input id="wickets" type="number" placeholder="Wickets Taken"/>
+    <input id="overs" type="number" step="0.1" placeholder="Overs Bowled"/>
+    <input id="runsConceded" type="number" placeholder="Runs Conceded"/>
+    <button onclick="addMatch()">Add Match</button>
   </div>
 
-  <footer>© SadiCoinTech Sports Intelligence Platform</footer>
+  <!-- CAREER TABLE -->
+  <div class="card">
+    <h2>Player Career Statistics</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Matches</th>
+          <th>Total Runs</th>
+          <th>Average</th>
+          <th>Strike Rate</th>
+          <th>Wickets</th>
+          <th>Bowling Avg</th>
+          <th>Economy</th>
+        </tr>
+      </thead>
+      <tbody id="careerTable"></tbody>
+    </table>
+  </div>
 
+  <!-- PERFORMANCE CHART -->
+  <div class="card">
+    <h2>Runs Per Match</h2>
+    <canvas id="runsChart"></canvas>
+  </div>
+
+  <!-- PDF -->
+  <div class="card">
+    <button onclick="downloadPDF()">Download Career Report PDF</button>
+  </div>
+
+</div>
+
+<footer>© SadiCoinTech Sports Intelligence Platform</footer>
 
 <script>
-const batData = [];
-const bowlData = [];
+const matches = [];
+const career = {};
 
-// ---------- ADD BATTING ----------
-function addBatting() {
-  const player = document.getElementById("player").value;
-  const balls = Number(document.getElementById("balls").value);
-  const runs = Number(document.getElementById("runs").value);
-  const dismissal = document.getElementById("dismissal").value;
+function addMatch() {
+  const player = playerEl.value.trim();
+  const runs = Number(runsEl.value);
+  const balls = Number(ballsEl.value);
+  const wickets = Number(wicketsEl.value);
+  const overs = Number(oversEl.value);
+  const runsConceded = Number(runsConcededEl.value);
 
-  if (!player || !balls) return alert("Enter valid batting data");
+  if (!player) return alert("Enter player name");
 
-  const strikeRate = ((runs / balls) * 100).toFixed(1);
+  matches.push({ player, runs });
 
-  batData.push({ player, runs, strikeRate, dismissal });
-  renderBatChart();
+  if (!career[player]) {
+    career[player] = {
+      matches: 0, runs: 0, balls: 0,
+      wickets: 0, overs: 0, runsConceded: 0
+    };
+  }
+
+  const c = career[player];
+  c.matches++;
+  c.runs += runs;
+  c.balls += balls;
+  c.wickets += wickets;
+  c.overs += overs;
+  c.runsConceded += runsConceded;
+
+  renderCareer();
+  renderChart();
 }
 
+const playerEl = document.getElementById("player");
+const runsEl = document.getElementById("runs");
+const ballsEl = document.getElementById("balls");
+const wicketsEl = document.getElementById("wickets");
+const oversEl = document.getElementById("overs");
+const runsConcededEl = document.getElementById("runsConceded");
 
-// ---------- ADD BOWLING ----------
-function addBowling() {
-  const player = document.getElementById("bowler").value;
-  const overs = Number(document.getElementById("overs").value);
-  const runs = Number(document.getElementById("runsConceded").value);
-  const wickets = Number(document.getElementById("wickets").value);
+function renderCareer() {
+  const tbody = document.getElementById("careerTable");
+  tbody.innerHTML = "";
 
-  if (!player || !overs) return alert("Enter valid bowling data");
+  Object.keys(career).forEach(name => {
+    const c = career[name];
 
-  const economy = (runs / overs).toFixed(2);
+    const avg = c.matches ? (c.runs / c.matches).toFixed(1) : 0;
+    const sr = c.balls ? ((c.runs / c.balls) * 100).toFixed(1) : 0;
+    const bowlAvg = c.wickets ? (c.runsConceded / c.wickets).toFixed(1) : "-";
+    const eco = c.overs ? (c.runsConceded / c.overs).toFixed(2) : 0;
 
-  bowlData.push({ player, economy, wickets });
-  renderBowlChart();
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td>${c.matches}</td>
+        <td>${c.runs}</td>
+        <td>${avg}</td>
+        <td>${sr}</td>
+        <td>${c.wickets}</td>
+        <td>${bowlAvg}</td>
+        <td>${eco}</td>
+      </tr>
+    `;
+  });
 }
 
+let chart;
 
-// ---------- CHARTS ----------
-let batChart, bowlChart;
+function renderChart() {
+  const ctx = document.getElementById("runsChart");
 
-function renderBatChart() {
-  const ctx = document.getElementById("batChart");
+  if (chart) chart.destroy();
 
-  if (batChart) batChart.destroy();
-
-  batChart = new Chart(ctx, {
-    type: "bar",
+  chart = new Chart(ctx, {
+    type: "line",
     data: {
-      labels: batData.map(d => d.player),
+      labels: matches.map((_, i) => "Match " + (i + 1)),
       datasets: [{
-        label: "Strike Rate",
-        data: batData.map(d => d.strikeRate)
+        label: "Runs",
+        data: matches.map(m => m.runs)
       }]
     }
   });
 }
 
-function renderBowlChart() {
-  const ctx = document.getElementById("bowlChart");
-
-  if (bowlChart) bowlChart.destroy();
-
-  bowlChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: bowlData.map(d => d.player),
-      datasets: [{
-        label: "Economy Rate",
-        data: bowlData.map(d => d.economy)
-      }]
-    }
-  });
-}
-
-
-// ---------- PDF EXPORT ----------
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
-  pdf.text("SadiCoinTech Sports AI Report", 20, 20);
+  pdf.text("SadiCoinTech Career Report", 20, 20);
 
-  // Bat chart image
-  const batImg = document.getElementById("batChart").toDataURL("image/png");
-  pdf.addImage(batImg, "PNG", 15, 30, 180, 70);
-
-  // Bowl chart image
-  const bowlImg = document.getElementById("bowlChart").toDataURL("image/png");
-  pdf.addImage(bowlImg, "PNG", 15, 110, 180, 70);
+  const img = document.getElementById("runsChart").toDataURL("image/png");
+  pdf.addImage(img, "PNG", 15, 30, 180, 80);
 
   pdf.text("© SadiCoinTech", 80, 200);
 
-  pdf.save("SadiCoinTech_Report.pdf");
+  pdf.save("SadiCoinTech_Career_Report.pdf");
 }
 </script>
 
