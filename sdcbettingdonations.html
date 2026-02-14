@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SadiCoinTech Sports AI Platform</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{font-family:Arial;margin:0;background:#0f172a;color:#e5e7eb}
+header{background:#020617;padding:18px;text-align:center;font-size:24px;font-weight:bold}
+.container{padding:20px;max-width:1200px;margin:auto}
+.card{background:#020617;border-radius:16px;padding:20px;margin-bottom:20px}
+input,select,button{padding:10px;margin:6px 0;border-radius:10px;border:none;width:100%}
+button{background:#22c55e;color:#fff;font-weight:bold;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #334155;padding:8px;text-align:center}
+canvas{background:#fff;border-radius:12px;padding:10px}
+footer{text-align:center;padding:20px;font-size:14px;opacity:.7}
+</style>
+</head>
+
+<body>
+
+<header>⚽🏏 SadiCoinTech Sports AI Platform</header>
+
+<div class="container">
+
+<!-- MATCH INPUT -->
+<div class="card">
+<h2>Add Match Record</h2>
+<input id="player" placeholder="Player Name">
+<input id="runs" type="number" placeholder="Runs">
+<input id="balls" type="number" placeholder="Balls">
+<input id="wickets" type="number" placeholder="Wickets">
+<input id="overs" type="number" step="0.1" placeholder="Overs Bowled">
+<input id="runsConceded" type="number" placeholder="Runs Conceded">
+<button onclick="addMatch()">Add Match</button>
+</div>
+
+<!-- CAREER TABLE -->
+<div class="card">
+<h2>Career Statistics</h2>
+<table>
+<thead>
+<tr>
+<th>Player</th><th>Matches</th><th>Runs</th><th>Average</th>
+<th>Strike Rate</th><th>Wickets</th><th>Bowl Avg</th><th>Economy</th>
+</tr>
+</thead>
+<tbody id="careerTable"></tbody>
+</table>
+</div>
+
+<!-- CHART -->
+<div class="card">
+<h2>Runs per Match</h2>
+<canvas id="runsChart"></canvas>
+</div>
+
+<!-- BOWLING EXTRAS -->
+<div class="card">
+<h2>Bowling Extras Tracker</h2>
+<input id="bowler" placeholder="Bowler Name">
+<input id="bOvers" type="number" step="0.1" placeholder="Overs">
+<input id="bRuns" type="number" placeholder="Runs Conceded">
+<input id="wides" type="number" placeholder="Wides">
+<input id="noballs" type="number" placeholder="No Balls">
+<input id="byes" type="number" placeholder="Byes">
+<input id="legbyes" type="number" placeholder="Leg Byes">
+<button onclick="addBowling()">Add Bowling Record</button>
+<p id="bowlingSummary"></p>
+</div>
+
+<!-- SDC HUMANITARIAN MODULE -->
+<div class="card">
+<h2>SDC Humanitarian Match Prediction</h2>
+
+<input id="teamA" placeholder="Team A">
+<input id="teamB" placeholder="Team B">
+
+<input id="user" placeholder="User Name">
+<input id="stake" type="number" placeholder="SDC Tokens">
+
+<select id="prediction">
+<option value="A">Team A Win</option>
+<option value="B">Team B Win</option>
+<option value="D">Draw</option>
+</select>
+
+<button onclick="addPrediction()">Add Prediction</button>
+
+<hr>
+
+<select id="result">
+<option value="A">Team A Won</option>
+<option value="B">Team B Won</option>
+<option value="D">Draw</option>
+</select>
+
+<button onclick="calculateRewards()">Distribute SDC</button>
+<pre id="rewardOutput"></pre>
+</div>
+
+<!-- PDF -->
+<div class="card">
+<button onclick="downloadPDF()">Download Full PDF Report</button>
+</div>
+
+</div>
+
+<footer>© SadiCoinTech Humanitarian Sports Intelligence</footer>
+
+<script>
+/* ---------- CAREER ENGINE ---------- */
+const matches=[];
+const career={};
+
+function addMatch(){
+const player=playerEl.value.trim();
+if(!player)return alert("Enter player");
+
+const data={
+runs:+runsEl.value||0,
+balls:+ballsEl.value||0,
+wickets:+wicketsEl.value||0,
+overs:+oversEl.value||0,
+runsConceded:+runsConcededEl.value||0
+};
+
+matches.push({player,runs:data.runs});
+
+if(!career[player]){
+career[player]={matches:0,runs:0,balls:0,wickets:0,overs:0,runsConceded:0};
+}
+
+const c=career[player];
+c.matches++;
+c.runs+=data.runs;
+c.balls+=data.balls;
+c.wickets+=data.wickets;
+c.overs+=data.overs;
+c.runsConceded+=data.runsConceded;
+
+renderCareer();
+renderChart();
+}
+
+const playerEl=document.getElementById("player");
+const runsEl=document.getElementById("runs");
+const ballsEl=document.getElementById("balls");
+const wicketsEl=document.getElementById("wickets");
+const oversEl=document.getElementById("overs");
+const runsConcededEl=document.getElementById("runsConceded");
+
+function renderCareer(){
+const tbody=document.getElementById("careerTable");
+tbody.innerHTML="";
+
+Object.keys(career).forEach(name=>{
+const c=career[name];
+
+const avg=c.matches?(c.runs/c.matches).toFixed(1):0;
+const sr=c.balls?((c.runs/c.balls)*100).toFixed(1):0;
+const bowlAvg=c.wickets?(c.runsConceded/c.wickets).toFixed(1):"-";
+const eco=c.overs?(c.runsConceded/c.overs).toFixed(2):0;
+
+tbody.innerHTML+=`
+<tr>
+<td>${name}</td><td>${c.matches}</td><td>${c.runs}</td>
+<td>${avg}</td><td>${sr}</td><td>${c.wickets}</td>
+<td>${bowlAvg}</td><td>${eco}</td>
+</tr>`;
+});
+}
+
+/* ---------- CHART ---------- */
+let chart;
+function renderChart(){
+const ctx=document.getElementById("runsChart");
+if(chart)chart.destroy();
+
+chart=new Chart(ctx,{
+type:"line",
+data:{
+labels:matches.map((_,i)=>"Match "+(i+1)),
+datasets:[{label:"Runs",data:matches.map(m=>m.runs)}]
+}
+});
+}
+
+/* ---------- BOWLING EXTRAS ---------- */
+function addBowling(){
+const overs=+bOvers.value||0;
+const runs=+bRuns.value||0;
+const extras=(+wides.value||0)+(+noballs.value||0)+(+byes.value||0)+(+legbyes.value||0);
+const economy=overs?((runs+extras)/overs).toFixed(2):0;
+
+bowlingSummary.innerText=`Extras: ${extras} | Economy: ${economy}`;
+}
+
+/* ---------- SDC HUMANITARIAN ---------- */
+const predictions=[];
+
+function addPrediction(){
+const userVal=user.value;
+const stakeVal=+stake.value;
+const pick=prediction.value;
+if(!userVal||!stakeVal)return alert("Invalid");
+
+predictions.push({user:userVal,stake:stakeVal,pick});
+alert("Prediction added to humanitarian pool");
+}
+
+function calculateRewards(){
+const res=result.value;
+const total=predictions.reduce((s,p)=>s+p.stake,0);
+const winners=predictions.filter(p=>p.pick===res);
+const correct=winners.reduce((s,p)=>s+p.stake,0);
+
+if(!correct){
+rewardOutput.textContent="No winners. Pool → Humanitarian Aid.";
+return;
+}
+
+const aid=total*0.1;
+let text=`Total Pool: ${total} SDC\nAid Fund: ${aid.toFixed(2)} SDC\n\n`;
+
+winners.forEach(w=>{
+const reward=((w.stake/correct)*(total-aid)).toFixed(2);
+text+=`${w.user} → ${reward} SDC\n`;
+});
+
+rewardOutput.textContent=text;
+}
+
+/* ---------- PDF ---------- */
+async function downloadPDF(){
+const {jsPDF}=window.jspdf;
+const pdf=new jsPDF();
+
+pdf.text("SadiCoinTech Sports AI Report",20,20);
+
+const img=document.getElementById("runsChart").toDataURL("image/png");
+pdf.addImage(img,"PNG",15,30,180,80);
+
+pdf.text("© SadiCoinTech Humanitarian Platform",40,200);
+pdf.save("SadiCoinTech_Report.pdf");
+}
+</script>
+
+</body>
+</html>
