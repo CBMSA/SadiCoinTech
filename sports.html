@@ -1,213 +1,236 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sports AI Platform — Multi-Sport Player & Team Analytics</title>
-<style>
-body { font-family: Arial, sans-serif; margin:0; background:#0b0f19; color:#fff; }
-header { background:#111827; padding:20px; text-align:center; }
-h1 { margin:0; }
-.container { display:flex; flex-wrap:wrap; gap:20px; padding:20px; }
-.card { background:#1f2937; padding:15px; border-radius:12px; flex:1 1 400px; }
-select, input, button { padding:8px; margin-top:10px; border-radius:8px; border:none; width:100%; }
-button { background:#22c55e; color:white; cursor:pointer; }
-table { width:100%; border-collapse:collapse; margin-top:10px; }
-th, td { border:1px solid #ffffff33; padding:6px; text-align:center; }
-canvas { width:100%; height:250px; margin-top:10px; border-radius:12px; background:#000; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SadiCoinTech Sports AI Dashboard</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+
+    header {
+      background: #020617;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    input, select, button {
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 10px;
+      border: none;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  </style>
 </head>
+
 <body>
-<header>
-<h1>Sports AI Unified Dashboard</h1>
-<p>Multi-Sport Player & Team Analytics with Charts and PDF Export</p>
-</header>
-<div class="container">
+  <header>⚽🏏 SadiCoinTech Sports AI Dashboard</header>
 
-<div class="card">
-<h2>Select Sport</h2>
-<select id="sportSelect" onchange="updateSportView()">
-<option>Cricket</option>
-<option>Football</option>
-<option>Basketball</option>
-<option>Rugby</option>
-<option>Polo</option>
-<option>Chess</option>
-<option>Bowling</option>
-<option>Water Polo</option>
-<option>Hockey</option>
-<option>Netball</option>
-</select>
-</div>
+  <div class="container">
 
-<div class="card">
-<h2>Add Player</h2>
-<input type="text" id="playerName" placeholder="Player Name" />
-<button onclick="addPlayer()">Add Player</button>
-<select id="playerSelect" onchange="displayPlayerStats()">
-</select>
-</div>
+    <!-- PLAYER INPUT -->
+    <div class="card">
+      <h2>Add Practice Batting Session</h2>
+      <input id="player" placeholder="Player Name" />
+      <input id="balls" type="number" placeholder="Balls Faced" />
+      <input id="runs" type="number" placeholder="Runs Scored" />
+      <input id="fours" type="number" placeholder="Fours" />
+      <input id="sixes" type="number" placeholder="Sixes" />
 
-<div class="card">
-<h2>Add Match Performance</h2>
-<form id="matchForm" onsubmit="addMatch(event)">
-<input type="number" id="matchNumber" placeholder="Match Number" required />
-<input type="text" id="batting" placeholder="Batting (Balls / Runs)" required />
-<input type="text" id="bowling" placeholder="Bowling (Wkts / Overs / Runs)" required />
-<button type="submit">Add Match</button>
-</form>
-<table id="performanceTable">
-<thead>
-<tr><th>Match</th><th>Batting</th><th>Bowling</th><th>Strike Rate</th><th>Run Rate</th><th>Talent</th><th>Estimated Value ($)</th></tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-<canvas id="playerChart"></canvas>
-</div>
+      <select id="dismissal">
+        <option>Not Out</option>
+        <option>Bowled</option>
+        <option>Caught</option>
+        <option>Caught Behind</option>
+        <option>Caught & Bowled</option>
+        <option>LBW</option>
+        <option>Run Out</option>
+      </select>
 
-<div class="card">
-<h2>Team Performance</h2>
-<canvas id="teamChart"></canvas>
-<button onclick="exportPDF()">Export PDF</button>
-</div>
+      <button onclick="addBatting()">Add Batting Record</button>
+    </div>
 
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- BOWLING INPUT -->
+    <div class="card">
+      <h2>Add Practice Bowling Session</h2>
+      <input id="bowler" placeholder="Bowler Name" />
+      <input id="overs" type="number" step="0.1" placeholder="Overs Bowled" />
+      <input id="runsConceded" type="number" placeholder="Runs Conceded" />
+      <input id="wickets" type="number" placeholder="Wickets Taken" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <button onclick="addBowling()">Add Bowling Record</button>
+    </div>
+
+
+    <!-- CHARTS -->
+    <div class="card">
+      <h2>Batting Performance Graph</h2>
+      <canvas id="batChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Bowling Performance Graph</h2>
+      <canvas id="bowlChart"></canvas>
+    </div>
+
+
+    <!-- PDF EXPORT -->
+    <div class="card">
+      <button onclick="downloadPDF()">Download Full Report PDF</button>
+    </div>
+
+  </div>
+
+  <footer>© SadiCoinTech Sports Intelligence Platform</footer>
+
 
 <script>
-let sportsData = {};
-let currentSport = 'Cricket';
-let currentPlayer = '';
+const batData = [];
+const bowlData = [];
 
-function updateSportView(){
-  currentSport = document.getElementById('sportSelect').value;
-  displayPlayerStats();
+// ---------- ADD BATTING ----------
+function addBatting() {
+  const player = document.getElementById("player").value;
+  const balls = Number(document.getElementById("balls").value);
+  const runs = Number(document.getElementById("runs").value);
+  const dismissal = document.getElementById("dismissal").value;
+
+  if (!player || !balls) return alert("Enter valid batting data");
+
+  const strikeRate = ((runs / balls) * 100).toFixed(1);
+
+  batData.push({ player, runs, strikeRate, dismissal });
+  renderBatChart();
 }
 
-function addPlayer(){
-  const name = document.getElementById('playerName').value.trim();
-  if(!name) return;
-  if(!sportsData[currentSport]) sportsData[currentSport] = {};
-  sportsData[currentSport][name] = [];
-  const select = document.getElementById('playerSelect');
-  const option = document.createElement('option');
-  option.value = name;
-  option.text = name;
-  select.add(option);
-  document.getElementById('playerName').value = '';
-  currentPlayer = name;
-  displayPlayerStats();
+
+// ---------- ADD BOWLING ----------
+function addBowling() {
+  const player = document.getElementById("bowler").value;
+  const overs = Number(document.getElementById("overs").value);
+  const runs = Number(document.getElementById("runsConceded").value);
+  const wickets = Number(document.getElementById("wickets").value);
+
+  if (!player || !overs) return alert("Enter valid bowling data");
+
+  const economy = (runs / overs).toFixed(2);
+
+  bowlData.push({ player, economy, wickets });
+  renderBowlChart();
 }
 
-function displayPlayerStats(){
-  const select = document.getElementById('playerSelect');
-  currentPlayer = select.value;
-  const tbody = document.getElementById('performanceTable').getElementsByTagName('tbody')[0];
-  tbody.innerHTML = '';
-  if(!currentPlayer || !sportsData[currentSport][currentPlayer]) return;
-  sportsData[currentSport][currentPlayer].forEach(match => {
-    const row = tbody.insertRow();
-    row.insertCell(0).innerText = match.match;
-    row.insertCell(1).innerText = match.batting;
-    row.insertCell(2).innerText = match.bowling;
-    row.insertCell(3).innerText = match.strikeRate;
-    row.insertCell(4).innerText = match.runRate;
-    row.insertCell(5).innerText = match.talent;
-    row.insertCell(6).innerText = match.value;
-  });
-  updatePlayerChart();
-  updateTeamChart();
-}
 
-function addMatch(event){
-  event.preventDefault();
-  const matchNum = document.getElementById('matchNumber').value;
-  const battingInput = document.getElementById('batting').value;
-  const bowlingInput = document.getElementById('bowling').value;
+// ---------- CHARTS ----------
+let batChart, bowlChart;
 
-  const balls = Number(battingInput.split('/')[0].trim());
-  const runs = Number(battingInput.split('/')[1].trim());
-  const wkts = Number(bowlingInput.split('/')[0].trim());
-  const overs = Number(bowlingInput.split('/')[1].trim());
-  const runsConceded = Number(bowlingInput.split('/')[2].trim());
+function renderBatChart() {
+  const ctx = document.getElementById("batChart");
 
-  const strikeRate = balls ? ((runs/balls)*100).toFixed(2) : 0;
-  const runRate = overs ? (runs/overs).toFixed(2) : 0;
-  const talent = ((runs*4 + wkts*6)/Math.max(1, balls)).toFixed(2);
-  const value = Math.max(0, ((30-25)*0.05 + 7*0.6 + talent*0.4)*1000000).toLocaleString();
+  if (batChart) batChart.destroy();
 
-  sportsData[currentSport][currentPlayer].push({
-    match: matchNum, batting: battingInput, bowling: bowlingInput,
-    strikeRate, runRate, talent, value
-  });
-
-  document.getElementById('matchForm').reset();
-  displayPlayerStats();
-}
-
-let playerChartInstance, teamChartInstance;
-function updatePlayerChart(){
-  const data = sportsData[currentSport][currentPlayer];
-  const labels = data.map(d=>d.match);
-  const runsData = data.map(d=>Number(d.batting.split('/')[1].trim()));
-  const wicketsData = data.map(d=>Number(d.bowling.split('/')[0].trim()));
-  if(playerChartInstance) playerChartInstance.destroy();
-  const ctx = document.getElementById('playerChart').getContext('2d');
-  playerChartInstance = new Chart(ctx, {
-    type:'line',
-    data:{labels, datasets:[
-      {label:'Runs', data:runsData, borderColor:'#22c55e', fill:false},
-      {label:'Wickets', data:wicketsData, borderColor:'#2563eb', fill:false}
-    ]},
-    options:{responsive:true, plugins:{legend:{position:'top'}}}
+  batChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: batData.map(d => d.player),
+      datasets: [{
+        label: "Strike Rate",
+        data: batData.map(d => d.strikeRate)
+      }]
+    }
   });
 }
 
-function updateTeamChart(){
-  const data = sportsData[currentSport];
-  const labels = [];
-  const totalRuns = [];
-  const totalWkts = [];
-  for(const player in data){
-    let sumRuns=0,sumWkts=0;
-    data[player].forEach(m=>{sumRuns+=Number(m.batting.split('/')[1].trim()); sumWkts+=Number(m.bowling.split('/')[0].trim());});
-    labels.push(player);
-    totalRuns.push(sumRuns);
-    totalWkts.push(sumWkts);
-  }
-  if(teamChartInstance) teamChartInstance.destroy();
-  const ctx = document.getElementById('teamChart').getContext('2d');
-  teamChartInstance = new Chart(ctx, {
-    type:'bar',
-    data:{labels, datasets:[
-      {label:'Total Runs', data:totalRuns, backgroundColor:'#22c55e'},
-      {label:'Total Wickets', data:totalWkts, backgroundColor:'#2563eb'}
-    ]},
-    options:{responsive:true, plugins:{legend:{position:'top'}}}
+function renderBowlChart() {
+  const ctx = document.getElementById("bowlChart");
+
+  if (bowlChart) bowlChart.destroy();
+
+  bowlChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: bowlData.map(d => d.player),
+      datasets: [{
+        label: "Economy Rate",
+        data: bowlData.map(d => d.economy)
+      }]
+    }
   });
 }
 
-function exportPDF(){
+
+// ---------- PDF EXPORT ----------
+async function downloadPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text('Sports AI Performance Report',10,20);
-  doc.setFontSize(12);
-  let y = 30;
-  for(const player in sportsData[currentSport]){
-    doc.text(`Player: ${player}`,10,y); y+=7;
-    sportsData[currentSport][player].forEach(m=>{
-      doc.text(`Match ${m.match}: Batting ${m.batting}, Bowling ${m.bowling}, SR ${m.strikeRate}, RR ${m.runRate}`,10,y);
-      y+=7;
-    });
-    y+=5;
-  }
-  doc.save('SportsAI_Report.pdf');
+  const pdf = new jsPDF();
+
+  pdf.text("SadiCoinTech Sports AI Report", 20, 20);
+
+  // Bat chart image
+  const batImg = document.getElementById("batChart").toDataURL("image/png");
+  pdf.addImage(batImg, "PNG", 15, 30, 180, 70);
+
+  // Bowl chart image
+  const bowlImg = document.getElementById("bowlChart").toDataURL("image/png");
+  pdf.addImage(bowlImg, "PNG", 15, 110, 180, 70);
+
+  pdf.text("© SadiCoinTech", 80, 200);
+
+  pdf.save("SadiCoinTech_Report.pdf");
 }
 </script>
 
