@@ -12,10 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body {
-  margin:0; font-family:Arial; background:#0b0f2c; color:#e5e7eb;
-  transition: background 0.5s;
-}
+body { margin:0; font-family:Arial; background:#0b0f2c; color:#e5e7eb; transition: background 0.5s;}
 header {background:#020617; padding:18px; font-size:24px; font-weight:bold; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.5);}
 nav {display:flex; gap:15px; justify-content:center; padding:10px; background:#0f1225; border-bottom:1px solid #1c1f3a;}
 nav a {color:#22c55e; text-decoration:none; font-weight:bold; transition: color 0.3s;}
@@ -44,6 +41,7 @@ footer{text-align:center; padding:20px; font-size:14px; opacity:0.7;}
 <a href="#live">Live Matches</a>
 <a href="#leaderboard">Leaderboard</a>
 <a href="#pdf">PDF Report</a>
+<a href="#addmatch">Add Match</a>
 </nav>
 
 <div class="container">
@@ -63,6 +61,15 @@ footer{text-align:center; padding:20px; font-size:14px; opacity:0.7;}
 </table>
 </div>
 
+<!-- ADD MATCH -->
+<div class="card" id="addmatch">
+<h2>Add Custom Match</h2>
+<input id="customTeamA" placeholder="Team A Name">
+<input id="customTeamB" placeholder="Team B Name">
+<input id="customDate" type="datetime-local" placeholder="Match Date & Time">
+<button onclick="addCustomMatch()">Add Match</button>
+</div>
+
 <!-- PDF EXPORT -->
 <div class="card" id="pdf">
 <button onclick="downloadPDF()">Download Betting Report PDF</button>
@@ -72,34 +79,54 @@ footer{text-align:center; padding:20px; font-size:14px; opacity:0.7;}
 <footer>© SadiCoinTech Humanitarian Cricket Platform</footer>
 
 <script>
-// ---------------------- DATA ----------------------
-const matches = []; 
-const predictions = []; 
+const matches=[];
+const predictions=[];
+const matchesContainer=document.getElementById("matchesContainer");
 
-// ---------------------- LIVE MATCH FETCH ----------------------
-const matchesContainer = document.getElementById("matchesContainer");
-
-// Replace YOUR_CRICDATA_API_KEY with actual API key
-async function fetchLiveMatches() {
-  try {
-    const resp = await fetch(`https://cricapi.com/api/matches?apikey=c7fcbc55-d199-4b75-8a3c-aa231ca6b7a1`);
-    const data = await resp.json();
-    matches.length = 0;
-    if (data.matches && data.matches.length) {
-      data.matches.forEach(m => matches.push({
-        id:m.unique_id, teamA:m['team-1'], teamB:m['team-2'], date:new Date(m.date), liveScore:"N/A", started:false
-      }));
+// ---------------------- FETCH LIVE MATCHES ----------------------
+async function fetchLiveMatches(){
+  try{
+    const resp=await fetch(`https://cricapi.com/api/matches?apikey=c7fcbc55-d199-4b75-8a3c-aa231ca6b7a1`);
+    const data=await resp.json();
+    matches.length=0;
+    if(data.matches && data.matches.length){
+      data.matches.forEach(m=>{
+        matches.push({
+          id:m.unique_id,
+          teamA:m['team-1'],
+          teamB:m['team-2'],
+          date:new Date(m.date),
+          liveScore:"Fetching...",
+          started:false,
+          processed:false
+        });
+      });
       renderMatches();
-    } else matchesContainer.innerHTML="No live matches currently.";
-  } catch(e) { matchesContainer.innerHTML="Unable to fetch live matches.";}
+      fetchLiveScores();
+    }else matchesContainer.innerHTML="No live matches currently.";
+  }catch(e){matchesContainer.innerHTML="Unable to fetch live matches."; console.error(e);}
 }
 fetchLiveMatches();
 setInterval(fetchLiveMatches,15000);
 
+// ---------------------- FETCH LIVE SCORES ----------------------
+async function fetchLiveScores(){
+  matches.forEach(async match=>{
+    try{
+      const scoreResp=await fetch(`https://cricapi.com/api/cricketScore?apikey=c7fcbc55-d199-4b75-8a3c-aa231ca6b7a1&unique_id=${match.id}`);
+      const scoreData=await scoreResp.json();
+      match.liveScore=scoreData.score||"Score not available";
+      const scoreEl=document.getElementById(`liveScore-${match.id}`);
+      if(scoreEl) scoreEl.textContent=match.liveScore;
+    }catch(e){console.warn("Failed score for match:",match.id);}
+  });
+}
+setInterval(fetchLiveScores,15000);
+
 // ---------------------- RENDER MATCHES ----------------------
-function renderMatches() {
+function renderMatches(){
   matchesContainer.innerHTML="";
-  matches.forEach(match => {
+  matches.forEach(match=>{
     const div=document.createElement("div");
     div.className="match-card";
     div.innerHTML=`
@@ -135,7 +162,7 @@ function startCountdown(match){
   },1000);
 }
 
-// Disable/enable inputs when match starts
+// ---------------------- ENABLE/DISABLE INPUTS ----------------------
 function updateMatchInputs(matchId, enabled){
   const card=document.querySelector(`[onclick="addPrediction('${matchId}', this)"]`).parentElement;
   card.querySelectorAll("input,select,button").forEach(el=>el.disabled=!enabled);
@@ -154,13 +181,6 @@ function addPrediction(matchId, btn){
   renderLeaderboard();
 }
 
-// ---------------------- SIMULATE MATCH RESULTS ----------------------
-// In real app, this should come from CricAPI live score & result endpoint
-function simulateMatchResult(matchId){
-  const match=Math.random()>0.5 ? 'A':'B'; // simulate random winner
-  distributeRewards(matchId,match);
-}
-
 // ---------------------- DISTRIBUTE REWARDS ----------------------
 function distributeRewards(matchId,result){
   const matchPredictions=predictions.filter(p=>p.matchId===matchId);
@@ -168,9 +188,7 @@ function distributeRewards(matchId,result){
   const winners=matchPredictions.filter(p=>p.pick===result);
   const correctTotal=winners.reduce((s,p)=>s+p.stake,0);
   const aidFund=totalPool*0.1;
-  winners.forEach(w=>{
-    w.reward=((w.stake/correctTotal)*(totalPool-aidFund)).toFixed(2);
-  });
+  winners.forEach(w=>{ w.reward=((w.stake/correctTotal)*(totalPool-aidFund)).toFixed(2); });
   renderLeaderboard();
 }
 
@@ -187,6 +205,25 @@ function renderLeaderboard(){
     tbody.innerHTML+=`<tr><td>${u}</td><td>${userStats[u].correct}</td><td>${userStats[u].SDC.toFixed(2)}</td></tr>`;
   });
 }
+
+// ---------------------- AUTO-FETCH RESULTS & DISTRIBUTE ----------------------
+async function fetchMatchResults(){
+  matches.forEach(async match=>{
+    try{
+      if(match.id.startsWith("custom-") || match.processed) return;
+      const scoreResp=await fetch(`https://cricapi.com/api/cricketScore?apikey=c7fcbc55-d199-4b75-8a3c-aa231ca6b7a1&unique_id=${match.id}`);
+      const scoreData=await scoreResp.json();
+      if(scoreData.matchEnded){
+        match.processed=true;
+        const winner=scoreData.winner==='draw'?'D':scoreData.winner==='team-1'?'A':'B';
+        distributeRewards(match.id,winner);
+        const scoreEl=document.getElementById(`liveScore-${match.id}`);
+        if(scoreEl) scoreEl.textContent+= " → Finished";
+      }
+    }catch(e){console.warn("Failed to fetch result for match:",match.id);}
+  });
+}
+setInterval(fetchMatchResults,30000);
 
 // ---------------------- PDF EXPORT ----------------------
 async function downloadPDF(){
@@ -213,6 +250,20 @@ async function downloadPDF(){
   });
   pdf.text("© SadiCoinTech Humanitarian Cricket Platform",50,280);
   pdf.save("SadiCoinTech_Betting_Report.pdf");
+}
+
+// ---------------------- ADD CUSTOM MATCH ----------------------
+function addCustomMatch(){
+  const teamA=document.getElementById("customTeamA").value.trim();
+  const teamB=document.getElementById("customTeamB").value.trim();
+  const date=document.getElementById("customDate").value;
+  if(!teamA||!teamB||!date){alert("Enter valid match data"); return;}
+  const match={id:"custom-"+Date.now(),teamA,teamB,date:new Date(date),liveScore:"N/A",started:false,processed:false};
+  matches.push(match);
+  renderMatches();
+  document.getElementById("customTeamA").value="";
+  document.getElementById("customTeamB").value="";
+  document.getElementById("customDate").value="";
 }
 </script>
 </body>
