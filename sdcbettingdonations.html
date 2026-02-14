@@ -82,7 +82,7 @@ const matchesContainer = document.getElementById("matchesContainer");
 // Replace YOUR_CRICDATA_API_KEY with actual API key
 async function fetchLiveMatches() {
   try {
-    const resp = await fetch(`https://cricapi.com/api/matches?apikey=YOUR_CRICDATA_API_KEY`);
+    const resp = await fetch(`https://cricapi.com/api/matches?apikey=c7fcbc55-d199-4b75-8a3c-aa231ca6b7a1`);
     const data = await resp.json();
     matches.length = 0;
     if (data.matches && data.matches.length) {
