@@ -1,100 +1,262 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SDC FSP Portal</title>
+<title>SDC FSP Super App</title>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+  background: linear-gradient(135deg,#0f0f1a,#12122a,#0d1b2a);
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+}
+.card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+}
+.nav-tabs .nav-link {
+  color: #ccc;
+}
+.nav-tabs .nav-link.active {
+  background-color: #6c5ce7;
+  color: #fff;
+  border: none;
+}
+.btn-primary { background:#6c5ce7;border:none;}
+.btn-success { background:#00b894;border:none;}
+.btn-warning { background:#fdcb6e;border:none;}
+.btn-info { background:#0984e3;border:none;}
+input, select {
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: white !important;
+}
+pre {
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.feature-list li {
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+h5 { font-weight:600; }
+</style>
 </head>
-<body class="p-4 bg-dark text-light">
 
-<h2>SDC FSP Portal — Africa Payments & FX</h2>
+<body class="p-3">
 
-<!-- Network Operator Payments -->
-<div class="card p-3 mb-3">
-  <h5>African Mobile Money Payment</h5>
+<h2 class="mb-4">SDC FSP Super App — Telecom | Fintech | Marketplace | Super App</h2>
 
-  <select id="country" class="form-control mb-1">
-    <option value="ZA">South Africa</option>
-    <option value="ZW">Zimbabwe</option>
-    <option value="KE">Kenya</option>
-    <option value="UG">Uganda</option>
-    <option value="NG">Nigeria</option>
-    <option value="GH">Ghana</option>
-    <option value="TZ">Tanzania</option>
-    <option value="RW">Rwanda</option>
-  </select>
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#wallet">Wallet</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#mobile">Mobile Money</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#market">Marketplace</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#telecom">Telecom</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#fintech">Fintech</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#compliance">Compliance</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#superapp">Super App</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#infrastructure">Infrastructure</a></li>
+  <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#revenue">Revenue</a></li>
+</ul>
 
-  <select id="network" class="form-control mb-1">
-    <option value="mtn">MTN</option>
-    <option value="vodacom">Vodacom</option>
-    <option value="airtel">Airtel</option>
-    <option value="orange">Orange</option>
-    <option value="telkom">Telkom</option>
-    <option value="cellc">Cell C</option>
-    <option value="econet">Econet</option>
-  </select>
+<div class="tab-content">
 
-  <input type="text" id="msisdn" class="form-control mb-1" placeholder="Phone Number">
-  <input type="number" id="mobileAmount" class="form-control mb-1" placeholder="Amount">
-
-  <button class="btn btn-success" onclick="mobileDeposit()">Deposit via Mobile Money</button>
-  <button class="btn btn-warning" onclick="mobileWithdraw()">Withdraw to Mobile Money</button>
-
-  <pre id="mobileMsg"></pre>
+<!-- WALLET -->
+<div class="tab-pane fade show active" id="wallet">
+  <div class="card p-3 mb-3">
+    <h5>Wallet Dashboard</h5>
+    <input type="text" id="walletId" class="form-control mb-2" placeholder="Wallet ID">
+    <button class="btn btn-info" onclick="fetchBalance()">Check Balance</button>
+    <pre id="walletMsg"></pre>
+  </div>
 </div>
 
-<!-- Live FX Rates -->
-<div class="card p-3 mb-3">
-  <h5>Live African FX Rates</h5>
-  <button class="btn btn-info mb-2" onclick="getFXRates()">Fetch Live Rates</button>
-  <pre id="fxRates"></pre>
+<!-- MOBILE MONEY -->
+<div class="tab-pane fade" id="mobile">
+  <div class="card p-3 mb-3">
+    <h5>African Mobile Money Integration</h5>
+    <select id="network" class="form-control mb-2">
+      <option>MTN</option>
+      <option>Vodacom</option>
+      <option>Airtel</option>
+      <option>Orange</option>
+      <option>Econet</option>
+      <option>Cell C</option>
+    </select>
+    <input type="text" id="msisdn" class="form-control mb-2" placeholder="Phone Number">
+    <input type="number" id="amount" class="form-control mb-2" placeholder="Amount">
+    <button class="btn btn-success" onclick="mobileDeposit()">Deposit</button>
+    <button class="btn btn-warning" onclick="mobileWithdraw()">Withdraw</button>
+    <pre id="mobileMsg"></pre>
+  </div>
+</div>
+
+<!-- MARKETPLACE -->
+<div class="tab-pane fade" id="market">
+  <div class="card p-3 mb-3">
+    <h5>Marketplace Engine</h5>
+    <ul class="feature-list">
+      <li>Vendor Onboarding</li>
+      <li>Product Listings</li>
+      <li>Cart & Checkout</li>
+      <li>Order Management</li>
+      <li>Inventory Control</li>
+      <li>Escrow Payments</li>
+      <li>Returns & Refunds</li>
+      <li>Seller Commission Engine</li>
+    </ul>
+  </div>
+</div>
+
+<!-- TELECOM -->
+<div class="tab-pane fade" id="telecom">
+  <div class="card p-3 mb-3">
+    <h5>Telecom & MNO Services</h5>
+    <ul class="feature-list">
+      <li>Voice & SMS</li>
+      <li>Data Bundles</li>
+      <li>eSIM Provisioning</li>
+      <li>International Roaming</li>
+      <li>USSD APIs</li>
+      <li>SMS Gateway APIs</li>
+      <li>SIM Registration APIs</li>
+      <li>Identity Verification APIs</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FINTECH -->
+<div class="tab-pane fade" id="fintech">
+  <div class="card p-3 mb-3">
+    <h5>Fintech Layer</h5>
+    <ul class="feature-list">
+      <li>Multi-Currency Wallet</li>
+      <li>Bank Transfers</li>
+      <li>Virtual & Physical Cards</li>
+      <li>International Remittance</li>
+      <li>Crypto Integration</li>
+      <li>Subscription Billing</li>
+      <li>BNPL</li>
+      <li>Payroll Tools</li>
+    </ul>
+  </div>
+</div>
+
+<!-- COMPLIANCE -->
+<div class="tab-pane fade" id="compliance">
+  <div class="card p-3 mb-3">
+    <h5>Compliance & Risk</h5>
+    <ul class="feature-list">
+      <li>KYC Onboarding</li>
+      <li>AML Monitoring</li>
+      <li>Fraud Detection</li>
+      <li>Transaction Monitoring</li>
+      <li>Reporting Dashboard</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SUPER APP -->
+<div class="tab-pane fade" id="superapp">
+  <div class="card p-3 mb-3">
+    <h5>Super App Modules</h5>
+    <ul class="feature-list">
+      <li>Messaging (PhotoChat)</li>
+      <li>Ride-Hailing</li>
+      <li>Food Delivery</li>
+      <li>Loans & Credit</li>
+      <li>Investments</li>
+      <li>Insurance</li>
+      <li>Mini-App Ecosystem</li>
+      <li>Government Services</li>
+    </ul>
+  </div>
+</div>
+
+<!-- INFRASTRUCTURE -->
+<div class="tab-pane fade" id="infrastructure">
+  <div class="card p-3 mb-3">
+    <h5>Infrastructure Stack</h5>
+    <ul class="feature-list">
+      <li>Visa / Mastercard Processing</li>
+      <li>Banking APIs</li>
+      <li>SWIFT Integration</li>
+      <li>Payment Gateways</li>
+      <li>Cloud Hosting</li>
+      <li>Blockchain Nodes</li>
+      <li>API Gateway</li>
+      <li>Fraud Engines</li>
+      <li>SMS/USSD Aggregators</li>
+    </ul>
+  </div>
+</div>
+
+<!-- REVENUE -->
+<div class="tab-pane fade" id="revenue">
+  <div class="card p-3 mb-3">
+    <h5>Revenue Model Engine</h5>
+    <ul class="feature-list">
+      <li>Transaction Fees</li>
+      <li>Merchant Commission</li>
+      <li>Float Interest</li>
+      <li>Lending Interest</li>
+      <li>Subscription Fees</li>
+      <li>Advertising</li>
+      <li>API Usage Fees</li>
+      <li>Cross-border FX Margin</li>
+      <li>Withdrawal Fees</li>
+    </ul>
+  </div>
+</div>
+
 </div>
 
 <script>
-const API_BASE = "/api";
+const API_BASE="/api";
 
-// Mobile Money Deposit
-async function mobileDeposit() {
-  const country = document.getElementById('country').value;
-  const network = document.getElementById('network').value;
-  const msisdn = document.getElementById('msisdn').value;
-  const amount = parseFloat(document.getElementById('mobileAmount').value);
-
-  const res = await fetch(`${API_BASE}/africa/mobile-money`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'deposit', country, network, msisdn, amount })
-  });
-
-  const data = await res.json();
-  document.getElementById('mobileMsg').innerText = JSON.stringify(data, null, 2);
+async function fetchBalance(){
+  const walletId=document.getElementById('walletId').value;
+  const res=await fetch(`${API_BASE}/wallet/${walletId}`);
+  document.getElementById('walletMsg').innerText=JSON.stringify(await res.json(),null,2);
 }
 
-// Mobile Money Withdraw
-async function mobileWithdraw() {
-  const country = document.getElementById('country').value;
-  const network = document.getElementById('network').value;
-  const msisdn = document.getElementById('msisdn').value;
-  const amount = parseFloat(document.getElementById('mobileAmount').value);
+async function mobileDeposit(){
+  const network=document.getElementById('network').value;
+  const msisdn=document.getElementById('msisdn').value;
+  const amount=document.getElementById('amount').value;
 
-  const res = await fetch(`${API_BASE}/africa/mobile-money`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'withdraw', country, network, msisdn, amount })
+  const res=await fetch(`${API_BASE}/mobile/deposit`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({network,msisdn,amount})
   });
-
-  const data = await res.json();
-  document.getElementById('mobileMsg').innerText = JSON.stringify(data, null, 2);
+  document.getElementById('mobileMsg').innerText=JSON.stringify(await res.json(),null,2);
 }
 
-// Live FX Rates (e.g., EDOH or other aggregator)
-async function getFXRates() {
-  const res = await fetch(`${API_BASE}/africa/fx-rates`);
-  const data = await res.json();
-  document.getElementById('fxRates').innerText = JSON.stringify(data, null, 2);
+async function mobileWithdraw(){
+  const network=document.getElementById('network').value;
+  const msisdn=document.getElementById('msisdn').value;
+  const amount=document.getElementById('amount').value;
+
+  const res=await fetch(`${API_BASE}/mobile/withdraw`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({network,msisdn,amount})
+  });
+  document.getElementById('mobileMsg').innerText=JSON.stringify(await res.json(),null,2);
 }
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
