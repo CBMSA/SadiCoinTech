@@ -1,265 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Debt Projections, IMF Formulas, and BOP</title>
-
-  <!-- jsPDF for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
-    nav a { margin-right: 15px; text-decoration: none; color: #003366; font-weight: bold; }
-    .form-container { background: #fff; padding: 20px; max-width: 950px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
-    h2 { color: #003366; text-align: center; margin: 0 0 8px 0; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    label { display:block; margin-top:10px; font-weight:600; color:#234; }
-    input, textarea, select { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px; font-size:14px; box-sizing:border-box; }
-    textarea { min-height:90px; }
-    button { margin-top:14px; background:#003366; color:#fff; padding:10px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
-    button.secondary { background:#0b69ff; }
-    .small { font-size:12px; color:#666; }
-    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
-    th,td { border:1px solid #e6edf3; padding:6px 8px; text-align:right; }
-    th:first-child, td:first-child { text-align:left; }
-    .out { background:#fafbfd; padding:10px; border-radius:6px; border:1px dashed #e3eefc; white-space:pre-wrap; }
-    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Formulas Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .result {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-  <nav>
-    <a href="citizenswallet.html">SDC Wallet</a>|
-    <a href="Sadicoinapi.js">SadicoinApi</a>|
-    <a href="SadiCoin.html">SadiCoin DApp</a>|
-    <a href="tokenomics.html">Tokenomics</a>
-  </nav>
 
-  <!-- IMF Formulas Section -->
-  <div class="form-container">
-    <h2>IMF Qualification Formulas</h2>
+<div class="container">
 
-    <!-- SDR Formulas -->
-    <h3>Special Drawing Rights (SDR)</h3>
-    <pre>
-    SDR Allocation Formula:
-    SDR Allocation = (Member Quota Share / Total IMF Quota) * Total SDR Allocation
+    <h1 class="text-center">Financial Formulas Platform</h1>
 
-    SDR Conversion to National Currency:
-    Value of SDR = (Currency Weight) * (Exchange Rate)
-    </pre>
+    <!-- SDR Calculation Section -->
+    <div class="section">
+        <h3>Special Drawing Rights (SDR)</h3>
+        <label for="quotaShare">Member Quota Share:</label>
+        <input type="number" id="quotaShare" class="form-control" placeholder="Enter Member Quota Share" required>
+        <label for="totalQuota">Total IMF Quota:</label>
+        <input type="number" id="totalQuota" class="form-control" placeholder="Enter Total IMF Quota" required>
+        <button id="calculateSDR" class="btn btn-primary mt-2">Calculate SDR Allocation</button>
+        <div id="sdrResult" class="result"></div>
+    </div>
 
-    <!-- Debt Sustainability Formulas -->
-    <h3>Debt Management and Debt Sustainability</h3>
-    <pre>
-    Debt-to-GDP Ratio:
-    Debt-to-GDP = (Total Debt / GDP) * 100
+    <!-- Debt Management Section -->
+    <div class="section">
+        <h3>Debt Sustainability</h3>
+        <label for="totalDebt">Total Debt:</label>
+        <input type="number" id="totalDebt" class="form-control" placeholder="Enter Total Debt" required>
+        <label for="gdp">GDP:</label>
+        <input type="number" id="gdp" class="form-control" placeholder="Enter GDP" required>
+        <label for="debtService">Debt Service Payments:</label>
+        <input type="number" id="debtService" class="form-control" placeholder="Enter Debt Service Payments" required>
+        <button id="calculateDebtSustainability" class="btn btn-primary mt-2">Calculate Debt-to-GDP Ratio</button>
+        <div id="debtResult" class="result"></div>
+    </div>
 
-    Debt Service Ratio:
-    Debt Service Ratio = (Debt Service Payments / Revenue or GDP) * 100
+    <!-- Balance of Payments Section -->
+    <div class="section">
+        <h3>Balance of Payments (BOP)</h3>
+        <label for="directInvest">Direct Investment:</label>
+        <input type="number" id="directInvest" class="form-control" placeholder="Enter value for direct investment" required>
+        <label for="portfolioInvest">Portfolio Investment:</label>
+        <input type="number" id="portfolioInvest" class="form-control" placeholder="Enter value for portfolio investment" required>
+        <label for="otherInvest">Other Investments:</label>
+        <input type="number" id="otherInvest" class="form-control" placeholder="Enter value for other investments" required>
+        <label for="exports">Exports:</label>
+        <input type="number" id="exports" class="form-control" placeholder="Enter value for exports" required>
+        <label for="imports">Imports:</label>
+        <input type="number" id="imports" class="form-control" placeholder="Enter value for imports" required>
+        <button id="calculateBOP" class="btn btn-primary mt-2">Calculate BOP</button>
+        <div id="bopResult" class="result"></div>
+    </div>
 
-    Debt Sustainability:
-    Debt Sustainability = Debt Service / (Revenue / Exports) < Threshold
+    <!-- Data and Cybersecurity Section -->
+    <div class="section">
+        <h3>Data Security & Cybersecurity</h3>
+        <label for="dataSecurity">Data Security (CIA - Confidentiality, Integrity, Availability):</label>
+        <input type="number" id="dataSecurity" class="form-control" placeholder="Enter data security value" required>
+        <label for="latency">Data Latency (Distance / Transmission Speed):</label>
+        <input type="number" id="latency" class="form-control" placeholder="Enter data latency value" required>
+        <button id="calculateSecurity" class="btn btn-primary mt-2">Calculate Data Security</button>
+        <div id="securityResult" class="result"></div>
+    </div>
 
-    Effective Interest Rate (EIR):
-    EIR = (Debt Service / Total Debt) * 100
-    </pre>
+</div>
 
-    <!-- Debt Framework -->
-    <h3>Debt Sustainability Framework for Low-Income Countries</h3>
-    <pre>
-    Debt Service-to-Revenue Ratio:
-    Debt Service-to-Revenue Ratio = Debt Service / Government Revenue * 100
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Calculate SDR Allocation
+    document.getElementById('calculateSDR').addEventListener('click', function() {
+        const quotaShare = parseFloat(document.getElementById('quotaShare').value);
+        const totalQuota = parseFloat(document.getElementById('totalQuota').value);
+        if (!isNaN(quotaShare) && !isNaN(totalQuota)) {
+            const sdrAllocation = (quotaShare / totalQuota) * 100;
+            document.getElementById('sdrResult').textContent = 'SDR Allocation: ' + sdrAllocation.toFixed(2) + '%';
+        } else {
+            alert('Please enter valid values for quota share and total quota.');
+        }
+    });
 
-    Gross Financing Needs (GFN):
-    GFN = Debt Service + Budget Deficit
+    // Calculate Debt-to-GDP Ratio
+    document.getElementById('calculateDebtSustainability').addEventListener('click', function() {
+        const totalDebt = parseFloat(document.getElementById('totalDebt').value);
+        const gdp = parseFloat(document.getElementById('gdp').value);
+        if (!isNaN(totalDebt) && !isNaN(gdp)) {
+            const debtToGDP = (totalDebt / gdp) * 100;
+            document.getElementById('debtResult').textContent = 'Debt-to-GDP Ratio: ' + debtToGDP.toFixed(2) + '%';
+        } else {
+            alert('Please enter valid values for total debt and GDP.');
+        }
+    });
 
-    Debt Accumulation Framework:
-    Debt(t) = Debt(t-1) + Interest Payments - Primary Surplus/Deficit
-    </pre>
+    // Calculate Balance of Payments (BOP)
+    document.getElementById('calculateBOP').addEventListener('click', function() {
+        const directInvest = parseFloat(document.getElementById('directInvest').value);
+        const portfolioInvest = parseFloat(document.getElementById('portfolioInvest').value);
+        const otherInvest = parseFloat(document.getElementById('otherInvest').value);
+        const exports = parseFloat(document.getElementById('exports').value);
+        const imports = parseFloat(document.getElementById('imports').value);
 
-    <!-- BOP Formulas -->
-    <h3>Balance of Payments (BOP) Formulas</h3>
-    <pre>
-    Current Account:
-    Current Account = Goods + Services + Income + Current Transfers
+        if (!isNaN(directInvest) && !isNaN(portfolioInvest) && !isNaN(otherInvest) && !isNaN(exports) && !isNaN(imports)) {
+            const currentAccount = exports - imports;
+            const capitalAccount = directInvest + portfolioInvest + otherInvest;
+            const bop = currentAccount + capitalAccount;
+            document.getElementById('bopResult').textContent = 'Balance of Payments (BOP): ' + bop.toFixed(2);
+        } else {
+            alert('Please enter valid values for all fields.');
+        }
+    });
 
-    Capital and Financial Account:
-    Capital and Financial Account = Direct Investment + Portfolio Investment + Other Investments
+    // Calculate Data Security and Latency
+    document.getElementById('calculateSecurity').addEventListener('click', function() {
+        const dataSecurity = parseFloat(document.getElementById('dataSecurity').value);
+        const latency = parseFloat(document.getElementById('latency').value);
 
-    Net Errors and Omissions (NEO):
-    Net Errors and Omissions = Current Account + Capital and Financial Account
-
-    Trade Balance:
-    Trade Balance = Exports - Imports
-
-    Exchange Rate Impact:
-    Impact of Exchange Rate = (Change in Exchange Rate) * (Current Account Balance)
-    </pre>
-
-    <!-- Additional Formulas -->
-    <h3>Other Financial Formulas</h3>
-    <pre>
-    GDP Growth Rate:
-    GDP Growth Rate = ((Current GDP - Previous GDP) / Previous GDP) * 100
-    </pre>
-
-    <!-- Data Management and Cybersecurity -->
-    <h3>Vitara - Information & Data Management</h3>
-    <pre>
-    Data Security Formula:
-    CIA = Confidentiality + Integrity + Availability
-
-    Hashing Algorithm (SHA-256):
-    Hash(x) = SHA-256(x)
-
-    Data Redundancy:
-    Redundancy = Total Copies of Data * Backup Locations
-
-    Data Latency:
-    Latency = Distance / Transmission Speed
-
-    Data Integrity (Checksum):
-    Checksum = Sum(Data_i mod m)
-    </pre>
-
-    <h3>Linux Foundation - Cybersecurity Essentials</h3>
-    <pre>
-    Access Control (RBAC):
-    Access Grant = User Role + Permissions + Resources
-
-    Symmetric Encryption (AES):
-    Encrypted Data = Plaintext Data ⊕ Key
-
-    Asymmetric Encryption (RSA):
-    Ciphertext = Plaintext ^ e mod n
-
-    Digital Signature:
-    Digital Signature = Message Hash ^ d mod n
-
-    Network Security:
-    Port Scan Result = {Open Ports}
-    </pre>
-  </div>
-
-  <div class="form-container">
-    <h3>Balance of Payments (BOP) Calculation</h3>
-    <label>Goods</label>
-    <input type="number" id="goods" placeholder="Enter value for goods" />
-    <label>Services</label>
-    <input type="number" id="services" placeholder="Enter value for services" />
-    <label>Income</label>
-    <input type="number" id="income" placeholder="Enter value for income" />
-    <label>Current Transfers</label>
-    <input type="number" id="transfers" placeholder="Enter value for transfers" />
-
-    <label>Direct Investment</label>
-    <input type="number" id="directInvest" placeholder="Enter value for direct investment" />
-    <label>Portfolio Investment</label>
-    <input type="number" id="portfolioInvest" placeholder="Enter value for portfolio investment" />
-    <label>Other Investments</label>
-    <input type="number" id="otherInvest" placeholder="Enter value for other investments" />
-
-    <label>Exports</label>
-    <input type="number" id="exports" placeholder="Enter value for exports" />
-    <label>Imports</label>
-    <input type="number" id="imports" placeholder="Enter value for imports" />
-
-    <button id="calculateBOP">Calculate BOP</button>
-
-    <div id="bopResults"></div>
-  </div>
-
-  <script>
-    // Utility to format numbers with commas
-    function fmt(num) {
-      return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
-    }
-
-    // BOP Calculation Functionality
-    function calculateBOP() {
-      const goods = parseFloat(document.getElementById('goods').value) || 0;
-      const services = parseFloat(document.getElementById('services').value) || 0;
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const transfers = parseFloat(document.getElementById('transfers').value) || 0;
-      const directInvest = parseFloat(document.getElementById('directInvest').value) || 0;
-      const portfolioInvest = parseFloat(document.getElementById('portfolioInvest').value) || 0;
-      const otherInvest = parseFloat(document.getElementById('otherInvest').value) || 0;
-      const exports = parseFloat(document.getElementById('exports').value) || 0;
-      const imports = parseFloat(document.getElementById('imports').value) || 0;
-
-      const currentAccount = goods + services + income + transfers;
-      const capitalAccount = directInvest + portfolioInvest + otherInvest;
-      const tradeBalance = exports - imports;
-
-      const netErrorsAndO
-
-
-
-
-
-
-const netErrorsAndOmissions = currentAccount + capitalAccount;
-      const exchangeRateImpact = (parseFloat(document.getElementById('exchangeRateImpact').value) || 0) * currentAccount;
-
-      // Display Results
-      const bopResults = document.getElementById('bopResults');
-      bopResults.innerHTML = `
-        <h4>Balance of Payments Calculation</h4>
-        <p><strong>Current Account:</strong> ${fmt(currentAccount)} USD</p>
-        <p><strong>Capital and Financial Account:</strong> ${fmt(capitalAccount)} USD</p>
-        <p><strong>Trade Balance:</strong> ${fmt(tradeBalance)} USD</p>
-        <p><strong>Net Errors and Omissions (NEO):</strong> ${fmt(netErrorsAndOmissions)} USD</p>
-        <p><strong>Impact of Exchange Rate:</strong> ${fmt(exchangeRateImpact)} USD</p>
-      `;
-    }
-
-    // Event listener for the BOP calculation button
-    document.getElementById('calculateBOP').addEventListener('click', calculateBOP);
-
-    // Function to download PDF
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      doc.setFontSize(16);
-      doc.text('Debt Projections, IMF Formulas, and BOP', 10, 10);
-
-      doc.setFontSize(12);
-      doc.text('Special Drawing Rights (SDR) and other formulas:', 10, 20);
-      doc.text('SDR Allocation Formula', 10, 30);
-      doc.text('SDR Allocation = (Member Quota Share / Total IMF Quota) * Total SDR Allocation', 10, 40);
-      doc.text('Debt-to-GDP Ratio', 10, 50);
-      doc.text('Debt-to-GDP = (Total Debt / GDP) * 100', 10, 60);
-      doc.text('Debt Service Ratio', 10, 70);
-      doc.text('Debt Service Ratio = (Debt Service Payments / Revenue or GDP) * 100', 10, 80);
-      doc.text('Current Account', 10, 90);
-      doc.text('Current Account = Goods + Services + Income + Current Transfers', 10, 100);
-
-      doc.addPage();
-      doc.text('BOP Calculation Results:', 10, 10);
-      doc.text(`Current Account: ${fmt(parseFloat(document.getElementById('goods').value) + parseFloat(document.getElementById('services').value) + parseFloat(document.getElementById('income').value) + parseFloat(document.getElementById('transfers').value))}`, 10, 20);
-      doc.text(`Capital Account: ${fmt(parseFloat(document.getElementById('directInvest').value) + parseFloat(document.getElementById('portfolioInvest').value) + parseFloat(document.getElementById('otherInvest').value))}`, 10, 30);
-      doc.text(`Trade Balance: ${fmt(parseFloat(document.getElementById('exports').value) - parseFloat(document.getElementById('imports').value))}`, 10, 40);
-      doc.text(`Net Errors and Omissions (NEO): ${fmt(parseFloat(document.getElementById('goods').value) + parseFloat(document.getElementById('services').value) + parseFloat(document.getElementById('income').value) + parseFloat(document.getElementById('transfers').value) + parseFloat(document.getElementById('directInvest').value) + parseFloat(document.getElementById('portfolioInvest').value) + parseFloat(document.getElementById('otherInvest').value))}`, 10, 50);
-
-      // Save PDF
-      doc.save('debt_projections_and_bop.pdf');
-    }
-
-    // Add event listener to download button
-    const downloadBtn = document.createElement('button');
-    downloadBtn.textContent = 'Download PDF';
-    downloadBtn.style.marginTop = '20px';
-    downloadBtn.style.backgroundColor = '#003366';
-    downloadBtn.style.color = 'white';
-    downloadBtn.style.border = 'none';
-    downloadBtn.style.padding = '10px 15px';
-    downloadBtn.style.fontWeight = '700';
-    downloadBtn.style.borderRadius = '6px';
-    document.body.appendChild(downloadBtn);
-    downloadBtn.addEventListener('click', downloadPDF);
-  </script>
+        if (!isNaN(dataSecurity) && !isNaN(latency)) {
+            const securityValue = dataSecurity * latency;
+            document.getElementById('securityResult').textContent = 'Data Security Value: ' + securityValue.toFixed(2);
+        } else {
+            alert('Please enter valid values for data security and latency.');
+        }
+    });
+</script>
 
 </body>
 </html>
