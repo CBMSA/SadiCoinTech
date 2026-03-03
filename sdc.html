@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Debt Projections and IMF Qualifications</title>
+  <title>Debt Projections, IMF Formulas, and BOP</title>
 
   <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -35,79 +35,11 @@
     <a href="tokenomics.html">Tokenomics</a>
   </nav>
 
-  <!-- SME Credit Form -->
-  <div class="form-container">
-    <h2>SME Credit Data Submission</h2>
-    <form id="creditForm">
-      <label for="name">Company Name</label>
-      <input type="text" id="name" required>
-
-      <label for="taxID">Tax Identification Number</label>
-      <input type="text" id="taxID" required>
-
-      <label for="country">Country</label>
-      <input type="text" id="country" required>
-
-      <label for="financials">Financial Summary</label>
-      <textarea id="financials" required></textarea>
-
-      <label for="docURL">Document URL (PDF)</label>
-      <input type="url" id="docURL" required>
-
-      <button type="submit">Submit Credit Record</button>
-    </form>
-    <div id="status" class="small"></div>
-  </div>
-
-  <!-- Debt Projection -->
-  <div class="form-container" id="debtPanel">
-    <h2>IMF-style Debt Projection (multi-year)</h2>
-
-    <div class="grid">
-      <div>
-        <label>Starting Debt (t=0)</label>
-        <input id="debt0" type="number" step="0.01" value="1000000000">
-        <label>GDP (current)</label>
-        <input id="gdp0" type="number" step="0.01" value="5000000000">
-        <label>Nominal Interest Rate (%)</label>
-        <input id="i_nom" type="number" step="0.0001" value="5.00">
-        <label>Nominal GDP Growth Rate (%)</label>
-        <input id="g_nom" type="number" step="0.0001" value="3.00">
-        <label>Inflation Rate (%)</label>
-        <input id="inflation" type="number" step="0.0001" value="2.00">
-      </div>
-
-      <div>
-        <label>Primary Balance (annual; positive = surplus)</label>
-        <input id="primaryBal" type="number" step="0.01" value="-20000000">
-        <label>Overall Balance (annual)</label>
-        <input id="overallBal" type="number" step="0.01" value="-50000000">
-        <label>Amortizations (mode)</label>
-        <select id="amortMode">
-          <option value="absolute">Absolute annual amount</option>
-          <option value="pctDebt">Percent of debt (beginning of year)</option>
-        </select>
-        <label id="amortLabel">Amortization Amount (abs)</label>
-        <input id="amortInput" type="number" step="0.01" value="30000000">
-        <label>Projection Years</label>
-        <input id="years" type="number" min="1" max="50" value="10">
-      </div>
-    </div>
-
-    <div class="controls">
-      <button id="btnProject">Run Projection</button>
-      <button id="btnDownloadPDF" class="secondary">Download PDF</button>
-      <button id="btnDownloadXML" class="secondary">Download XML</button>
-      <button id="btnClear" class="secondary">Clear Results</button>
-    </div>
-
-    <div id="summary" class="out" style="margin-top:12px">Run projection to see results here.</div>
-    <div id="tableWrapper" style="margin-top:12px; overflow:auto;"></div>
-  </div>
-
   <!-- IMF Formulas Section -->
   <div class="form-container">
     <h2>IMF Qualification Formulas</h2>
+
+    <!-- SDR Formulas -->
     <h3>Special Drawing Rights (SDR)</h3>
     <pre>
     SDR Allocation Formula:
@@ -117,6 +49,7 @@
     Value of SDR = (Currency Weight) * (Exchange Rate)
     </pre>
 
+    <!-- Debt Sustainability Formulas -->
     <h3>Debt Management and Debt Sustainability</h3>
     <pre>
     Debt-to-GDP Ratio:
@@ -132,6 +65,7 @@
     EIR = (Debt Service / Total Debt) * 100
     </pre>
 
+    <!-- Debt Framework -->
     <h3>Debt Sustainability Framework for Low-Income Countries</h3>
     <pre>
     Debt Service-to-Revenue Ratio:
@@ -144,6 +78,33 @@
     Debt(t) = Debt(t-1) + Interest Payments - Primary Surplus/Deficit
     </pre>
 
+    <!-- BOP Formulas -->
+    <h3>Balance of Payments (BOP) Formulas</h3>
+    <pre>
+    Current Account:
+    Current Account = Goods + Services + Income + Current Transfers
+
+    Capital and Financial Account:
+    Capital and Financial Account = Direct Investment + Portfolio Investment + Other Investments
+
+    Net Errors and Omissions (NEO):
+    Net Errors and Omissions = Current Account + Capital and Financial Account
+
+    Trade Balance:
+    Trade Balance = Exports - Imports
+
+    Exchange Rate Impact:
+    Impact of Exchange Rate = (Change in Exchange Rate) * (Current Account Balance)
+    </pre>
+
+    <!-- Additional Formulas -->
+    <h3>Other Financial Formulas</h3>
+    <pre>
+    GDP Growth Rate:
+    GDP Growth Rate = ((Current GDP - Previous GDP) / Previous GDP) * 100
+    </pre>
+
+    <!-- Data Management and Cybersecurity -->
     <h3>Vitara - Information & Data Management</h3>
     <pre>
     Data Security Formula:
@@ -181,136 +142,54 @@
     </pre>
   </div>
 
+  <div class="form-container">
+    <h3>Balance of Payments (BOP) Calculation</h3>
+    <label>Goods</label>
+    <input type="number" id="goods" placeholder="Enter value for goods" />
+    <label>Services</label>
+    <input type="number" id="services" placeholder="Enter value for services" />
+    <label>Income</label>
+    <input type="number" id="income" placeholder="Enter value for income" />
+    <label>Current Transfers</label>
+    <input type="number" id="transfers" placeholder="Enter value for transfers" />
+
+    <label>Direct Investment</label>
+    <input type="number" id="directInvest" placeholder="Enter value for direct investment" />
+    <label>Portfolio Investment</label>
+    <input type="number" id="portfolioInvest" placeholder="Enter value for portfolio investment" />
+    <label>Other Investments</label>
+    <input type="number" id="otherInvest" placeholder="Enter value for other investments" />
+
+    <label>Exports</label>
+    <input type="number" id="exports" placeholder="Enter value for exports" />
+    <label>Imports</label>
+    <input type="number" id="imports" placeholder="Enter value for imports" />
+
+    <button id="calculateBOP">Calculate BOP</button>
+
+    <div id="bopResults"></div>
+  </div>
+
   <script>
-    function fmt(num){ return (typeof num==='number' && isFinite(num)) ? num.toLocaleString(undefined,{minimum
-
-
-
-
-<script>
     // Utility to format numbers with commas
     function fmt(num) {
       return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
     }
 
-    // Debt Projection Calculation
-    function runDebtProjection() {
-      const debt0 = parseFloat(document.getElementById('debt0').value);
-      const gdp0 = parseFloat(document.getElementById('gdp0').value);
-      const i_nom = parseFloat(document.getElementById('i_nom').value) / 100;
-      const g_nom = parseFloat(document.getElementById('g_nom').value) / 100;
-      const inflation = parseFloat(document.getElementById('inflation').value) / 100;
-      const primaryBal = parseFloat(document.getElementById('primaryBal').value);
-      const overallBal = parseFloat(document.getElementById('overallBal').value);
-      const amortMode = document.getElementById('amortMode').value;
-      const amortInput = parseFloat(document.getElementById('amortInput').value);
-      const years = parseInt(document.getElementById('years').value);
+    // BOP Calculation Functionality
+    function calculateBOP() {
+      const goods = parseFloat(document.getElementById('goods').value) || 0;
+      const services = parseFloat(document.getElementById('services').value) || 0;
+      const income = parseFloat(document.getElementById('income').value) || 0;
+      const transfers = parseFloat(document.getElementById('transfers').value) || 0;
+      const directInvest = parseFloat(document.getElementById('directInvest').value) || 0;
+      const portfolioInvest = parseFloat(document.getElementById('portfolioInvest').value) || 0;
+      const otherInvest = parseFloat(document.getElementById('otherInvest').value) || 0;
+      const exports = parseFloat(document.getElementById('exports').value) || 0;
+      const imports = parseFloat(document.getElementById('imports').value) || 0;
 
-      let debt = debt0;
-      let gdp = gdp0;
-      let results = [];
-      let summary = '';
+      const currentAccount = goods + services + income + transfers;
+      const capitalAccount = directInvest + portfolioInvest + otherInvest;
+      const tradeBalance = exports - imports;
 
-      for (let t = 0; t < years; t++) {
-        const interest = debt * i_nom;
-        const inflationAdjustedGdp = gdp * (1 + g_nom);
-        const amortization = amortMode === 'absolute' ? amortInput : debt * amortInput / 100;
-        const debtService = interest + amortization;
-        const primaryDeficit = primaryBal + overallBal;
-        
-        debt = debt + primaryDeficit + interest - amortization;
-        gdp = inflationAdjustedGdp;
-
-        results.push({
-          year: t + 1,
-          debt: debt,
-          gdp: gdp,
-          interest: interest,
-          amortization: amortization,
-          debtService: debtService,
-        });
-      }
-
-      // Populate Table with Results
-      let tableHTML = '<table><tr><th>Year</th><th>Debt</th><th>GDP</th><th>Interest</th><th>Amortization</th><th>Debt Service</th></tr>';
-      results.forEach(result => {
-        tableHTML += `<tr>
-          <td>${result.year}</td>
-          <td>${fmt(result.debt)}</td>
-          <td>${fmt(result.gdp)}</td>
-          <td>${fmt(result.interest)}</td>
-          <td>${fmt(result.amortization)}</td>
-          <td>${fmt(result.debtService)}</td>
-        </tr>`;
-      });
-      tableHTML += '</table>';
-      document.getElementById('tableWrapper').innerHTML = tableHTML;
-
-      // Summary output
-      summary = `Total Debt after ${years} years: ${fmt(debt)}\nTotal GDP after ${years} years: ${fmt(gdp)}`;
-      document.getElementById('summary').textContent = summary;
-    }
-
-    // Download PDF
-    function downloadPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text('Debt Projection Summary', 10, 10);
-      doc.text(document.getElementById('summary').textContent, 10, 20);
-      doc.text('Debt Projection Table:', 10, 40);
-      doc.autoTable({ html: '#tableWrapper table' });
-      doc.save('debt_projection.pdf');
-    }
-
-    // Download XML
-    function downloadXML() {
-      const results = [];
-      const rows = document.querySelectorAll('#tableWrapper table tr');
-      rows.forEach((row, idx) => {
-        if (idx > 0) { // Skip header row
-          const cols = row.querySelectorAll('td');
-          const result = {
-            year: cols[0].textContent,
-            debt: cols[1].textContent,
-            gdp: cols[2].textContent,
-            interest: cols[3].textContent,
-            amortization: cols[4].textContent,
-            debtService: cols[5].textContent,
-          };
-          results.push(result);
-        }
-      });
-
-      const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-<DebtProjection>
-  ${results.map(result => `
-  <Year>
-    <YearNumber>${result.year}</YearNumber>
-    <Debt>${result.debt}</Debt>
-    <GDP>${result.gdp}</GDP>
-    <Interest>${result.interest}</Interest>
-    <Amortization>${result.amortization}</Amortization>
-    <DebtService>${result.debtService}</DebtService>
-  </Year>
-  `).join('')}
-</DebtProjection>`;
-
-      const blob = new Blob([xmlContent], { type: 'application/xml' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'debt_projection.xml';
-      link.click();
-    }
-
-    // Event Listeners for Buttons
-    document.getElementById('btnProject').addEventListener('click', runDebtProjection);
-    document.getElementById('btnDownloadPDF').addEventListener('click', downloadPDF);
-    document.getElementById('btnDownloadXML').addEventListener('click', downloadXML);
-    document.getElementById('btnClear').addEventListener('click', () => {
-      document.getElementById('summary').textContent = 'Run projection to see results here.';
-      document.getElementById('tableWrapper').innerHTML = '';
-      document.getElementById('debtPanel').reset();
-    });
-  </script>
-</body>
-</html>
+      const netErrorsAndO
