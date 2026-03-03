@@ -183,3 +183,134 @@
 
   <script>
     function fmt(num){ return (typeof num==='number' && isFinite(num)) ? num.toLocaleString(undefined,{minimum
+
+
+
+
+<script>
+    // Utility to format numbers with commas
+    function fmt(num) {
+      return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : num;
+    }
+
+    // Debt Projection Calculation
+    function runDebtProjection() {
+      const debt0 = parseFloat(document.getElementById('debt0').value);
+      const gdp0 = parseFloat(document.getElementById('gdp0').value);
+      const i_nom = parseFloat(document.getElementById('i_nom').value) / 100;
+      const g_nom = parseFloat(document.getElementById('g_nom').value) / 100;
+      const inflation = parseFloat(document.getElementById('inflation').value) / 100;
+      const primaryBal = parseFloat(document.getElementById('primaryBal').value);
+      const overallBal = parseFloat(document.getElementById('overallBal').value);
+      const amortMode = document.getElementById('amortMode').value;
+      const amortInput = parseFloat(document.getElementById('amortInput').value);
+      const years = parseInt(document.getElementById('years').value);
+
+      let debt = debt0;
+      let gdp = gdp0;
+      let results = [];
+      let summary = '';
+
+      for (let t = 0; t < years; t++) {
+        const interest = debt * i_nom;
+        const inflationAdjustedGdp = gdp * (1 + g_nom);
+        const amortization = amortMode === 'absolute' ? amortInput : debt * amortInput / 100;
+        const debtService = interest + amortization;
+        const primaryDeficit = primaryBal + overallBal;
+        
+        debt = debt + primaryDeficit + interest - amortization;
+        gdp = inflationAdjustedGdp;
+
+        results.push({
+          year: t + 1,
+          debt: debt,
+          gdp: gdp,
+          interest: interest,
+          amortization: amortization,
+          debtService: debtService,
+        });
+      }
+
+      // Populate Table with Results
+      let tableHTML = '<table><tr><th>Year</th><th>Debt</th><th>GDP</th><th>Interest</th><th>Amortization</th><th>Debt Service</th></tr>';
+      results.forEach(result => {
+        tableHTML += `<tr>
+          <td>${result.year}</td>
+          <td>${fmt(result.debt)}</td>
+          <td>${fmt(result.gdp)}</td>
+          <td>${fmt(result.interest)}</td>
+          <td>${fmt(result.amortization)}</td>
+          <td>${fmt(result.debtService)}</td>
+        </tr>`;
+      });
+      tableHTML += '</table>';
+      document.getElementById('tableWrapper').innerHTML = tableHTML;
+
+      // Summary output
+      summary = `Total Debt after ${years} years: ${fmt(debt)}\nTotal GDP after ${years} years: ${fmt(gdp)}`;
+      document.getElementById('summary').textContent = summary;
+    }
+
+    // Download PDF
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text('Debt Projection Summary', 10, 10);
+      doc.text(document.getElementById('summary').textContent, 10, 20);
+      doc.text('Debt Projection Table:', 10, 40);
+      doc.autoTable({ html: '#tableWrapper table' });
+      doc.save('debt_projection.pdf');
+    }
+
+    // Download XML
+    function downloadXML() {
+      const results = [];
+      const rows = document.querySelectorAll('#tableWrapper table tr');
+      rows.forEach((row, idx) => {
+        if (idx > 0) { // Skip header row
+          const cols = row.querySelectorAll('td');
+          const result = {
+            year: cols[0].textContent,
+            debt: cols[1].textContent,
+            gdp: cols[2].textContent,
+            interest: cols[3].textContent,
+            amortization: cols[4].textContent,
+            debtService: cols[5].textContent,
+          };
+          results.push(result);
+        }
+      });
+
+      const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<DebtProjection>
+  ${results.map(result => `
+  <Year>
+    <YearNumber>${result.year}</YearNumber>
+    <Debt>${result.debt}</Debt>
+    <GDP>${result.gdp}</GDP>
+    <Interest>${result.interest}</Interest>
+    <Amortization>${result.amortization}</Amortization>
+    <DebtService>${result.debtService}</DebtService>
+  </Year>
+  `).join('')}
+</DebtProjection>`;
+
+      const blob = new Blob([xmlContent], { type: 'application/xml' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'debt_projection.xml';
+      link.click();
+    }
+
+    // Event Listeners for Buttons
+    document.getElementById('btnProject').addEventListener('click', runDebtProjection);
+    document.getElementById('btnDownloadPDF').addEventListener('click', downloadPDF);
+    document.getElementById('btnDownloadXML').addEventListener('click', downloadXML);
+    document.getElementById('btnClear').addEventListener('click', () => {
+      document.getElementById('summary').textContent = 'Run projection to see results here.';
+      document.getElementById('tableWrapper').innerHTML = '';
+      document.getElementById('debtPanel').reset();
+    });
+  </script>
+</body>
+</html>
