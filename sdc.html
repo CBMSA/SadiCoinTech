@@ -1,892 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDC CBDC Platform with MoMo Payment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-        }
-        .footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        .hero-section {
-            background-color: #f5f5f5;
-            padding: 100px 0;
-            text-align: center;
-        }
-        .payment-button {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .container {
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Debt Projections and IMF Qualifications</title>
+
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+    nav a { margin-right: 15px; text-decoration: none; color: #003366; font-weight: bold; }
+    .form-container { background: #fff; padding: 20px; max-width: 950px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
+    h2 { color: #003366; text-align: center; margin: 0 0 8px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display:block; margin-top:10px; font-weight:600; color:#234; }
+    input, textarea, select { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px; font-size:14px; box-sizing:border-box; }
+    textarea { min-height:90px; }
+    button { margin-top:14px; background:#003366; color:#fff; padding:10px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+    button.secondary { background:#0b69ff; }
+    .small { font-size:12px; color:#666; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
+    th,td { border:1px solid #e6edf3; padding:6px 8px; text-align:right; }
+    th:first-child, td:first-child { text-align:left; }
+    .out { background:#fafbfd; padding:10px; border-radius:6px; border:1px dashed #e3eefc; white-space:pre-wrap; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  </style>
 </head>
 <body>
-
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1>SDC CBDC Platform with MoMo Payment</h1>
-                    <p>Your trusted platform for Central Bank Digital Currency (CBDC) payments and MoMo Wallet Integration.</p>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <h2>Welcome to SDC CBDC</h2>
-            <p>Seamless and secure digital currency transactions powered by the Reserve Bank's digital currency system and MoMo Wallet integration.</p>
-        </div>
-    </section>
-
-    <!-- MoMo Payment Section -->
-    <section class="container">
-        <h3>Pay with MoMo</h3>
-        <form id="momo-payment-form">
-            <div class="form-group">
-                <label for="momo-amount">Amount (in ZAR)</label>
-                <input type="number" id="momo-amount" class="form-control" placeholder="Enter amount in ZAR" required>
-            </div>
-            <button type="submit" class="payment-button">Pay with MoMo</button>
-        </form>
-    </section>
-
-    <!-- Real-Time Exchange Rates -->
-    <section class="container">
-        <h3>Real-Time Exchange Rates</h3>
-        <div id="exchange-rates">
-            <p>Loading exchange rates...</p>
-        </div>
-    </section>
-
-    <!-- Mint CBDC Section -->
-    <section class="container">
-        <h3>Mint and Issue CBDC</h3>
-        <form id="mint-cbdc-form">
-            <div class="form-group">
-                <label for="mint-amount">Amount to Mint (in ZAR)</label>
-                <input type="number" id="mint-amount" class="form-control" placeholder="Enter amount to mint in ZAR" required>
-            </div>
-            <button type="submit" class="payment-button">Mint CBDC</button>
-        </form>
-    </section>
-
-    <!-- CBDC Transaction History -->
-    <section class="container">
-        <h3>Your CBDC Transactions</h3>
-        <div id="transaction-history">
-            <!-- Transaction history will go here -->
-        </div>
-    </section>
-
-    <!-- Final Transaction Report Section -->
-    <section id="transaction-report" class="container" style="display:none;">
-        <h4>Transaction Report</h4>
-        <p><strong>Initial Amount (ZAR):</strong> <span id="initial-amount"></span></p>
-        <p><strong>Converted Amount (SDC):</strong> <span id="converted-amount"></span></p>
-        <p><strong>Transaction Fee (2%):</strong> $<span id="transaction-fee"></span></p>
-        <p><strong>Final Amount (SDC):</strong> $<span id="final-amount"></span></p>
-    </section>
-
-    <!-- Footer Section -->
-    <footer class="footer">
-        <p>&copy; 2026 SadiCoin Tech. All Rights Reserved.</p>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const apiKey = 'YOUR_MOMO_API_KEY';  // Use your MoMo API key
-        const apiUser = 'YOUR_MOMO_API_USER'; // Use your MoMo API user
-        const momoApiUrl = 'https://sandbox.momodeveloper.mtn.com/v1_0/apiuser/' + apiUser + '/collections';
-
-        // MoMo Payment Request API
-        document.getElementById('momo-payment-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const amount = document.getElementById('momo-amount').value;
-
-            if (amount && amount > 0) {
-                try {
-                    const response = await fetch(momoApiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${apiKey}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            amount: amount,
-                            currency: 'ZAR',
-                            callbackUrl: 'https://your-callback-url.com',  // Set your callback URL here
-                            payerMessage: `Payment of ZAR ${amount} for CBDC purchase`,
-                        }),
-                    });
-
-                    if (response.status === 202) {
-                        const paymentStatus = await response.json();
-                        alert(`Payment request sent! Payment Status: ${paymentStatus.status}`);
-                        
-                        // Simulate transaction history update
-                        const transactionHistoryDiv = document.getElementById('transaction-history');
-                        const newTransaction = document.createElement('div');
-                        newTransaction.textContent = `Payment of ZAR ${amount} completed successfully.`;
-                        transactionHistoryDiv.appendChild(newTransaction);
-
-                        // Transaction Report
-                        const convertedAmount = amount * 0.065; // Example conversion to CBDC (SDC)
-                        const transactionFee = (convertedAmount * 2) / 100; // 2% fee
-                        const finalAmount = convertedAmount - transactionFee;
-
-                        document.getElementById('initial-amount').textContent = amount.toFixed(2) + ' ZAR';
-                        document.getElementById('converted-amount').textContent = convertedAmount.toFixed(2) + ' SDC';
-                        document.getElementById('transaction-fee').textContent = transactionFee.toFixed(2);
-                        document.getElementById('final-amount').textContent = finalAmount.toFixed(2);
-                        document.getElementById('transaction-report').style.display = 'block';
-                    } else {
-                        alert('Payment request failed. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Error making MoMo payment request:', error);
-                    alert('An error occurred. Please try again later.');
-                }
-            } else {
-                alert('Please enter a valid amount.');
-            }
-        });
-
-        // Fetch real-time exchange rates
-        async function fetchExchangeRates() {
-            try {
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/ZAR');
-                const data = await response.json();
-                const rates = data.rates;
-                const exchangeRatesDiv = document.getElementById('exchange-rates');
-                
-                exchangeRatesDiv.innerHTML = `
-                    <p>ZAR to USD: ${rates.USD}</p>
-                    <p>ZAR to EUR: ${rates.EUR}</p>
-                    <p>ZAR to GBP: ${rates.GBP}</p>
-                    <p>ZAR to CNY: ${rates.CNY}</p>
-                    <p>ZAR to JPY: ${rates.JPY}</p>
-                `;
-            } catch (error) {
-                console.error('Error fetching exchange rates:', error);
-                document.getElementById('exchange-rates').innerHTML = `<p>Error fetching exchange rates.</p>`;
-            }
-        }
-
-        // Call the function to fetch exchange rates
-        fetchExchangeRates();
-
-        // Mint and issue CBDC
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SadiCoin Tech Marketplace & Business Financial Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <!-- jsPDF for PDF generation -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-        }
-        .footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        .hero-section {
-            background-color: #f5f5f5;
-            padding: 100px 0;
-            text-align: center;
-        }
-        .payment-button {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .cart, .transfer-section, .fx-section, .product-section, .financial-section {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-        .receipt-section {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #e7f5e7;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1>SadiCoin Tech Marketplace</h1>
-                    <p>Your go-to platform for secure payments, digital wallets, FX trading, and more.</p>
-                    <p>NB:KINDLY NOTE THAT THIS PLATFORM IS STILL UNDER SOFTWARE DEVELOPMENT TILL FEATURE NOTICE</p> 
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <h2>Welcome to SadiCoin Tech</h2>
-            <p>Browse products, make payments securely, explore digital services, and trade foreign currencies!</p>
-            <p>NB: THIS PLATFORM IS STILL UNDER DEVELOPMENT, PRODUCT LAUNCH COMING SOON...⏳</p>
-        </div>
-    </section>
-
-    <!-- Financial Statements Section -->
-    <section class="container financial-section">
-        <h3>Business Financial Statements</h3>
-        <form id="financial-statement-form">
-            <div class="form-group">
-                <label for="income">Business Income (ZAR)</label>
-                <input type="number" id="income" class="form-control" placeholder="Enter business income" required>
-            </div>
-            <div class="form-group">
-                <label for="expenses">Business Expenses (ZAR)</label>
-                <input type="number" id="expenses" class="form-control" placeholder="Enter business expenses" required>
-            </div>
-            <div class="form-group">
-                <label for="net-profit">Net Profit (ZAR)</label>
-                <input type="number" id="net-profit" class="form-control" placeholder="Calculated from Income - Expenses" disabled>
-            </div>
-            <button type="submit" class="payment-button">Generate Financial Statement</button>
-        </form>
-    </section>
-
-    <!-- Transaction History Section -->
-    <section class="container financial-section">
-        <h3>Transaction History</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Transaction ID</th>
-                    <th>Amount (ZAR)</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="transaction-history">
-                <!-- Example transaction data -->
-                <tr>
-                    <td>2026-02-25</td>
-                    <td>TXN001</td>
-                    <td>500.00</td>
-                    <td>Completed</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- Financial Report Section -->
-    <section class="container financial-section">
-        <h3>Generate Financial Reports</h3>
-        <form id="financial-report-form">
-            <div class="form-group">
-                <label for="report-type">Report Type</label>
-                <select id="report-type" class="form-control" required>
-                    <option value="audit">Audit Report</option>
-                    <option value="tax">Tax Return Report</option>
-                </select>
-            </div>
-            <button type="submit" class="payment-button">Generate Report</button>
-        </form>
-    </section>
-
-    <!-- Footer Section -->
-    <footer class="footer">
-        <p>&copy; 2026 SadiCoin Tech. All Rights Reserved.</p>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const transactionFeePercentage = 2;  // Example transaction fee (2%)
-        const bankCharge = 0.10;  // Example bank charge (0.10 ZAR)
-
-        // Handle Financial Statement Form Submission
-        document.getElementById('financial-statement-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const income = parseFloat(document.getElementById('income').value);
-            const expenses = parseFloat(document.getElementById('expenses').value);
-
-            if (!income || !expenses) {
-                alert('Please enter valid income and expenses.');
-                return;
-            }
-
-            const netProfit = income - expenses;
-            document.getElementById('net-profit').value = netProfit.toFixed(2);
-        });
-
-        // Handle Financial Report Form Submission (Audit/Tax Report)
-        document.getElementById('financial-report-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const reportType = document.getElementById('report-type').value;
-
-            // Auto deduct audit fee
-            const auditFee = 0.05 * parseFloat(document.getElementById('net-profit').value); // Example fee
-            const finalAmountAfterFee = parseFloat(document.getElementById('net-profit').value) - auditFee;
-
-            alert(`Audit Fee Deducted: ${auditFee.toFixed(2)} ZAR. Final Amount: ${finalAmountAfterFee.toFixed(2)} ZAR`);
-
-            // Generate PDF Report (using jsPDF)
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.text(`SadiCoin Tech ${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report`, 20, 20);
-            doc.text(`Income: ZAR ${document.getElementById('income').value}`, 20, 30);
-            doc.text(`Expenses: ZAR ${document.getElementById('expenses').value}`, 20, 40);
-            doc.text(`Net Profit: ZAR ${document.getElementById('net-profit').value}`, 20, 50);
-            doc.text(`Audit Fee: ZAR ${auditFee.toFixed(2)}`, 20, 60);
-            doc.text(`Final Amount After Audit Fee: ZAR ${finalAmountAfterFee.toFixed(2)}`, 20, 70);
-
-            // Save the generated PDF
-            doc.save(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)}_Report_${new Date().toISOString()}.pdf`);
-
-            // If you want to support XML generation instead of PDF, here's an example for XML using XML format
-            if (reportType === 'audit') {
-                const xmlData = `
-                    <AuditReport>
-                        <Income>${document.getElementById('income').value}</Income>
-                        <Expenses>${document.getElementById('expenses').value}</Expenses>
-                        <NetProfit>${document.getElementById('net-profit').value}</NetProfit>
-                        <AuditFee>${auditFee.toFixed(2)}</AuditFee>
-                        <FinalAmountAfterFee>${finalAmountAfterFee.toFixed(2)}</FinalAmountAfterFee>
-                    </AuditReport>
-                `;
-                const blob = new Blob([xmlData], { type: 'application/xml' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${reportType.charAt(0).toUpperCase() + reportType.slice(1)}_Report_${new Date().toISOString()}.xml`;
-                link.click();
-            }
-        });
-
-        // Sample Transaction History
-        function addTransaction(date, transactionId, amount, status) {
-            const historyTable = document.getElementById('transaction-history');
-            const row = historyTable.insertRow();
-            row.insertCell(0).textContent = date;
-            row.insertCell(1).textContent = transactionId;
-            row.insertCell(2).textContent = amount.toFixed(2);
-            row.insertCell(3).textContent = status;
-        }
-
-        // Example of adding a new transaction
-        addTransaction('2026-02-25', 'TXN002', 1000.00, 'Completed');
-        addTransaction('2026-02-24', 'TXN003', 200.00, 'Pending');
-    </script>
-</body>
-</html>
-
-
-
-
-Copy code
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDC CBDC Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .header {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-        }
-        .footer {
-            background-color: #222;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-        .hero-section {
-            background-color: #f5f5f5;
-            padding: 100px 0;
-            text-align: center;
-        }
-        .payment-button {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .container {
-            margin-top: 20px;
-        }
-        .container h3 {
-            margin-bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Header Section -->
-    <header class="header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1>SDC CBDC Platform</h1>
-                    <p>Your trusted platform for Central Bank Digital Currency (CBDC) payments, transactions, and management.</p>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <h2>Welcome to SDC CBDC</h2>
-            <p>Seamless and secure digital currency transactions powered by the Reserve Bank's digital currency system.</p>
-        </div>
-    </section>
-
-    <!-- Digital Wallet and MoMo Payment Section -->
-    <section class="container">
-        <h3>Digital Wallet Integration & MoMo Payment</h3>
-        <form id="momo-payment-form">
-            <div class="form-group">
-                <label for="amount">Amount (in ZAR)</label>
-                <input type="number" id="momo-amount" class="form-control" placeholder="Enter amount in ZAR" required>
-            </div>
-            <button type="submit" class="payment-button">Pay with MoMo</button>
-        </form>
-    </section>
-
-    <!-- Real-Time Exchange Rates -->
-    <section class="container">
-        <h3>Real-Time Exchange Rates</h3>
-        <div id="exchange-rates">
-            <p>Loading exchange rates...</p>
-        </div>
-    </section>
-
-    <!-- CBDC Minting and Issuing -->
-    <section class="container">
-        <h3>Mint and Issue CBDC</h3>
-        <form id="mint-cbdc-form">
-            <div class="form-group">
-                <label for="mint-amount">Amount to Mint (in ZAR)</label>
-                <input type="number" id="mint-amount" class="form-control" placeholder="Enter amount to mint in ZAR" required>
-            </div>
-            <button type="submit" class="payment-button">Mint CBDC</button>
-        </form>
-    </section>
-
-    <!-- CBDC Transaction History -->
-    <section class="container">
-        <h3>Your CBDC Transactions</h3>
-        <div id="transaction-history">
-            <!-- Transaction history will go here -->
-        </div>
-    </section>
-
-    <!-- Final Transaction Report Section -->
-    <section id="transaction-report" class="container" style="display:none;">
-        <h4>Transaction Report</h4>
-        <p><strong>Initial Amount (ZAR):</strong> <span id="initial-amount"></span></p>
-        <p><strong>Converted Amount (SDC):</strong> <span id="converted-amount"></span></p>
-        <p><strong>Transaction Fee (2%):</strong> $<span id="transaction-fee"></span></p>
-        <p><strong>Final Amount (SDC):</strong> $<span id="final-amount"></span></p>
-    </section>
-
-    <!-- Footer Section -->
-    <footer class="footer">
-        <p>&copy; 2026 SadiCoin Tech. All Rights Reserved.</p>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Mockup of the MoMo Payment API Integration
-        document.getElementById('momo-payment-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const amount = document.getElementById('momo-amount').value;
-
-            if (amount && amount > 0) {
-                // Simulate the MoMo API call (integration with MoMo API goes here)
-                alert(`Payment of ZAR ${amount} sent via MoMo.`);
-                // Actual API integration should be handled in this block, making an API call to MoMo's API for payment processing.
-
-                // Simulate transaction history update
-                const transactionHistoryDiv = document.getElementById('transaction-history');
-                const newTransaction = document.createElement('div');
-                newTransaction.textContent = `Payment of ZAR ${amount} completed.`;
-                transactionHistoryDiv.appendChild(newTransaction);
-
-                // After successful payment, generate transaction report
-                const convertedAmount = amount * 0.065; // Example conversion to CBDC (SDC)
-                const transactionFee = (convertedAmount * 2) / 100; // 2% fee
-                const finalAmount = convertedAmount - transactionFee;
-
-                // Display the report
-                document.getElementById('initial-amount').textContent = amount.toFixed(2) + ' ZAR';
-                document.getElementById('converted-amount').textContent = convertedAmount.toFixed(2) + ' SDC';
-                document.getElementById('transaction-fee').textContent = transactionFee.toFixed(2);
-                document.getElementById('final-amount').textContent = finalAmount.toFixed(2);
-                document.getElementById('transaction-report').style.display = 'block';
-            } else {
-                alert('Please enter a valid amount.');
-            }
-        });
-
-        // Fetch real-time exchange rates
-        async function fetchExchangeRates() {
-            const response = await fetch('https://api.exchangerate-api.com/v4/latest/ZAR');
-            const data = await response.json();
-            const rates = data.rates;
-            const exchangeRatesDiv = document.getElementById('exchange-rates');
-
-            exchangeRatesDiv.innerHTML = `
-                <p>ZAR to USD: ${rates.USD}</p>
-                <p>ZAR to EUR: ${rates.EUR}</p>
-                <p>ZAR to GBP: ${rates.GBP}</p>
-                <p>ZAR to CNY: ${rates.CNY}</p>
-                <p>ZAR to JPY: ${rates.JPY}</p>
-            `;
-        }
-
-        // Call the function to fetch exchange rates
-        fetchExchangeRates();
-
-        // Mint and issue CBDC
-        document.getElementById('mint-cbdc-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const mintAmount = document.getElementById('mint-amount').value;
-
-            if (mintAmount && mintAmount > 0) {
-                // Simulate minting of CBDC (Wholesale amount)
-                alert(`Minted CBDC worth ZAR ${mintAmount}.`);
-                // Add actual logic for minting CBDC here, such as calling an API or a smart contract
-
-                // Simulate transaction history update
-                const transactionHistoryDiv = document.getElementById('transaction-history');
-                const newTransaction = document.createElement('div');
-                newTransaction.textContent = `Minted ZAR ${mintAmount} worth of CBDC.`;
-                transactionHistoryDiv.appendChild(newTransaction);
-            } else {
-                alert('Please enter a valid minting amount.');
-            }
-        });
-    </script>
-</body>
-</html>
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SadiCoin Tech | Web3 Climate Finance</title>
-
-<!-- Web3 libs -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
-
-<style>
-:root{
-  --bg:#0b0f14;
-  --card:#111827;
-  --accent:#00f6ff;
-  --accent2:#22c55e;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-header{
-  padding:1.5rem;
-  border-bottom:1px solid #1f2937;
-}
-header h1{margin:0;font-size:1.4rem}
-nav a{
-  color:var(--muted);
-  margin-right:1rem;
-  text-decoration:none;
-}
-section{
-  padding:2rem;
-}
-.grid{
-  display:grid;
-  gap:1rem;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-}
-.card{
-  background:var(--card);
-  padding:1.5rem;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,.25);
-}
-.btn{
-  padding:.6rem 1rem;
-  border-radius:8px;
-  border:none;
-  cursor:pointer;
-}
-.primary{background:var(--accent);color:#000}
-.secondary{background:#1f2937;color:var(--text)}
-small{color:var(--muted)}
-iframe{border:none;border-radius:12px}
-</style>
-</head>
-
-<body>
-
-<header>
-  <h1>SadiCoin Tech</h1>
   <nav>
-    <a href="#wallet">Wallet</a>
-    <a href="#dao">DAO</a>
-    <a href="#projects">Projects</a>
-    <a href="#audit">Impact Audit</a>
+    <a href="citizenswallet.html">SDC Wallet</a>|
+    <a href="Sadicoinapi.js">SadicoinApi</a>|
+    <a href="SadiCoin.html">SadiCoin DApp</a>|
+    <a href="tokenomics.html">Tokenomics</a>
   </nav>
-</header>
 
-<!-- WALLET -->
-<section id="wallet">
-  <h2>Wallet</h2>
-  <button class="btn primary" onclick="connectWallet()">Connect Wallet</button>
-  <div id="walletAddress"></div>
-  <div id="transactions" class="grid"></div>
-</section>
+  <!-- SME Credit Form -->
+  <div class="form-container">
+    <h2>SME Credit Data Submission</h2>
+    <form id="creditForm">
+      <label for="name">Company Name</label>
+      <input type="text" id="name" required>
 
-<!-- DAO -->
-<section id="dao">
-  <h2>DAO Governance</h2>
-  <div id="daoProposals" class="grid"></div>
-</section>
+      <label for="taxID">Tax Identification Number</label>
+      <input type="text" id="taxID" required>
 
-<!-- PROJECTS -->
-<section id="projects">
-  <h2>Climate Finance Projects</h2>
+      <label for="country">Country</label>
+      <input type="text" id="country" required>
 
-  <!-- Earth Engine -->
-  <iframe 
-    src="https://earthengine.google.com/iframes/timelapse_player.html"
-    width="100%" height="400">
-  </iframe>
+      <label for="financials">Financial Summary</label>
+      <textarea id="financials" required></textarea>
 
-  <div id="projectList" class="grid"></div>
-</section>
+      <label for="docURL">Document URL (PDF)</label>
+      <input type="url" id="docURL" required>
 
-<!-- AUDIT -->
-<section id="audit">
-  <h2>Public Proof of Impact</h2>
-  <p class="muted">
-    All metrics below are independently verifiable via Supabase records and on-chain references.
-  </p>
-  <div id="impactAudit" class="grid"></div>
-</section>
+      <button type="submit">Submit Credit Record</button>
+    </form>
+    <div id="status" class="small"></div>
+  </div>
 
-<script>
-/* =========================
-   SUPABASE CONFIG (VERCEL)
-========================= */
-const supabase = supabase.createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+  <!-- Debt Projection -->
+  <div class="form-container" id="debtPanel">
+    <h2>IMF-style Debt Projection (multi-year)</h2>
 
-/* =========================
-   WALLET / ETHERS
-========================= */
-let provider, signer, userWallet;
+    <div class="grid">
+      <div>
+        <label>Starting Debt (t=0)</label>
+        <input id="debt0" type="number" step="0.01" value="1000000000">
+        <label>GDP (current)</label>
+        <input id="gdp0" type="number" step="0.01" value="5000000000">
+        <label>Nominal Interest Rate (%)</label>
+        <input id="i_nom" type="number" step="0.0001" value="5.00">
+        <label>Nominal GDP Growth Rate (%)</label>
+        <input id="g_nom" type="number" step="0.0001" value="3.00">
+        <label>Inflation Rate (%)</label>
+        <input id="inflation" type="number" step="0.0001" value="2.00">
+      </div>
 
-async function connectWallet(){
-  provider = new ethers.BrowserProvider(window.ethereum);
-  signer = await provider.getSigner();
-  userWallet = await signer.getAddress();
-  document.getElementById("walletAddress").innerHTML =
-    `<p><strong>Connected:</strong> ${userWallet}</p>`;
-  loadTransactions();
-}
+      <div>
+        <label>Primary Balance (annual; positive = surplus)</label>
+        <input id="primaryBal" type="number" step="0.01" value="-20000000">
+        <label>Overall Balance (annual)</label>
+        <input id="overallBal" type="number" step="0.01" value="-50000000">
+        <label>Amortizations (mode)</label>
+        <select id="amortMode">
+          <option value="absolute">Absolute annual amount</option>
+          <option value="pctDebt">Percent of debt (beginning of year)</option>
+        </select>
+        <label id="amortLabel">Amortization Amount (abs)</label>
+        <input id="amortInput" type="number" step="0.01" value="30000000">
+        <label>Projection Years</label>
+        <input id="years" type="number" min="1" max="50" value="10">
+      </div>
+    </div>
 
-/* =========================
-   DAO
-========================= */
-const DAO_ABI = [
-  "function proposals(uint256) view returns (string description, uint256 forVotes, uint256 againstVotes)",
-  "function vote(uint256,bool)"
-];
-const DAO_ADDRESS = "0xDAO_CONTRACT_ADDRESS";
+    <div class="controls">
+      <button id="btnProject">Run Projection</button>
+      <button id="btnDownloadPDF" class="secondary">Download PDF</button>
+      <button id="btnDownloadXML" class="secondary">Download XML</button>
+      <button id="btnClear" class="secondary">Clear Results</button>
+    </div>
 
-let dao;
+    <div id="summary" class="out" style="margin-top:12px">Run projection to see results here.</div>
+    <div id="tableWrapper" style="margin-top:12px; overflow:auto;"></div>
+  </div>
 
-async function loadDAO(){
-  dao = new ethers.Contract(DAO_ADDRESS, DAO_ABI, signer);
-  const container = document.getElementById("daoProposals");
+  <!-- IMF Formulas Section -->
+  <div class="form-container">
+    <h2>IMF Qualification Formulas</h2>
+    <h3>Special Drawing Rights (SDR)</h3>
+    <pre>
+    SDR Allocation Formula:
+    SDR Allocation = (Member Quota Share / Total IMF Quota) * Total SDR Allocation
 
-  for(let i=0;i<3;i++){
-    const p = await dao.proposals(i);
-    container.innerHTML += `
-      <div class="card">
-        <h3>Proposal #${i}</h3>
-        <p>${p.description}</p>
-        <p>For: ${p.forVotes}</p>
-        <p>Against: ${p.againstVotes}</p>
-        <button class="btn secondary" onclick="vote(${i},true)">Vote Yes</button>
-        <button class="btn secondary" onclick="vote(${i},false)">Vote No</button>
-      </div>`;
-  }
-}
+    SDR Conversion to National Currency:
+    Value of SDR = (Currency Weight) * (Exchange Rate)
+    </pre>
 
-async function vote(id,support){
-  await dao.vote(id,support);
-}
+    <h3>Debt Management and Debt Sustainability</h3>
+    <pre>
+    Debt-to-GDP Ratio:
+    Debt-to-GDP = (Total Debt / GDP) * 100
 
-/* =========================
-   TRANSACTIONS (LIVE)
-========================= */
-async function loadTransactions(){
-  const {data} = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("wallet_address", userWallet)
-    .order("created_at",{ascending:false});
+    Debt Service Ratio:
+    Debt Service Ratio = (Debt Service Payments / Revenue or GDP) * 100
 
-  const el = document.getElementById("transactions");
-  el.innerHTML = "";
+    Debt Sustainability:
+    Debt Sustainability = Debt Service / (Revenue / Exports) < Threshold
 
-  data.forEach(tx=>{
-    el.innerHTML += `
-      <div class="card">
-        <p><strong>Tx:</strong> ${tx.tx_hash}</p>
-        <p>${tx.amount} ${tx.token}</p>
-        <small>${new Date(tx.created_at).toLocaleString()}</small>
-      </div>`;
-  });
-}
+    Effective Interest Rate (EIR):
+    EIR = (Debt Service / Total Debt) * 100
+    </pre>
 
-supabase
-  .channel("transactions")
-  .on("postgres_changes",
-    {event:"INSERT",schema:"public",table:"transactions"},
-    ()=>loadTransactions()
-  ).subscribe();
+    <h3>Debt Sustainability Framework for Low-Income Countries</h3>
+    <pre>
+    Debt Service-to-Revenue Ratio:
+    Debt Service-to-Revenue Ratio = Debt Service / Government Revenue * 100
 
-/* =========================
-   PROJECTS
-========================= */
-async function loadProjects(){
-  const {data} = await supabase
-    .from("projects")
-    .select("*");
+    Gross Financing Needs (GFN):
+    GFN = Debt Service + Budget Deficit
 
-  const el = document.getElementById("projectList");
+    Debt Accumulation Framework:
+    Debt(t) = Debt(t-1) + Interest Payments - Primary Surplus/Deficit
+    </pre>
 
-  data.forEach(p=>{
-    el.innerHTML += `
-      <div class="card">
-        <h3>${p.title}</h3>
-        <p><strong>Project UUID:</strong> ${p.id}</p>
-        <p>Impact Value: ${p.impact_value}</p>
-        <p>SDGs: ${p.sdg.join(", ")}</p>
-        <button class="btn primary">Fund This Project</button>
-      </div>`;
-  });
-}
+    <h3>Vitara - Information & Data Management</h3>
+    <pre>
+    Data Security Formula:
+    CIA = Confidentiality + Integrity + Availability
 
-/* =========================
-   PUBLIC IMPACT AUDIT
-========================= */
-async function loadAudit(){
-  const {data} = await supabase
-    .from("projects")
-    .select("id,title,impact_value,sdg");
+    Hashing Algorithm (SHA-256):
+    Hash(x) = SHA-256(x)
 
-  const el = document.getElementById("impactAudit");
+    Data Redundancy:
+    Redundancy = Total Copies of Data * Backup Locations
 
-  data.forEach(p=>{
-    el.innerHTML += `
-      <div class="card">
-        <h3>${p.title}</h3>
-        <p>UUID: ${p.id}</p>
-        <p>Impact: ${p.impact_value}</p>
-        <p>SDGs: ${p.sdg.join(", ")}</p>
-      </div>`;
-  });
-}
+    Data Latency:
+    Latency = Distance / Transmission Speed
 
-/* =========================
-   INIT
-========================= */
-loadProjects();
-loadAudit();
-</script>
+    Data Integrity (Checksum):
+    Checksum = Sum(Data_i mod m)
+    </pre>
 
-</body>
-</html>
+    <h3>Linux Foundation - Cybersecurity Essentials</h3>
+    <pre>
+    Access Control (RBAC):
+    Access Grant = User Role + Permissions + Resources
+
+    Symmetric Encryption (AES):
+    Encrypted Data = Plaintext Data ⊕ Key
+
+    Asymmetric Encryption (RSA):
+    Ciphertext = Plaintext ^ e mod n
+
+    Digital Signature:
+    Digital Signature = Message Hash ^ d mod n
+
+    Network Security:
+    Port Scan Result = {Open Ports}
+    </pre>
+  </div>
+
+  <script>
+    function fmt(num){ return (typeof num==='number' && isFinite(num)) ? num.toLocaleString(undefined,{minimum
