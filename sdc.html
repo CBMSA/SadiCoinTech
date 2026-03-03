@@ -193,3 +193,73 @@
       const tradeBalance = exports - imports;
 
       const netErrorsAndO
+
+
+
+
+
+
+const netErrorsAndOmissions = currentAccount + capitalAccount;
+      const exchangeRateImpact = (parseFloat(document.getElementById('exchangeRateImpact').value) || 0) * currentAccount;
+
+      // Display Results
+      const bopResults = document.getElementById('bopResults');
+      bopResults.innerHTML = `
+        <h4>Balance of Payments Calculation</h4>
+        <p><strong>Current Account:</strong> ${fmt(currentAccount)} USD</p>
+        <p><strong>Capital and Financial Account:</strong> ${fmt(capitalAccount)} USD</p>
+        <p><strong>Trade Balance:</strong> ${fmt(tradeBalance)} USD</p>
+        <p><strong>Net Errors and Omissions (NEO):</strong> ${fmt(netErrorsAndOmissions)} USD</p>
+        <p><strong>Impact of Exchange Rate:</strong> ${fmt(exchangeRateImpact)} USD</p>
+      `;
+    }
+
+    // Event listener for the BOP calculation button
+    document.getElementById('calculateBOP').addEventListener('click', calculateBOP);
+
+    // Function to download PDF
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text('Debt Projections, IMF Formulas, and BOP', 10, 10);
+
+      doc.setFontSize(12);
+      doc.text('Special Drawing Rights (SDR) and other formulas:', 10, 20);
+      doc.text('SDR Allocation Formula', 10, 30);
+      doc.text('SDR Allocation = (Member Quota Share / Total IMF Quota) * Total SDR Allocation', 10, 40);
+      doc.text('Debt-to-GDP Ratio', 10, 50);
+      doc.text('Debt-to-GDP = (Total Debt / GDP) * 100', 10, 60);
+      doc.text('Debt Service Ratio', 10, 70);
+      doc.text('Debt Service Ratio = (Debt Service Payments / Revenue or GDP) * 100', 10, 80);
+      doc.text('Current Account', 10, 90);
+      doc.text('Current Account = Goods + Services + Income + Current Transfers', 10, 100);
+
+      doc.addPage();
+      doc.text('BOP Calculation Results:', 10, 10);
+      doc.text(`Current Account: ${fmt(parseFloat(document.getElementById('goods').value) + parseFloat(document.getElementById('services').value) + parseFloat(document.getElementById('income').value) + parseFloat(document.getElementById('transfers').value))}`, 10, 20);
+      doc.text(`Capital Account: ${fmt(parseFloat(document.getElementById('directInvest').value) + parseFloat(document.getElementById('portfolioInvest').value) + parseFloat(document.getElementById('otherInvest').value))}`, 10, 30);
+      doc.text(`Trade Balance: ${fmt(parseFloat(document.getElementById('exports').value) - parseFloat(document.getElementById('imports').value))}`, 10, 40);
+      doc.text(`Net Errors and Omissions (NEO): ${fmt(parseFloat(document.getElementById('goods').value) + parseFloat(document.getElementById('services').value) + parseFloat(document.getElementById('income').value) + parseFloat(document.getElementById('transfers').value) + parseFloat(document.getElementById('directInvest').value) + parseFloat(document.getElementById('portfolioInvest').value) + parseFloat(document.getElementById('otherInvest').value))}`, 10, 50);
+
+      // Save PDF
+      doc.save('debt_projections_and_bop.pdf');
+    }
+
+    // Add event listener to download button
+    const downloadBtn = document.createElement('button');
+    downloadBtn.textContent = 'Download PDF';
+    downloadBtn.style.marginTop = '20px';
+    downloadBtn.style.backgroundColor = '#003366';
+    downloadBtn.style.color = 'white';
+    downloadBtn.style.border = 'none';
+    downloadBtn.style.padding = '10px 15px';
+    downloadBtn.style.fontWeight = '700';
+    downloadBtn.style.borderRadius = '6px';
+    document.body.appendChild(downloadBtn);
+    downloadBtn.addEventListener('click', downloadPDF);
+  </script>
+
+</body>
+</html>
