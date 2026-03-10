@@ -3,70 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cricket Scoring System</title>
+  <title>Live Cricket Scoring System</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    section {
-      margin-bottom: 20px;
-    }
-
-    button {
-      padding: 10px;
-      margin: 10px 0;
-      cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    table, th, td {
-      border: 1px solid #000;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-    form input, form select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 14px;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    header { text-align: center; margin-bottom: 20px; }
+    section { margin-bottom: 20px; }
+    button { padding: 10px; margin: 10px 0; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    table, th, td { border: 1px solid #000; }
+    th, td { padding: 10px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    form input, form select { width: 100%; padding: 10px; margin-bottom: 10px; }
+    footer { text-align: center; margin-top: 40px; font-size: 14px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Cricket Scoring System</h1>
+    <h1>Live Cricket Scoring System</h1>
   </header>
 
+  <!-- Match Details -->
   <section id="scoreboard">
     <h2>Match Details</h2>
     <form id="matchDetailsForm">
@@ -92,6 +49,7 @@
     </form>
   </section>
 
+  <!-- Ball-by-Ball Scoring Section -->
   <section id="ballByBall">
     <h2>Ball-by-Ball Scoring</h2>
     <form id="ballForm">
@@ -134,6 +92,7 @@
     </table>
   </section>
 
+  <!-- Match Summary Section -->
   <section id="summary">
     <h2>Match Summary</h2>
     <div id="matchSummary">
