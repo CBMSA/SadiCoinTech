@@ -92,53 +92,54 @@
     </form>
   </section>
 
-  <section id="batsmanDetails">
-    <h2>Batsman Scoring</h2>
-    <table id="batsmanTable">
-      <thead>
-        <tr>
-          <th>Batsman</th>
-          <th>Runs</th>
-          <th>Balls</th>
-          <th>Fours</th>
-          <th>Sixes</th>
-          <th>Out (How)</th>
-          <th>Fielder</th>
-          <th>Bowler</th>
-        </tr>
-      </thead>
-      <tbody id="batsmanRows">
-        <!-- Batsman details will be inserted here dynamically -->
-      </tbody>
-    </table>
-    <button id="addBatsmanRow">Add Batsman</button>
-  </section>
+  <section id="ballByBall">
+    <h2>Ball-by-Ball Scoring</h2>
+    <form id="ballForm">
+      <label for="batsman">Batsman:</label>
+      <input type="text" id="batsman" name="batsman" required />
 
-  <section id="bowlerDetails">
-    <h2>Bowler Scoring</h2>
-    <table id="bowlerTable">
+      <label for="bowler">Bowler:</label>
+      <input type="text" id="bowler" name="bowler" required />
+
+      <label for="runs">Runs:</label>
+      <input type="number" id="runs" name="runs" min="0" max="6" required />
+
+      <label for="extras">Extras:</label>
+      <input type="number" id="extras" name="extras" min="0" required />
+
+      <label for="out">Out:</label>
+      <input type="text" id="out" name="out" placeholder="Optional" />
+
+      <button type="submit">Record Ball</button>
+    </form>
+
+    <h3>Current Score</h3>
+    <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0</p>
+
+    <h3>Ball-by-Ball Details</h3>
+    <table id="ballDetailsTable">
       <thead>
         <tr>
+          <th>Ball</th>
+          <th>Batsman</th>
           <th>Bowler</th>
-          <th>Overs</th>
           <th>Runs</th>
-          <th>Wickets</th>
           <th>Extras</th>
+          <th>Out</th>
         </tr>
       </thead>
-      <tbody id="bowlerRows">
-        <!-- Bowler details will be inserted here dynamically -->
+      <tbody id="ballDetailsRows">
+        <!-- Ball-by-ball details will be inserted here dynamically -->
       </tbody>
     </table>
-    <button id="addBowlerRow">Add Bowler</button>
   </section>
 
   <section id="summary">
     <h2>Match Summary</h2>
     <div id="matchSummary">
-      <!-- Summary content will be inserted here dynamically -->
+      <!-- Match summary will be displayed here -->
     </div>
-    <button id="downloadReport">Download Summary Report</button>
+    <button id="downloadReport">Download Match Summary</button>
   </section>
 
   <footer>
@@ -147,45 +148,59 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      let batsmanRowCounter = 1;
-      let bowlerRowCounter = 1;
+      let totalRuns = 0;
+      let totalWickets = 0;
+      let totalBalls = 0;
+      let ballCount = 1;
+      const ballDetailsTable = document.getElementById("ballDetailsRows");
+      const scoreDisplay = document.getElementById("score");
 
-      const batsmanTable = document.getElementById("batsmanRows");
-      const bowlerTable = document.getElementById("bowlerRows");
+      // Handle the submission of a ball's data
+      document.getElementById("ballForm").addEventListener("submit", (e) => {
+        e.preventDefault();
 
-      // Add new batsman row
-      document.getElementById("addBatsmanRow").addEventListener("click", () => {
+        const batsman = document.getElementById("batsman").value;
+        const bowler = document.getElementById("bowler").value;
+        const runs = parseInt(document.getElementById("runs").value, 10);
+        const extras = parseInt(document.getElementById("extras").value, 10);
+        const out = document.getElementById("out").value;
+
+        // Update total runs and wickets if applicable
+        totalRuns += runs + extras;
+        if (out) totalWickets++;
+
+        // Increment balls
+        totalBalls++;
+
+        // Calculate overs (example: 6 balls = 1 over)
+        let overs = Math.floor(totalBalls / 6);
+        let ballsInCurrentOver = totalBalls % 6;
+        let oversDisplay = `${overs}.${ballsInCurrentOver}`;
+
+        // Display the updated score
+        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${oversDisplay}`;
+
+        // Create a new row for the ball-by-ball table
         const row = document.createElement("tr");
-
         row.innerHTML = `
-          <td><input type="text" name="batsman${batsmanRowCounter}" required /></td>
-          <td><input type="number" name="runs${batsmanRowCounter}" required /></td>
-          <td><input type="number" name="balls${batsmanRowCounter}" required /></td>
-          <td><input type="number" name="fours${batsmanRowCounter}" required /></td>
-          <td><input type="number" name="sixes${batsmanRowCounter}" required /></td>
-          <td><input type="text" name="out${batsmanRowCounter}" /></td>
-          <td><input type="text" name="fielder${batsmanRowCounter}" /></td>
-          <td><input type="text" name="bowler${batsmanRowCounter}" /></td>
+          <td>${ballCount}</td>
+          <td>${batsman}</td>
+          <td>${bowler}</td>
+          <td>${runs}</td>
+          <td>${extras}</td>
+          <td>${out || '-'}</td>
         `;
+        ballDetailsTable.appendChild(row);
 
-        batsmanTable.appendChild(row);
-        batsmanRowCounter++;
-      });
+        // Increment the ball count
+        ballCount++;
 
-      // Add new bowler row
-      document.getElementById("addBowlerRow").addEventListener("click", () => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-          <td><input type="text" name="bowlerName${bowlerRowCounter}" required /></td>
-          <td><input type="number" name="overs${bowlerRowCounter}" required /></td>
-          <td><input type="number" name="runsBowled${bowlerRowCounter}" required /></td>
-          <td><input type="number" name="wickets${bowlerRowCounter}" required /></td>
-          <td><input type="number" name="extras${bowlerRowCounter}" /></td>
-        `;
-
-        bowlerTable.appendChild(row);
-        bowlerRowCounter++;
+        // Clear the form inputs
+        document.getElementById("batsman").value = '';
+        document.getElementById("bowler").value = '';
+        document.getElementById("runs").value = '';
+        document.getElementById("extras").value = '';
+        document.getElementById("out").value = '';
       });
 
       // Handle match details form submission
@@ -215,7 +230,7 @@
         return parScore - (oversLost * dlsFactor);
       }
 
-      // Generate and download summary report
+      // Generate and download match summary
       document.getElementById("downloadReport").addEventListener("click", () => {
         const summaryContent = document.getElementById("matchSummary").innerHTML;
         const reportContent = `Cricket Match Summary:\n\n${summaryContent}`;
