@@ -9,13 +9,23 @@
     body { font-family: Arial, sans-serif; padding: 20px; }
     header { text-align: center; margin-bottom: 20px; }
     section { margin-bottom: 20px; }
-    button { padding: 10px; margin: 10px 0; cursor: pointer; }
+    button { padding: 15px; margin: 5px; font-size: 18px; cursor: pointer; width: 50px; height: 50px; }
+    button:active { background-color: #ddd; }
+    #scoreboard, #ballByBall { margin-bottom: 30px; }
     table { width: 100%; border-collapse: collapse; }
     table, th, td { border: 1px solid #000; }
     th, td { padding: 10px; text-align: center; }
     th { background-color: #f4f4f4; }
     form input, form select { width: 100%; padding: 10px; margin-bottom: 10px; }
     footer { text-align: center; margin-top: 40px; font-size: 14px; }
+
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 10px; max-width: 300px; margin: 0 auto; }
+    .keypad button { font-size: 16px; }
+    .keypad .extra { background-color: #f0f0f0; }
+    .keypad .submit { background-color: #28a745; color: white; grid-column: span 3; }
+    .keypad .clear { background-color: #dc3545; color: white; grid-column: span 3; }
+
+    .score-display { font-size: 20px; margin-bottom: 15px; text-align: center; }
   </style>
 </head>
 <body>
@@ -23,57 +33,56 @@
     <h1>Live Cricket Scoring System</h1>
   </header>
 
-  <!-- Match Details -->
   <section id="scoreboard">
     <h2>Match Details</h2>
     <form id="matchDetailsForm">
       <label for="competition">Competition:</label>
       <input type="text" id="competition" name="competition" required>
-
       <label for="matchType">Match Type:</label>
       <select id="matchType" name="matchType">
         <option value="home">Home</option>
         <option value="away">Away</option>
       </select>
-
       <label for="innings">Innings:</label>
       <input type="text" id="innings" name="innings" required>
-
       <label for="date">Date:</label>
       <input type="date" id="date" name="date" required>
-
       <label for="venue">Venue:</label>
       <input type="text" id="venue" name="venue" required>
-
       <button type="submit">Save Match Details</button>
     </form>
   </section>
 
-  <!-- Ball-by-Ball Scoring Section -->
   <section id="ballByBall">
     <h2>Ball-by-Ball Scoring</h2>
-    <form id="ballForm">
-      <label for="batsman">Batsman:</label>
-      <input type="text" id="batsman" name="batsman" required />
 
-      <label for="bowler">Bowler:</label>
-      <input type="text" id="bowler" name="bowler" required />
+    <div class="score-display">
+      <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
+    </div>
 
-      <label for="runs">Runs:</label>
-      <input type="number" id="runs" name="runs" min="0" max="6" required />
+    <!-- Scoring Pad Section -->
+    <div class="keypad">
+      <button class="run" data-value="0">0</button>
+      <button class="run" data-value="1">1</button>
+      <button class="run" data-value="2">2</button>
+      <button class="run" data-value="3">3</button>
+      <button class="run" data-value="4">4</button>
+      <button class="run" data-value="5">5</button>
+      <button class="run" data-value="6">6</button>
+      <button class="extra" data-value="w">Wide</button>
+      <button class="extra" data-value="nb">No-ball</button>
+      <button class="run" data-value="by">Bye</button>
+      <button class="run" data-value="lb">Leg Bye</button>
+      <button class="out" data-value="bowled">Bowled</button>
+      <button class="out" data-value="caught">Caught</button>
+      <button class="out" data-value="run-out">Run-out</button>
+      <button class="out" data-value="stumped">Stumped</button>
 
-      <label for="extras">Extras:</label>
-      <input type="number" id="extras" name="extras" min="0" required />
+      <button class="submit">Submit</button>
+      <button class="clear">Clear</button>
+    </div>
 
-      <label for="out">Out:</label>
-      <input type="text" id="out" name="out" placeholder="Optional" />
-
-      <button type="submit">Record Ball</button>
-    </form>
-
-    <h3>Current Score</h3>
-    <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0</p>
-
+    <!-- Ball-by-Ball Table -->
     <h3>Ball-by-Ball Details</h3>
     <table id="ballDetailsTable">
       <thead>
@@ -92,7 +101,6 @@
     </table>
   </section>
 
-  <!-- Match Summary Section -->
   <section id="summary">
     <h2>Match Summary</h2>
     <div id="matchSummary">
@@ -113,93 +121,84 @@
       let ballCount = 1;
       const ballDetailsTable = document.getElementById("ballDetailsRows");
       const scoreDisplay = document.getElementById("score");
+      let currentBatsman = '';
+      let currentBowler = '';
+      let currentExtras = 0;
+      let currentOut = '';
 
-      // Handle the submission of a ball's data
-      document.getElementById("ballForm").addEventListener("submit", (e) => {
-        e.preventDefault();
+      // Handle scoring pad button clicks (runs, extras, outs)
+      const buttons = document.querySelectorAll(".keypad button");
+      let selectedRuns = 0;
+      let selectedExtras = 0;
+      let selectedOut = "";
 
-        const batsman = document.getElementById("batsman").value;
-        const bowler = document.getElementById("bowler").value;
-        const runs = parseInt(document.getElementById("runs").value, 10);
-        const extras = parseInt(document.getElementById("extras").value, 10);
-        const out = document.getElementById("out").value;
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          const value = button.dataset.value;
 
-        // Update total runs and wickets if applicable
-        totalRuns += runs + extras;
-        if (out) totalWickets++;
+          if (value === 'w' || value === 'nb' || value === 'by' || value === 'lb') {
+            selectedExtras = value;
+            selectedRuns = 0;
+          } else if (value === 'submit') {
+            recordBall();
+          } else if (value === 'clear') {
+            resetInputs();
+          } else {
+            selectedRuns = value;
+            selectedExtras = 0;
+          }
 
-        // Increment balls
+          updateDisplay();
+        });
+      });
+
+      // Record ball data
+      function recordBall() {
+        if (selectedRuns === 0 && selectedExtras === 0 && selectedOut === "") return;
+
+        totalRuns += parseInt(selectedRuns, 10) || 0;
+        currentExtras = selectedExtras;
+
+        if (selectedOut) {
+          totalWickets++;
+        }
+
         totalBalls++;
 
-        // Calculate overs (example: 6 balls = 1 over)
         let overs = Math.floor(totalBalls / 6);
         let ballsInCurrentOver = totalBalls % 6;
         let oversDisplay = `${overs}.${ballsInCurrentOver}`;
 
-        // Display the updated score
         scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${oversDisplay}`;
 
-        // Create a new row for the ball-by-ball table
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${ballCount}</td>
-          <td>${batsman}</td>
-          <td>${bowler}</td>
-          <td>${runs}</td>
-          <td>${extras}</td>
-          <td>${out || '-'}</td>
+          <td>${currentBatsman}</td>
+          <td>${currentBowler}</td>
+          <td>${selectedRuns}</td>
+          <td>${currentExtras}</td>
+          <td>${selectedOut || '-'}</td>
         `;
         ballDetailsTable.appendChild(row);
 
-        // Increment the ball count
         ballCount++;
-
-        // Clear the form inputs
-        document.getElementById("batsman").value = '';
-        document.getElementById("bowler").value = '';
-        document.getElementById("runs").value = '';
-        document.getElementById("extras").value = '';
-        document.getElementById("out").value = '';
-      });
-
-      // Handle match details form submission
-      document.getElementById("matchDetailsForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const competition = document.getElementById("competition").value;
-        const matchType = document.getElementById("matchType").value;
-        const innings = document.getElementById("innings").value;
-        const date = document.getElementById("date").value;
-        const venue = document.getElementById("venue").value;
-
-        const summary = `
-          <p><strong>Competition:</strong> ${competition}</p>
-          <p><strong>Match Type:</strong> ${matchType}</p>
-          <p><strong>Innings:</strong> ${innings}</p>
-          <p><strong>Date:</strong> ${date}</p>
-          <p><strong>Venue:</strong> ${venue}</p>
-        `;
-
-        document.getElementById("matchSummary").innerHTML = summary;
-      });
-
-      // DLS Calculation (Simple Example)
-      function calculateDLS(parScore, oversLost) {
-        const dlsFactor = 1.5;  // Sample factor for demonstration
-        return parScore - (oversLost * dlsFactor);
+        resetInputs();
       }
 
-      // Generate and download match summary
-      document.getElementById("downloadReport").addEventListener("click", () => {
-        const summaryContent = document.getElementById("matchSummary").innerHTML;
-        const reportContent = `Cricket Match Summary:\n\n${summaryContent}`;
+      // Update the display after each selection
+      function updateDisplay() {
+        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${totalBalls / 6}.${totalBalls % 6}`;
+      }
 
-        const blob = new Blob([reportContent], { type: "text/plain" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "match_summary.txt";
-        link.click();
-      });
+      // Reset all inputs
+      function resetInputs() {
+        selectedRuns = 0;
+        selectedExtras = 0;
+        selectedOut = '';
+        currentExtras = 0;
+        currentOut = '';
+      }
     });
   </script>
 </body>
