@@ -1,3 +1,10 @@
+To complete your requirements, here's a full working solution that includes:
+Video Ball-by-Ball Clips Auto-Download - The clips will automatically download when each ball is recorded.
+Selecting Batsman and Bowler from the List - You can select a batsman and bowler from a list, which will be logged into the ball-by-ball table.
+Here’s your updated code:
+Full Updated Code
+Html
+Copy code
 <!doctype html>
 <html lang="en">
 <head>
@@ -58,6 +65,24 @@
       <h2>Ball-by-Ball Scoring</h2>
       <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
 
+      <div>
+        <label for="batsmanSelect">Batsman:</label>
+        <select id="batsmanSelect">
+          <option value="Player 1">Player 1</option>
+          <option value="Player 2">Player 2</option>
+          <option value="Player 3">Player 3</option>
+          <!-- Add more players -->
+        </select>
+
+        <label for="bowlerSelect">Bowler:</label>
+        <select id="bowlerSelect">
+          <option value="Bowler 1">Bowler 1</option>
+          <option value="Bowler 2">Bowler 2</option>
+          <option value="Bowler 3">Bowler 3</option>
+          <!-- Add more bowlers -->
+        </select>
+      </div>
+
       <div class="keypad">
         <button class="run" data-value="0">0</button>
         <button class="run" data-value="1">1</button>
@@ -117,6 +142,9 @@
       let mediaRecorder;
       let recordedChunks = [];
 
+      const batsmanSelect = document.getElementById("batsmanSelect");
+      const bowlerSelect = document.getElementById("bowlerSelect");
+
       // Handle scoring pad button clicks
       const buttons = document.querySelectorAll(".keypad button");
       let selectedRuns = 0;
@@ -145,6 +173,9 @@
 
       // Record ball data
       function recordBall() {
+        currentBatsman = batsmanSelect.value;
+        currentBowler = bowlerSelect.value;
+
         if (selectedRuns === 0 && selectedExtras === 0 && selectedOut === "") return;
 
         totalRuns += parseInt(selectedRuns, 10) || 0;
@@ -165,119 +196,4 @@
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${ballCount}</td>
-          <td>${currentBatsman}</td>
-          <td>${currentBowler}</td>
-          <td>${selectedRuns}</td>
-          <td>${currentExtras}</td>
-          <td>${selectedOut || '-'}</td>
-        `;
-        ballDetailsTable.appendChild(row);
-
-        ballCount++;
-        resetInputs();
-        stopRecording();  // Stop recording after ball is submitted
-      }
-
-      // Update the display after each selection
-      function updateDisplay() {
-        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${totalBalls / 6}.${totalBalls % 6}`;
-      }
-
-      // Reset all inputs
-      function resetInputs() {
-        selectedRuns = 0;
-        selectedExtras = 0;
-        selectedOut = '';
-        currentExtras = 0;
-        currentOut = '';
-      }
-
-      // Start video recording
-      function startRecording() {
-        const stream = video.srcObject;
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-
-        mediaRecorder.ondataavailable = event => {
-          recordedChunks.push(event.data);
-        };
-
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: 'video/webm' });
-          const videoURL = URL.createObjectURL(blob);
-
-          // Create a downloadable link for the ball-by-ball clip
-          const a = document.createElement('a');
-          a.href = videoURL;
-          a.download = `ball_${ballCount - 1}.webm`; // Automatically names the video file based on ball number
-          a.click();
-
-          // Reset the recorded chunks for the next recording
-          recordedChunks = [];
-        };
-
-        mediaRecorder.start();
-        log('Recording started...');
-      }
-
-      // Stop video recording
-      function stopRecording() {
-        if (mediaRecorder && mediaRecorder.state !== "inactive") {
-          mediaRecorder.stop();
-          log('Recording stopped...');
-        }
-      }
-
-      // Log information to the UI
-      function log(message) {
-        const logElement = document.createElement('div');
-        logElement.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-        document.getElementById('log').appendChild(logElement);
-      }
-
-      // Handle Match Details Form submission
-      document.getElementById("matchDetailsForm").addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const matchDetails = {
-          competition: document.getElementById("competition").value,
-          matchType: document.getElementById("matchType").value,
-          innings: document.getElementById("innings").value,
-          date: document.getElementById("date").value,
-          venue: document.getElementById("venue").value,
-        };
-
-        console.log("Match Details:", matchDetails);
-        log('Match details saved.');
-      });
-
-      // Handle Start and Stop buttons
-      document.getElementById("startBtn").addEventListener("click", startRecording);
-      document.getElementById("stopBtn").addEventListener("click", stopRecording);
-
-      // Handle Export Match Report
-      document.getElementById("exportBtn").addEventListener("click", () => {
-        const matchSummary = {
-          totalRuns,
-          totalWickets,
-          totalBalls,
-          matchDetails: {
-            competition: document.getElementById("competition").value,
-            matchType: document.getElementById("matchType").value,
-            innings: document.getElementById("innings").value,
-            date: document.getElementById("date").value,
-            venue: document.getElementById("venue").value,
-          },
-        };
-
-        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchSummary, null, 2));
-        const a = document.createElement('a');
-        a.setAttribute('href', dataStr);
-        a.setAttribute('download', 'match_report.json');
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
-    });
-  </script>
-</body>
-</html>
+          <td>${current
