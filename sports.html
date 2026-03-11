@@ -196,4 +196,119 @@ Copy code
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${ballCount}</td>
-          <td>${current
+          <td>${currentBatsman}</td>
+          <td>${currentBowler}</td>
+          <td>${selectedRuns}</td>
+          <td>${currentExtras}</td>
+          <td>${selectedOut || '-'}</td>
+        `;
+        ballDetailsTable.appendChild(row);
+
+        ballCount++;
+        resetInputs();
+        stopRecording();  // Stop recording after ball is submitted
+      }
+
+      // Update the display after each selection
+      function updateDisplay() {
+        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${totalBalls / 6}.${totalBalls % 6}`;
+      }
+
+      // Reset all inputs
+      function resetInputs() {
+        selectedRuns = 0;
+        selectedExtras = 0;
+        selectedOut = '';
+        currentExtras = 0;
+        currentOut = '';
+      }
+
+      // Start video recording
+      function startRecording() {
+        const stream = video.srcObject;
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = event => {
+          recordedChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const videoURL = URL.createObjectURL(blob);
+
+          // Create a downloadable link for the ball-by-ball clip
+          const a = document.createElement('a');
+          a.href = videoURL;
+          a.download = `ball_${ballCount - 1}.webm`; // Automatically names the video file based on ball number
+          a.click();
+
+          // Reset the recorded chunks for the next recording
+          recordedChunks = [];
+        };
+
+        mediaRecorder.start();
+        log('Recording started...');
+      }
+
+      // Stop video recording
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+          log('Recording stopped...');
+        }
+      }
+
+      // Log information to the UI
+      function log(message) {
+        const logElement = document.createElement('div');
+        logElement.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        document.getElementById('log').appendChild(logElement);
+      }
+
+      // Handle Match Details Form submission
+      document.getElementById("matchDetailsForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const matchDetails = {
+          competition: document.getElementById("competition").value,
+          matchType: document.getElementById("matchType").value,
+          innings: document.getElementById("innings").value,
+          date: document.getElementById("date").value,
+          venue: document.getElementById("venue").value,
+        };
+
+        console.log("Match Details:", matchDetails);
+        log('Match details saved.');
+      });
+
+      // Handle Start and Stop buttons
+      document.getElementById("startBtn").addEventListener("click", startRecording);
+      document.getElementById("stopBtn").addEventListener("click", stopRecording);
+
+      // Handle Export Match Report
+      document.getElementById("exportBtn").addEventListener("click", () => {
+        const matchSummary = {
+          totalRuns,
+          totalWickets,
+          totalBalls,
+          matchDetails: {
+            competition: document.getElementById("competition").value,
+            matchType: document.getElementById("matchType").value,
+            innings: document.getElementById("innings").value,
+            date: document.getElementById("date").value,
+            venue: document.getElementById("venue").value,
+          },
+        };
+
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchSummary, null, 2));
+        const a = document.createElement('a');
+        a.setAttribute('href', dataStr);
+        a.setAttribute('download', 'match_report.json');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    });
+  </script>
+</body>
+</html>
