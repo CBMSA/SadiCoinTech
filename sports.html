@@ -1,66 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cricket Scoring System - Professional</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Cricket Scoring System</title>
   <style>
-    body { font-family: Arial, sans-serif; background-color: #0f172a; color: #e6eef8; margin: 0; padding: 0; }
-    header { background-color: #1f2937; padding: 20px; text-align: center; }
-    h1 { font-size: 2em; color: white; }
-    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-    .panel { background: #071022; padding: 20px; border-radius: 12px; box-shadow: 0 6px 18px rgba(2, 6, 23, .6); }
-    .keypad button, .submit, .clear, .run, .extra, .out { padding: 12px; font-size: 16px; cursor: pointer; border-radius: 8px; }
-    .run { background-color: #2563eb; color: white; }
-    .extra { background-color: #10b981; color: white; }
-    .out { background-color: #dc2626; color: white; }
-    .submit { background-color: #22c55e; color: white; }
-    .clear { background-color: #ef4444; color: white; }
-    .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-    .score-display { margin-top: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; text-align: center; border: 1px solid #e6eef8; }
-    button { border: none; padding: 10px; cursor: pointer; }
-    footer { text-align: center; padding: 10px; background-color: #1f2937; margin-top: 20px; }
-    footer p { color: white; }
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; background:#f4f4f4; color:#333; }
+    .app { display: grid; grid-template-columns: 1fr 360px; gap: 12px; height: 100vh; padding: 12px; }
+    .panel { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    video { width:100%; height: auto; border-radius:12px; background: black; }
+    canvas { position: absolute; left:12px; top:12px; pointer-events:none; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; }
+    button { background:#4CAF50; border:none; padding:8px 10px; border-radius:8px; color:white; cursor:pointer; }
+    button.secondary { background:#888; }
+    .log { max-height:60vh; overflow:auto; padding:8px; font-size:14px; }
+    .score { font-size:18px; margin-bottom:8px; }
+    .badge { background:#4CAF50; padding:6px 8px; border-radius:999px; display:inline-block; }
+    .small { font-size:13px; opacity:.85 }
+    table { width:100%; margin-top: 20px; border-collapse: collapse; }
+    table, th, td { border: 1px solid #ddd; }
+    th, td { padding: 8px 12px; text-align: center; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Cricket Scoring System</h1>
-    <p>For Managers, Coaches, Scouts, Players, and Parents</p>
-  </header>
+  <div class="app">
+    <div class="panel" id="main">
+      <video id="video" playsinline autoplay muted></video>
+      <canvas id="overlay"></canvas>
 
-  <div class="container">
-    <!-- Match Details Form -->
-    <div class="panel" id="matchDetailsPanel">
-      <h2>Match Details</h2>
+      <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between">
+        <button id="startBtn">Start Recording</button>
+        <button id="stopBtn" class="secondary">Stop Recording</button>
+        <button id="exportBtn">Export Match Report</button>
+      </div>
+      <hr />
+
+      <h3>Match Details</h3>
       <form id="matchDetailsForm">
         <label for="competition">Competition:</label>
-        <input type="text" id="competition" name="competition" required>
+        <input type="text" id="competition" name="competition" required><br>
         <label for="matchType">Match Type:</label>
         <select id="matchType" name="matchType">
           <option value="home">Home</option>
           <option value="away">Away</option>
-        </select>
+        </select><br>
         <label for="innings">Innings:</label>
-        <input type="text" id="innings" name="innings" required>
+        <input type="text" id="innings" name="innings" required><br>
         <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required>
+        <input type="date" id="date" name="date" required><br>
         <label for="venue">Venue:</label>
-        <input type="text" id="venue" name="venue" required>
+        <input type="text" id="venue" name="venue" required><br>
         <button type="submit">Save Match Details</button>
       </form>
     </div>
 
-    <!-- Ball-by-Ball Scoring -->
-    <div class="panel" id="scoringPanel">
+    <div class="panel" id="side">
       <h2>Ball-by-Ball Scoring</h2>
-      <div class="score-display">
-        <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
-      </div>
+      <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
 
-      <!-- Scoring Pad -->
       <div class="keypad">
         <button class="run" data-value="0">0</button>
         <button class="run" data-value="1">1</button>
@@ -77,12 +74,10 @@
         <button class="out" data-value="caught">Caught</button>
         <button class="out" data-value="run-out">Run-out</button>
         <button class="out" data-value="stumped">Stumped</button>
-
-        <button class="submit" data-value="submit">Submit</button>
-        <button class="clear" data-value="clear">Clear</button>
+        <button class="submit">Submit</button>
+        <button class="clear">Clear</button>
       </div>
 
-      <!-- Ball-by-Ball Table -->
       <h3>Ball-by-Ball Details</h3>
       <table id="ballDetailsTable">
         <thead>
@@ -95,22 +90,13 @@
             <th>Out</th>
           </tr>
         </thead>
-        <tbody id="ballDetailsRows">
-        </tbody>
+        <tbody id="ballDetailsRows"></tbody>
       </table>
+
+      <h3>Match Summary</h3>
+      <div id="matchSummary"></div>
     </div>
   </div>
-
-  <!-- Match Summary and Report -->
-  <section id="summary">
-    <div class="panel">
-      <h2>Match Summary</h2>
-      <div id="matchSummary">
-        <!-- Match summary will be displayed here -->
-      </div>
-      <button id="downloadReport">Download Match Summary</button>
-    </div>
-  </section>
 
   <footer>
     <p>&copy; 2026 Cricket Scoring System. All rights reserved.</p>
@@ -124,12 +110,14 @@
       let ballCount = 1;
       const ballDetailsTable = document.getElementById("ballDetailsRows");
       const scoreDisplay = document.getElementById("score");
-      let currentBatsman = 'Batsman 1'; // Example
-      let currentBowler = 'Bowler 1'; // Example
+      let currentBatsman = '';
+      let currentBowler = '';
       let currentExtras = 0;
       let currentOut = '';
+      let mediaRecorder;
+      let recordedChunks = [];
 
-      // Handle scoring pad button clicks (runs, extras, outs)
+      // Handle scoring pad button clicks
       const buttons = document.querySelectorAll(".keypad button");
       let selectedRuns = 0;
       let selectedExtras = 0;
@@ -179,10 +167,7 @@
           <td>${ballCount}</td>
           <td>${currentBatsman}</td>
           <td>${currentBowler}</td>
-         Certainly! Here's the remaining part of the code:
-Html
-Copy code
-<td>${selectedRuns}</td>
+          <td>${selectedRuns}</td>
           <td>${currentExtras}</td>
           <td>${selectedOut || '-'}</td>
         `;
@@ -190,6 +175,7 @@ Copy code
 
         ballCount++;
         resetInputs();
+        stopRecording();  // Stop recording after ball is submitted
       }
 
       // Update the display after each selection
@@ -206,48 +192,90 @@ Copy code
         currentOut = '';
       }
 
+      // Start video recording
+      function startRecording() {
+        const stream = video.srcObject;
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+        mediaRecorder.ondataavailable = event => {
+          recordedChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const videoURL = URL.createObjectURL(blob);
+
+          // Create a downloadable link for the ball-by-ball clip
+          const a = document.createElement('a');
+          a.href = videoURL;
+          a.download = `ball_${ballCount - 1}.webm`; // Automatically names the video file based on ball number
+          a.click();
+
+          // Reset the recorded chunks for the next recording
+          recordedChunks = [];
+        };
+
+        mediaRecorder.start();
+        log('Recording started...');
+      }
+
+      // Stop video recording
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+          log('Recording stopped...');
+        }
+      }
+
+      // Log information to the UI
+      function log(message) {
+        const logElement = document.createElement('div');
+        logElement.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        document.getElementById('log').appendChild(logElement);
+      }
+
       // Handle Match Details Form submission
-      const matchDetailsForm = document.getElementById('matchDetailsForm');
-      matchDetailsForm.addEventListener('submit', (e) => {
+      document.getElementById("matchDetailsForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
         const matchDetails = {
-          competition: document.getElementById('competition').value,
-          matchType: document.getElementById('matchType').value,
-          innings: document.getElementById('innings').value,
-          date: document.getElementById('date').value,
-          venue: document.getElementById('venue').value,
+          competition: document.getElementById("competition").value,
+          matchType: document.getElementById("matchType").value,
+          innings: document.getElementById("innings").value,
+          date: document.getElementById("date").value,
+          venue: document.getElementById("venue").value,
         };
 
-        console.log("Match Details Submitted:", matchDetails);
-        alert("Match Details Saved Successfully!");
+        console.log("Match Details:", matchDetails);
+        log('Match details saved.');
       });
 
-      // Handle downloading match report
-      document.getElementById('downloadReport').addEventListener('click', () => {
-        const matchReport = {
-          runs: totalRuns,
-          wickets: totalWickets,
-          overs: `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`,
-          ballDetails: Array.from(ballDetailsTable.rows).map(row => {
-            return {
-              ball: row.cells[0].textContent,
-              batsman: row.cells[1].textContent,
-              bowler: row.cells[2].textContent,
-              runs: row.cells[3].textContent,
-              extras: row.cells[4].textContent,
-              out: row.cells[5].textContent,
-            };
-          })
+      // Handle Start and Stop buttons
+      document.getElementById("startBtn").addEventListener("click", startRecording);
+      document.getElementById("stopBtn").addEventListener("click", stopRecording);
+
+      // Handle Export Match Report
+      document.getElementById("exportBtn").addEventListener("click", () => {
+        const matchSummary = {
+          totalRuns,
+          totalWickets,
+          totalBalls,
+          matchDetails: {
+            competition: document.getElementById("competition").value,
+            matchType: document.getElementById("matchType").value,
+            innings: document.getElementById("innings").value,
+            date: document.getElementById("date").value,
+            venue: document.getElementById("venue").value,
+          },
         };
 
-        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchReport, null, 2));
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchSummary, null, 2));
         const a = document.createElement('a');
         a.setAttribute('href', dataStr);
         a.setAttribute('download', 'match_report.json');
         document.body.appendChild(a);
         a.click();
-        a.remove();
+        document.body.removeChild(a);
       });
     });
   </script>
