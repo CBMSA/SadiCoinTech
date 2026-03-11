@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Cricket Scoring DApp — Prototype</title>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; background:#0f172a; color:#e6eef8; }
+    .app { display: grid; grid-template-columns: 1fr 360px; gap: 12px; height: 100vh; padding: 12px; }
+    .panel { background: linear-gradient(180deg,#0b1220, #071022); border-radius: 12px; padding: 12px; box-shadow: 0 6px 18px rgba(2,6,23,.6); }
+    video { width:100%; height: auto; border-radius:12px; background: black; }
+    canvas { position: absolute; left:12px; top:12px; pointer-events:none; }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; }
+    button { background:#2563eb; border:none; padding:8px 10px; border-radius:8px; color:white; cursor:pointer; }
+    button.secondary { background:#1f2937; }
+    .log { max-height:60vh; overflow:auto; padding:8px; font-size:14px; }
+    .score { font-size:18px; margin-bottom:8px; }
+    .badge { background:#0b1220; padding:6px 8px; border-radius:999px; display:inline-block; }
+    .small { font-size:13px; opacity:.85 }
+    .scouting-report, .practice-database, .game-stats { margin-top: 20px; }
+    .scouting-report table, .practice-database table, .game-stats table { width: 100%; margin-top: 10px; }
+    table, th, td { border: 1px solid #4b4b4b; border-collapse: collapse; }
+    th, td { padding: 8px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="panel" id="main">
+      <div style="position:relative">
+        <video id="video" playsinline autoplay muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+      <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between">
+        <div class="controls">
+          <button id="startBtn">Start</button>
+          <button id="stopBtn" class="secondary">Stop</button>
+          <button id="exportBtn">Export JSON</button>
+          <button id="resetBtn" class="secondary">Reset</button>
+        </div>
+        <div class="small">Frame interval: <span id="interval">200ms</span></div>
+      </div>
+      <hr />
+      <div style="display:flex; gap:12px; align-items:center">
+        <div class="badge">Detected Events: <span id="detectedCount">0</span></div>
+        <div class="badge">Confirmed Score: <span id="scoreText">0/0 (0.0)</span></div>
+      </div>
+
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center">
+        <button id="markRun">Mark Run</button>
+        <button id="markWicket">Mark Wicket</button>
+        <button id="markWide">Mark Wide</button>
+        <button id="markNoBall">Mark No-ball</button>
+        <button id="markPenalty">Mark Penalty</button>
+      </div>
+
+      <h3 style="margin-top:12px">Detection log / manual review</h3>
+      <div class="log" id="log"></div>
+    </div>
+
+    <div class="panel" id="side">
+      <h2>Scorecard</h2>
+      <div class="score" id="scorecard">Overs: 0.0<br/>Runs: 0<br/>Wickets: 0</div>
+
+      <h3>Configuration</h3>
+      <label class="small">Model interval (ms)</label>
+      <input id="modelInterval" type="range" min="100" max="1000" step="50" value="200" />
+      <div style="height:8px"></div>
+
+      <h3>Models</h3>
+      <div class="small">Using TensorFlow.js <span class="badge">coco-ssd</span> (sports ball) + <span class="badge">MoveNet</span> pose detection.</div>
+      <div style="height:10px"></div>
+      <div style="display:flex; gap:8px; flex-direction:column">
+        <button id="toggleDraw" class="secondary">Toggle Draw Boxes</button>
+        <button id="manualConfirm" class="secondary">Auto-confirm events (off)</button>
+      </div>
+
+      <h3 style="margin-top:12px">Quick tips</h3>
+      <div class="small">• For production, collect labeled clips (ball, wicket, stump, crease) and train a custom detector for stumps & ball trajectory.<br/>• Mobile: prefer native app or WebRTC camera constraints to 720p for speed.<br/>• Always allow manual override — AI will miss or misclassify events.</div>
+
+      <!-- Scouting Report Section -->
+      <div class="scouting-report">
+        <h3>Scouting Reports</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Performance</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="scouting-table">
+            <!-- Example Row -->
+            <tr>
+              <td>Player A</td>
+              <td>Batting: 45 Runs, Bowling: 2 Wickets</td>
+              <td>Good footwork, needs to improve consistency.</td>
+            </tr>
+            <tr>
+              <td>Player B</td>
+              <td>Batting: 30 Runs, Bowling: 1 Wicket</td>
+              <td>Struggles with spin bowling, improving fielding.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Practice Database Section -->
+      <div class="practice-database">
+        <h3>Player Practices</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Drill</th>
+              <th>Duration</th>
+              <th>Progress</th>
+            </tr>
+          </thead>
+          <tbody id="practice-table">
+            <!-- Example Row -->
+            <tr>
+              <td>Player A</td>
+              <td>Batting Drills</td>
+              <td>30 min</td>
+              <td>80% (Good control)</td>
+            </tr>
+            <tr>
+              <td>Player B</td>
+              <td>Bowling Accuracy</td>
+              <td>20 min</td>
+              <td>60% (Needs improvement)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Game Stats Section -->
+      <div class="game-stats">
+        <h3>Game Stats</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Match</th>
+              <th>Runs</th>
+              <th>Wickets</th>
+              <th>Player of the Match</th>
+            </tr>
+          </thead>
+          <tbody id="game-table">
+            <!-- Example Row -->
+            <tr>
+              <td>Match 1</td>
+              <td>120</td>
+              <td>2</td>
+              <td>Player A</td>
+            </tr>
+            <tr>
+              <td>Match 2</td>
+              <td>80</td>
+              <td>3</td>
+              <td>Player B</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TensorFlow.js + models from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+  <script
