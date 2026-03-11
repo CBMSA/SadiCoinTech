@@ -1,26 +1,27 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Cricket Scoring System</title>
+  <title>AI Cricket Scoring System - Web3 Prototype</title>
   <style>
-    body { font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; background:#f4f4f4; color:#333; }
+    body { font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; background:#181818; color:#e0e0e0; }
     .app { display: grid; grid-template-columns: 1fr 360px; gap: 12px; height: 100vh; padding: 12px; }
-    .panel { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .panel { background: #1f1f1f; border-radius: 12px; padding: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
     video { width:100%; height: auto; border-radius:12px; background: black; }
     canvas { position: absolute; left:12px; top:12px; pointer-events:none; }
     .controls { display:flex; gap:8px; flex-wrap:wrap; }
     button { background:#4CAF50; border:none; padding:8px 10px; border-radius:8px; color:white; cursor:pointer; }
-    button.secondary { background:#888; }
+    button.secondary { background:#444; }
     .log { max-height:60vh; overflow:auto; padding:8px; font-size:14px; }
     .score { font-size:18px; margin-bottom:8px; }
     .badge { background:#4CAF50; padding:6px 8px; border-radius:999px; display:inline-block; }
     .small { font-size:13px; opacity:.85 }
-    table { width:100%; margin-top: 20px; border-collapse: collapse; }
-    table, th, td { border: 1px solid #ddd; }
+    table { width:100%; margin-top: 20px; border-collapse: collapse; color: #e0e0e0; }
+    table, th, td { border: 1px solid #444; }
     th, td { padding: 8px 12px; text-align: center; }
+    .keypad button { margin: 2px; }
+    footer { background-color: #181818; text-align: center; padding: 10px; color: #777; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -28,14 +29,12 @@
     <div class="panel" id="main">
       <video id="video" playsinline autoplay muted></video>
       <canvas id="overlay"></canvas>
-
       <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between">
         <button id="startBtn">Start Recording</button>
         <button id="stopBtn" class="secondary">Stop Recording</button>
         <button id="exportBtn">Export Match Report</button>
       </div>
       <hr />
-
       <h3>Match Details</h3>
       <form id="matchDetailsForm">
         <label for="competition">Competition:</label>
@@ -58,25 +57,6 @@
     <div class="panel" id="side">
       <h2>Ball-by-Ball Scoring</h2>
       <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
-
-      <div>
-        <label for="batsmanSelect">Batsman:</label>
-        <select id="batsmanSelect">
-          <option value="Player 1">Player 1</option>
-          <option value="Player 2">Player 2</option>
-          <option value="Player 3">Player 3</option>
-          <!-- Add more players -->
-        </select>
-
-        <label for="bowlerSelect">Bowler:</label>
-        <select id="bowlerSelect">
-          <option value="Bowler 1">Bowler 1</option>
-          <option value="Bowler 2">Bowler 2</option>
-          <option value="Bowler 3">Bowler 3</option>
-          <!-- Add more bowlers -->
-        </select>
-      </div>
-
       <div class="keypad">
         <button class="run" data-value="0">0</button>
         <button class="run" data-value="1">1</button>
@@ -129,15 +109,32 @@
       let ballCount = 1;
       const ballDetailsTable = document.getElementById("ballDetailsRows");
       const scoreDisplay = document.getElementById("score");
-      let currentBatsman = '';
-      let currentBowler = '';
+      let currentBatsman = 'Batsman 1';
+      let currentBowler = 'Bowler 1';
       let currentExtras = 0;
       let currentOut = '';
       let mediaRecorder;
       let recordedChunks = [];
+      let players = ['Player 1', 'Player 2', 'Player 3'];
+      let currentPlayerStats = {};
 
-      const batsmanSelect = document.getElementById("batsmanSelect");
-      const bowlerSelect = document.getElementById("bowlerSelect");
+      // Populate dropdown with players
+      const batsmanSelect = document.createElement('select');
+      const bowlerSelect = document.createElement('select');
+      players.forEach(player => {
+        let option = document.createElement('option');
+        option.value = player;
+        option.textContent = player;
+        batsmanSelect.appendChild(option);
+
+        option = document.createElement('option');
+        option.value = player;
+        option.textContent = player;
+        bowlerSelect.appendChild(option);
+      });
+
+      document.body.appendChild(batsmanSelect);
+      document.body.appendChild(bowlerSelect);
 
       // Handle scoring pad button clicks
       const buttons = document.querySelectorAll(".keypad button");
@@ -167,9 +164,6 @@
 
       // Record ball data
       function recordBall() {
-        currentBatsman = batsmanSelect.value;
-        currentBowler = bowlerSelect.value;
-
         if (selectedRuns === 0 && selectedExtras === 0 && selectedOut === "") return;
 
         totalRuns += parseInt(selectedRuns, 10) || 0;
@@ -198,6 +192,9 @@
         `;
         ballDetailsTable.appendChild(row);
 
+        // Update player stats
+        updatePlayerStats(currentBatsman, selectedRuns, currentExtras, selectedOut);
+
         ballCount++;
         resetInputs();
         stopRecording();  // Stop recording after ball is submitted
@@ -206,6 +203,28 @@
       // Update the display after each selection
       function updateDisplay() {
         scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${totalBalls / 6}.${totalBalls % 6}`;
+      }
+
+      // Update player stats
+      function updatePlayerStats(player, runs, extras, out) {
+        if (!currentPlayerStats[player]) {
+          currentPlayerStats[player] = {
+            runs: 0,
+            balls: 0,
+            wickets: 0,
+            extras: 0,
+            outs: 0
+          };
+        }
+
+        currentPlayerStats[player].runs += runs || 0;
+        currentPlayerStats[player].balls++;
+        currentPlayerStats[player].extras += (extras === 'w' || extras === 'nb') ? 1 : 0;
+        if (out) {
+          currentPlayerStats[player].outs++;
+        }
+
+        log(`Stats updated for ${player}: Runs: ${currentPlayerStats[player].runs}, Balls: ${currentPlayerStats[player].balls}, Outs: ${currentPlayerStats[player].outs}`);
       }
 
       // Reset all inputs
@@ -292,6 +311,7 @@
             date: document.getElementById("date").value,
             venue: document.getElementById("venue").value,
           },
+          playerStats: currentPlayerStats
         };
 
         const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchSummary, null, 2));
