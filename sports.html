@@ -387,4 +387,80 @@ src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
 
     // Handle button clicks
     document.getElementById('startBtn').onclick = async () => {
-      if (!video
+      if (!videosrcObject) await initCamera();
+      if (!cocoModel || !poseModel) await loadModels();
+      running = true;
+      detectLoop();
+      log('Detection started');
+    };
+
+    document.getElementById('stopBtn').onclick = () => {
+      running = false;
+      log('Detection stopped');
+    };
+
+    document.getElementById('toggleDraw').onclick = () => {
+      drawBoxes = !drawBoxes;
+      log('Toggle draw: ' + drawBoxes);
+    };
+
+    document.getElementById('manualConfirm').onclick = () => {
+      autoConfirm = !autoConfirm;
+      document.getElementById('manualConfirm').textContent = autoConfirm ? 'Auto-confirm events (on)' : 'Auto-confirm events (off)';
+    };
+
+    document.getElementById('markRun').onclick = () => {
+      const r = prompt('Runs scored?', '1');
+      confirmRun(Number(r || 1), 'manual');
+    };
+
+    document.getElementById('markWicket').onclick = () => {
+      confirmWicket('manual');
+    };
+
+    document.getElementById('markWide').onclick = () => {
+      confirmWide();
+    };
+
+    document.getElementById('markNoBall').onclick = () => {
+      confirmNoBall();
+    };
+
+    document.getElementById('markPenalty').onclick = () => {
+      const p = prompt('Penalty runs?', '5');
+      confirmPenalty(Number(p || 5));
+    };
+
+    document.getElementById('exportBtn').onclick = () => {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(state, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute('href', dataStr);
+      a.setAttribute('download', 'score-export.json');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+
+    document.getElementById('resetBtn').onclick = () => {
+      if (confirm('Reset scoreboard?')) {
+        state.runs = 0;
+        state.wickets = 0;
+        state.balls = 0;
+        state.events = [];
+        updateScoreUI();
+        log('State reset');
+        detectedCountEl.textContent = 0;
+      }
+    };
+
+    document.getElementById('modelInterval').oninput = (e) => {
+      modelInterval = Number(e.target.value);
+      document.getElementById('interval').textContent = modelInterval + 'ms';
+    };
+
+    // Initial UI update
+    updateScoreUI();
+    log('Prototype loaded — press Start');
+  </script>
+</body>
+</html>
