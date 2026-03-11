@@ -1,295 +1,255 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Cricket Scoring DApp — Prototype</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cricket Scoring System - Professional</title>
   <style>
-    body { font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; background:#0f172a; color:#e6eef8; }
-    .app { display: grid; grid-template-columns: 1fr 360px; gap: 12px; height: 100vh; padding: 12px; }
-    .panel { background: linear-gradient(180deg,#0b1220, #071022); border-radius: 12px; padding: 12px; box-shadow: 0 6px 18px rgba(2,6,23,.6); }
-    video { width:100%; height: auto; border-radius:12px; background: black; }
-    canvas { position: absolute; left:12px; top:12px; pointer-events:none; }
-    .controls { display:flex; gap:8px; flex-wrap:wrap; }
-    button { background:#2563eb; border:none; padding:8px 10px; border-radius:8px; color:white; cursor:pointer; }
-    button.secondary { background:#1f2937; }
-    .log { max-height:60vh; overflow:auto; padding:8px; font-size:14px; }
-    .score { font-size:18px; margin-bottom:8px; }
-    .badge { background:#0b1220; padding:6px 8px; border-radius:999px; display:inline-block; }
-    .small { font-size:13px; opacity:.85 }
-    .stats-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
-    .stats-table th, .stats-table td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    body { font-family: Arial, sans-serif; background-color: #0f172a; color: #e6eef8; margin: 0; padding: 0; }
+    header { background-color: #1f2937; padding: 20px; text-align: center; }
+    h1 { font-size: 2em; color: white; }
+    .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+    .panel { background: #071022; padding: 20px; border-radius: 12px; box-shadow: 0 6px 18px rgba(2, 6, 23, .6); }
+    .keypad button, .submit, .clear, .run, .extra, .out { padding: 12px; font-size: 16px; cursor: pointer; border-radius: 8px; }
+    .run { background-color: #2563eb; color: white; }
+    .extra { background-color: #10b981; color: white; }
+    .out { background-color: #dc2626; color: white; }
+    .submit { background-color: #22c55e; color: white; }
+    .clear { background-color: #ef4444; color: white; }
+    .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+    .score-display { margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; text-align: center; border: 1px solid #e6eef8; }
+    button { border: none; padding: 10px; cursor: pointer; }
+    footer { text-align: center; padding: 10px; background-color: #1f2937; margin-top: 20px; }
+    footer p { color: white; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="panel" id="main">
-      <!-- Video and Detection Setup -->
-      <div style="position:relative">
-        <video id="video" playsinline autoplay muted></video>
-        <canvas id="overlay"></canvas>
-      </div>
-      <div style="margin-top:10px; display:flex; align-items:center; justify-content:space-between">
-        <div class="controls">
-          <button id="startBtn">Start</button>
-          <button id="stopBtn" class="secondary">Stop</button>
-          <button id="exportBtn">Export JSON</button>
-          <button id="resetBtn" class="secondary">Reset</button>
-        </div>
-        <div class="small">Frame interval: <span id="interval">200ms</span></div>
-      </div>
-      <hr />
-      <!-- Scoring Panel -->
-      <div style="margin-top:10px; display:flex; gap:8px; align-items:center">
-        <button id="markRun">Mark Run</button>
-        <button id="markWicket">Mark Wicket</button>
-        <button id="markWide">Mark Wide</button>
-        <button id="markNoBall">Mark No-ball</button>
-        <button id="markPenalty">Mark Penalty</button>
-      </div>
+  <header>
+    <h1>Cricket Scoring System</h1>
+    <p>For Managers, Coaches, Scouts, Players, and Parents</p>
+  </header>
 
-      <h3 style="margin-top:12px">Detection log / manual review</h3>
-      <div class="log" id="log"></div>
+  <div class="container">
+    <!-- Match Details Form -->
+    <div class="panel" id="matchDetailsPanel">
+      <h2>Match Details</h2>
+      <form id="matchDetailsForm">
+        <label for="competition">Competition:</label>
+        <input type="text" id="competition" name="competition" required>
+        <label for="matchType">Match Type:</label>
+        <select id="matchType" name="matchType">
+          <option value="home">Home</option>
+          <option value="away">Away</option>
+        </select>
+        <label for="innings">Innings:</label>
+        <input type="text" id="innings" name="innings" required>
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+        <label for="venue">Venue:</label>
+        <input type="text" id="venue" name="venue" required>
+        <button type="submit">Save Match Details</button>
+      </form>
     </div>
 
-    <div class="panel" id="side">
-      <h2>Scorecard</h2>
-      <div class="score" id="scorecard">Overs: 0.0<br/>Runs: 0<br/>Wickets: 0</div>
-
-      <h3>Configuration</h3>
-      <label class="small">Model interval (ms)</label>
-      <input id="modelInterval" type="range" min="100" max="1000" step="50" value="200" />
-      <div style="height:8px"></div>
-
-      <h3>Teams and Players</h3>
-      <div>
-        <label for="teamA">Team A</label>
-        <input id="teamA" type="text" placeholder="Enter team A name">
-      </div>
-      <div>
-        <label for="teamB">Team B</label>
-        <input id="teamB" type="text" placeholder="Enter team B name">
-      </div>
-      <div>
-        <label for="players">Players</label>
-        <textarea id="players" placeholder="Enter player names, one per line"></textarea>
+    <!-- Ball-by-Ball Scoring -->
+    <div class="panel" id="scoringPanel">
+      <h2>Ball-by-Ball Scoring</h2>
+      <div class="score-display">
+        <p id="score">Runs: 0 | Wickets: 0 | Overs: 0.0 | Current Batsman: N/A | Bowler: N/A</p>
       </div>
 
-      <h3>Practice Player Stats</h3>
-      <button id="startPracticeBtn">Start Practice</button>
-      <button id="endPracticeBtn">End Practice</button>
-      <div id="playerStatsReport"></div>
+      <!-- Scoring Pad -->
+      <div class="keypad">
+        <button class="run" data-value="0">0</button>
+        <button class="run" data-value="1">1</button>
+        <button class="run" data-value="2">2</button>
+        <button class="run" data-value="3">3</button>
+        <button class="run" data-value="4">4</button>
+        <button class="run" data-value="5">5</button>
+        <button class="run" data-value="6">6</button>
+        <button class="extra" data-value="w">Wide</button>
+        <button class="extra" data-value="nb">No-ball</button>
+        <button class="run" data-value="by">Bye</button>
+        <button class="run" data-value="lb">Leg Bye</button>
+        <button class="out" data-value="bowled">Bowled</button>
+        <button class="out" data-value="caught">Caught</button>
+        <button class="out" data-value="run-out">Run-out</button>
+        <button class="out" data-value="stumped">Stumped</button>
+
+        <button class="submit" data-value="submit">Submit</button>
+        <button class="clear" data-value="clear">Clear</button>
+      </div>
+
+      <!-- Ball-by-Ball Table -->
+      <h3>Ball-by-Ball Details</h3>
+      <table id="ballDetailsTable">
+        <thead>
+          <tr>
+            <th>Ball</th>
+            <th>Batsman</th>
+            <th>Bowler</th>
+            <th>Runs</th>
+            <th>Extras</th>
+            <th>Out</th>
+          </tr>
+        </thead>
+        <tbody id="ballDetailsRows">
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@0.0.9"></script>
+  <!-- Match Summary and Report -->
+  <section id="summary">
+    <div class="panel">
+      <h2>Match Summary</h2>
+      <div id="matchSummary">
+        <!-- Match summary will be displayed here -->
+      </div>
+      <button id="downloadReport">Download Match Summary</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Cricket Scoring System. All rights reserved.</p>
+  </footer>
+
   <script>
-    let cocoModel = null;
-    let poseModel = null;
-    let running = false;
-    let autoConfirm = false;
-    let modelInterval = 200;
-    const state = {
-      runs: 0,
-      wickets: 0,
-      balls: 0,
-      events: [],
-      players: [],
-      practiceStats: {},
-    };
+    document.addEventListener("DOMContentLoaded", () => {
+      let totalRuns = 0;
+      let totalWickets = 0;
+      let totalBalls = 0;
+      let ballCount = 1;
+      const ballDetailsTable = document.getElementById("ballDetailsRows");
+      const scoreDisplay = document.getElementById("score");
+      let currentBatsman = 'Batsman 1'; // Example
+      let currentBowler = 'Bowler 1'; // Example
+      let currentExtras = 0;
+      let currentOut = '';
 
-    async function initCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
-        video.srcObject = stream;
-        await video.play();
-        overlay.width = video.videoWidth;
-        overlay.height = video.videoHeight;
-        log('Camera ready: ' + video.videoWidth + 'x' + video.videoHeight);
-      } catch (e) {
-        alert('Camera access failed: ' + e.message);
+      // Handle scoring pad button clicks (runs, extras, outs)
+      const buttons = document.querySelectorAll(".keypad button");
+      let selectedRuns = 0;
+      let selectedExtras = 0;
+      let selectedOut = "";
+
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          const value = button.dataset.value;
+
+          if (value === 'w' || value === 'nb' || value === 'by' || value === 'lb') {
+            selectedExtras = value;
+            selectedRuns = 0;
+          } else if (value === 'submit') {
+            recordBall();
+          } else if (value === 'clear') {
+            resetInputs();
+          } else {
+            selectedRuns = value;
+            selectedExtras = 0;
+          }
+
+          updateDisplay();
+        });
+      });
+
+      // Record ball data
+      function recordBall() {
+        if (selectedRuns === 0 && selectedExtras === 0 && selectedOut === "") return;
+
+        totalRuns += parseInt(selectedRuns, 10) || 0;
+        currentExtras = selectedExtras;
+
+        if (selectedOut) {
+          totalWickets++;
+        }
+
+        totalBalls++;
+
+        let overs = Math.floor(totalBalls / 6);
+        let ballsInCurrentOver = totalBalls % 6;
+        let oversDisplay = `${overs}.${ballsInCurrentOver}`;
+
+        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${oversDisplay}`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${ballCount}</td>
+          <td>${currentBatsman}</td>
+          <td>${currentBowler}</td>
+         Certainly! Here's the remaining part of the code:
+Html
+Copy code
+<td>${selectedRuns}</td>
+          <td>${currentExtras}</td>
+          <td>${selectedOut || '-'}</td>
+        `;
+        ballDetailsTable.appendChild(row);
+
+        ballCount++;
+        resetInputs();
       }
-    }
 
-    async function loadModels() {
-      log('Loading coco-ssd...');
-      cocoModel = await cocoSsd.load();
-      log('Loaded coco-ssd');
+      // Update the display after each selection
+      function updateDisplay() {
+        scoreDisplay.textContent = `Runs: ${totalRuns} | Wickets: ${totalWickets} | Overs: ${totalBalls / 6}.${totalBalls % 6}`;
+      }
 
-      log('Loading pose-detection MoveNet...');
-      const detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING };
-      poseModel = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-      log('Loaded pose model');
-    }
+      // Reset all inputs
+      function resetInputs() {
+        selectedRuns = 0;
+        selectedExtras = 0;
+        selectedOut = '';
+        currentExtras = 0;
+        currentOut = '';
+      }
 
-    function log(txt) {
-      const now = new Date().toLocaleTimeString();
-      const el = document.createElement('div');
-      el.innerHTML = `<span class="small">[${now}]</span> ${txt}`;
-      logEl.prepend(el);
-    }
+      // Handle Match Details Form submission
+      const matchDetailsForm = document.getElementById('matchDetailsForm');
+      matchDetailsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    // Scoring button functions
-    function confirmRun(runs = 1) {
-      state.runs += runs;
-      state.balls += 1;
-      state.events.push({ type: 'run', runs, time: new Date().toISOString() });
-      log(`Run +${runs}`);
-    }
-
-    function confirmWicket() {
-      state.wickets += 1;
-      state.balls += 1;
-      state.events.push({ type: 'wicket', time: new Date().toISOString() });
-      log('Wicket!');
-    }
-
-    // Add players
-    function addPlayers() {
-      const playerNames = document.getElementById('players').value.split("\n");
-      state.players = playerNames;
-      log('Players added: ' + state.players.join(', '));
-    }
-
-    // End practice and generate player report
-    document.getElementById('endPracticeBtn').onclick = () => {
-      // Generate and download individual practice performance reports for each player
-      state.players.forEach(player => {
-        const playerStats = state.practiceStats[player] || { runs: 0, wickets: 0, balls: 0 };
-        const playerReport = {
-          player: player,
-          runs: playerStats.runs,
-          wickets: playerStats.wickets,
-          balls: playerStats.balls,
+        const matchDetails = {
+          competition: document.getElementById('competition').value,
+          matchType: document.getElementById('matchType').value,
+          innings: document.getElementById('innings').value,
+          date: document.getElementById('date').value,
+          venue: document.getElementById('venue').value,
         };
-        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(playerReport, null, 2));
+
+        console.log("Match Details Submitted:", matchDetails);
+        alert("Match Details Saved Successfully!");
+      });
+
+      // Handle downloading match report
+      document.getElementById('downloadReport').addEventListener('click', () => {
+        const matchReport = {
+          runs: totalRuns,
+          wickets: totalWickets,
+          overs: `${Math.floor(totalBalls / 6)}.${totalBalls % 6}`,
+          ballDetails: Array.from(ballDetailsTable.rows).map(row => {
+            return {
+              ball: row.cells[0].textContent,
+              batsman: row.cells[1].textContent,
+              bowler: row.cells[2].textContent,
+              runs: row.cells[3].textContent,
+              extras: row.cells[4].textContent,
+              out: row.cells[5].textContent,
+            };
+          })
+        };
+
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(matchReport, null, 2));
         const a = document.createElement('a');
         a.setAttribute('href', dataStr);
-        a.setAttribute('download', `${player}_practice_report.json`);
+        a.setAttribute('download', 'match_report.json');
         document.body.appendChild(a);
         a.click();
         a.remove();
       });
-
-      // Update practice report UI
-      const reportContainer = document.getElementById('playerStatsReport');
-      reportContainer.innerHTML = `<h3>Practice Performance Report</h3>`;
-      state.players.forEach(player => {
-        const stats = state.practiceStats[player] || { runs: 0, wickets: 0, balls: 0 };
-        reportContainer.innerHTML += `
-          <div><strong>${player}</strong>: Runs: ${stats.runs}, Wickets: ${stats.wickets}, Balls: ${stats.balls}</div>
-        `;
-      });
-
-      log('Practice session ended, individual reports generated!');
-    };
-
-    // Video recording and downloading clips (ball-by-ball)
-    document.getElementById('stopBtn').onclick = () => {
-      running = false;
-      log('Detection stopped');
-      
-      // Save ball-by-ball video clips
-      saveBallByBallClip();
-
-      // Generate match video file (optimizing size for storage)
-      optimizeAndSaveVideo();
-    };
-
-    function saveBallByBallClip() {
-      // Logic for capturing and saving ball-by-ball video clips, ensuring each clip is under the size limit
-      const maxSize = 50; // Max size in MB for the entire match video
-      const maxBallClipSize = maxSize / 800; // Divide the max size by number of balls in the match (approx. 800 for an ODI)
-      const videoData = captureVideoFrame(); // This would be a function that grabs the current video frame
-
-      // Compress and save video clips
-      const clipData = compressVideo(videoData, maxBallClipSize);
-      downloadClip(clipData);
-    }
-
-    function captureVideoFrame() {
-      // Capture a single frame from the video
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg');
-    }
-
-    function compressVideo(videoData, maxSize) {
-      // This function would compress the video data to meet the size limit
-      // For simplicity, we are just using an image compression approach here
-      // A more advanced solution would require video compression tools (e.g., FFmpeg)
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.width = videoData.width;
-      canvas.height = videoData.height;
-
-      // Compress and resize the image/video frame
-      ctx.drawImage(videoData, 0, 0, canvas.width, canvas.height);
-      return canvas.toDataURL('image/jpeg', 0.7); // Compress to 70% quality (for example)
-    }
-
-    function downloadClip(clipData) {
-      const a = document.createElement('a');
-      a.href = clipData;
-      a.download = 'ball_clip.jpg'; // Save as an image, would need to change for video format
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-
-    function optimizeAndSaveVideo() {
-      // Create and save an optimized match video file (under the storage size limit)
-      const maxFileSize = 50; // Max file size in MB (for the whole match video)
-      const videoFile = captureVideo(); // Capture the whole match video
-
-      // Compress and ensure file size is under limit
-      const compressedVideo = compressVideo(videoFile, maxFileSize);
-      saveMatchVideo(compressedVideo);
-    }
-
-    function captureVideo() {
-      // Capture the full video from the match
-      const videoElement = document.getElementById('video');
-      const stream = videoElement.captureStream();
-      return stream;
-    }
-
-    function saveMatchVideo(videoData) {
-      // Save the full match video to file (after compression)
-      const a = document.createElement('a');
-      const videoBlob = new Blob([videoData], { type: 'video/mp4' });
-      const videoUrl = URL.createObjectURL(videoBlob);
-      a.href = videoUrl;
-      a.download = 'match_video.mp4'; // Save the video as a .mp4 file
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-
-    // Event Handlers for Start/Stop Practice and Match
-    document.getElementById('startBtn').onclick = async () => {
-      if (!video.srcObject) await initCamera();
-      if (!cocoModel || !poseModel) await loadModels();
-      running = true;
-      detectLoop();
-      log('Detection started');
-    };
-
-    // Placeholder for actual detection loop
-    async function detectLoop() {
-      if (!running) return;
-      // Detection logic for the game (for simplicity, not implemented here)
-      setTimeout(detectLoop, modelInterval);
-    }
-
-    // Initial Setup and State Updates
-    updateScoreUI();
-    log('Prototype loaded — press Start');
+    });
   </script>
 </body>
 </html>
