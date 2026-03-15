@@ -126,7 +126,7 @@
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        const countryData = data.find(item => item.country === country);
+        const countryData = data.find(item => item.sdg_name === country);  // Update filter for country (or sdg_code if needed)
 
         if (countryData) {
           return countryData;  // Return country data with SDG progress and other metrics
@@ -139,45 +139,19 @@
       }
     }
 
-    // Fetch Project Data from UNDP API
-    async function fetchProjectData(country) {
-      const apiUrl = `https://api.open.undp.org/api/project_list/`;  // Project Data API
-
-      try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const countryProjects = data.filter(item => item.country === country);
-
-        if (countryProjects && countryProjects.length > 0) {
-          return countryProjects;
-        } else {
-          alert('No project data found for this country');
-          return null;
-        }
-      } catch (error) {
-        console.error('Error fetching project data:', error);
-      }
-    }
-
     // Format numbers with commas
     function fmt(num) {
       return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2 }) : num;
     }
 
-    // Fetch SDG and Project Data for Selected Country
+    // Fetch SDG Data for Selected Country
     async function fetchSDGDataForCountry() {
       const country = document.getElementById('countrySelect').value;
 
-      const countrySDGData = await fetchSDGData(country);
-      const countryProjects = await fetchProjectData(country);
-
-      if (!countrySDGData || !countryProjects) return;
-
-      console.log('SDG Data:', countrySDGData);
-      console.log('Projects:', countryProjects);
-
-      document.getElementById('summary').innerText = `SDG Progress for ${country}: ${countrySDGData.progress}%`;
-      // Display Project Data as needed
+      const countryData = await fetchSDGData(country);
+      if (countryData) {
+        console.log('SDG Data:', countryData);  // You can use this data to display the SDG progress
+      }
     }
 
     // Run IMF Debt Projection
