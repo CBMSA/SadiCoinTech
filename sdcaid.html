@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Debt Projections and IMF Qualifications</title>
+
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f9; padding: 20px; }
+    nav a { margin-right: 15px; text-decoration: none; color: #003366; font-weight: bold; }
+    .form-container { background: #fff; padding: 20px; max-width: 950px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.08); }
+    h2 { color: #003366; text-align: center; margin: 0 0 8px 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display:block; margin-top:10px; font-weight:600; color:#234; }
+    input, textarea, select { width:100%; padding:8px; margin-top:6px; border:1px solid #ccc; border-radius:6px; font-size:14px; box-sizing:border-box; }
+    textarea { min-height:90px; }
+    button { margin-top:14px; background:#003366; color:#fff; padding:10px 12px; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+    button.secondary { background:#0b69ff; }
+    .small { font-size:12px; color:#666; }
+    table { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
+    th,td { border:1px solid #e6edf3; padding:6px 8px; text-align:right; }
+    th:first-child, td:first-child { text-align:left; }
+    .out { background:#fafbfd; padding:10px; border-radius:6px; border:1px dashed #e3eefc; white-space:pre-wrap; }
+    .controls { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="citizenswallet.html">SDC Wallet</a>|
+    <a href="Sadicoinapi.js">SadicoinApi</a>|
+    <a href="SadiCoin.html">SadiCoin DApp</a>|
+    <a href="tokenomics.html">Tokenomics</a>
+  </nav>
+
+  <!-- SME Credit Form -->
+  <div class="form-container">
+    <h2>SME Credit Data Submission</h2>
+    <form id="creditForm">
+      <label for="name">Company Name</label>
+      <input type="text" id="name" required>
+
+      <label for="taxID">Tax Identification Number</label>
+      <input type="text" id="taxID" required>
+
+      <label for="country">Country</label>
+      <input type="text" id="country" required>
+
+      <label for="financials">Financial Summary</label>
+      <textarea id="financials" required></textarea>
+
+      <label for="docURL">Document URL (PDF)</label>
+      <input type="url" id="docURL" required>
+
+      <button type="submit">Submit Credit Record</button>
+    </form>
+    <div id="status" class="small"></div>
+  </div>
+
+  <!-- Debt Projection -->
+  <div class="form-container" id="debtPanel">
+    <h2>IMF-style Debt Projection (multi-year)</h2>
+
+    <div class="grid">
+      <div>
+        <label>Starting Debt (t=0)</label>
+        <input id="debt0" type="number" step="0.01" value="1000000000">
+        <label>GDP (current)</label>
+        <input id="gdp0" type="number" step="0.01" value="5000000000">
+        <label>Nominal Interest Rate (%)</label>
+        <input id="i_nom" type="number" step="0.0001" value="5.00">
+        <label>Nominal GDP Growth Rate (%)</label>
+        <input id="g_nom" type="number" step="0.0001" value="3.00">
+        <label>Inflation Rate (%)</label>
+        <input id="inflation" type="number" step="0.0001" value="2.00">
+      </div>
+
+      <div>
+        <label>Primary Balance (annual; positive = surplus)</label>
+        <input id="primaryBal" type="number" step="0.01" value="-20000000">
+        <label>Overall Balance (annual)</label>
+        <input id="overallBal" type="number" step="0.01" value="-50000000">
+        <label>Amortizations (mode)</label>
+        <select id="amortMode">
+          <option value="absolute">Absolute annual amount</option>
+          <option value="pctDebt">Percent of debt (beginning of year)</option>
+        </select>
+        <label id="amortLabel">Amortization Amount (abs)</label>
+        <input id="amortInput" type="number" step="0.01" value="30000000">
+        <label>Projection Years</label>
+        <input id="years" type="number" min="1" max="50" value="10">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="btnProject">Run Projection</button>
+      <button id="btnDownloadPDF" class="secondary">Download PDF</button>
+      <button id="btnDownloadXML" class="secondary">Download XML</button>
+      <button id="btnClear" class="secondary">Clear Results</button>
+    </div>
+
+    <div id="summary" class="out" style="margin-top:12px">Run projection to see results here.</div>
+    <div id="tableWrapper" style="margin-top:12px; overflow:auto;"></div>
+  </div>
+
+  <script>
+    // Fetch SDG Data from UNDP API
+    async function fetchSDGData(country) {
+      const apiUrl = `https://api.open.undp.org/api/sdg-index.json`;  // Example API endpoint for SDG data
+      
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        const countryData = data.find(item => item.country === country);
+
+        if (countryData) {
+          return countryData;  // Return country data with SDG progress and other metrics
+        } else {
+          alert('No SDG data found for this country');
+          return null;
+        }
+      } catch (error) {
+        console.error('Error fetching SDG data:', error);
+      }
+    }
+
+    // Format numbers with commas
+    function fmt(num) {
+      return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2 }) : num;
+    }
+
+    // Run IMF Debt Projection
+    document.getElementById('btnProject').addEventListener('click', async function() {
+      const country = document.getElementById('country').value;
+
+      // Fetch SDG data for the selected country
+      const countryData = await fetchSDGData(country);
+      if (!countryData) return;
+
+      const debt0 = parseFloat(document.getElementById('debt0').value);
+      const gdp0 = parseFloat(document.getElementById('gdp0').value);
+      const i_nom = parseFloat(document.getElementById('i_nom').value) / 100;
+      const g_nom = parseFloat(document.getElementById('g_nom').value) / 100;
+      const inflation = parseFloat(document.getElementById('inflation').value) / 100;
+      const primaryBal = parseFloat(document.getElementById('primaryBal').value);
+      const overallBal = parseFloat(document.getElementById('overallBal').value);
+      const amortMode = document.getElementById('amortMode').value;
+      const amortInput = parseFloat(document.getElementById('amortInput').value);
+      const years = parseInt(document.getElementById('years').value);
+
+      let debt = debt0;
+      let gdp = gdp0;
+      let results = '';
+
+      for (let t = 1; t <= years; t++) {
+        debt += debt * i_nom + primaryBal + overallBal;
+        gdp *= (1 + g_nom);
+
+        let amortization = amortMode === 'absolute' ? amortInput : debt * amortInput / 100;
+        debt -= amortization;
+
+        results += `Year ${t}: Debt = ${fmt(debt)}, GDP = ${fmt(gdp)}\n`;
+      }
+
+      document.getElementById('summary').innerText = results;
+      generateTable(debt, gdp, years);
+    });
+
+    // Generate the Debt Projection Table
+    function generateTable(debt, gdp, years) {
+      let tableHTML = `<table><thead><tr><th>Year</th><th>Debt</th><th>GDP</th></tr></thead><tbody>`;
+      for (let i = 1; i <= years; i++) {
+        tableHTML += `<tr><td>${i}</td><td>${fmt(debt)}</td><td>${fmt(gdp)}</td></tr>`;
+        debt *= (1 + 0.05);  // Growth factor for example
+        gdp *= (1 + 0.03);
+      }
+      tableHTML += `</tbody></table>`;
+      document.getElementById('tableWrapper').innerHTML = tableHTML;
+    }
+
+    // Download PDF
+    document.getElementById('btnDownloadPDF').addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("IMF Debt Projection Report", 20, 10);
+      doc.text(document.getElementById('summary').innerText, 20, 30);
+      doc.save('Debt_Projection_Report.pdf');
+    });
+
+    // Download XML
+    document.getElementById('btnDownloadXML').addEventListener('click', function() {
+      let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n<DebtProjection>\n';
+      xmlContent += `<Debt>${fmt(debt)}</Debt>\n<GDP>${fmt(gdp)}</GDP>\n</DebtProjection>`;
+      const blob = new Blob([xmlContent], { type: 'application/xml' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'Debt_Projection_Report.xml';
+      link.click();
+    });
+
+    // Clear Results
+    document.getElementById('btnClear').addEventListener('click', function() {
+      document.getElementById('summary').innerText = 'Run projection to see results here.';
+      document.getElementById('tableWrapper').innerHTML = '';
+    });
+  </script>
+</body>
+</html>
