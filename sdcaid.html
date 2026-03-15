@@ -65,8 +65,8 @@
 
     <div class="grid">
       <div>
-        <label>Select Country</label>
-        <select id="countrySelect" onchange="fetchSDGDataForCountry()">
+        <label>Select Country for Debt Projection</label>
+        <select id="countrySelect" onchange="showDebtProjectionForm()">
           <option value="South Africa">South Africa</option>
           <option value="India">India</option>
           <option value="Brazil">Brazil</option>
@@ -77,9 +77,6 @@
           <option value="Mexico">Mexico</option>
           <option value="Egypt">Egypt</option>
           <option value="Vietnam">Vietnam</option>
-          <option value="Zimbabwe">Zimbabwe</option>
-          <option value="Zambia">Zambia</option>
-          <option value="Mozambique">Mozambique</option>
         </select>
         <label>Starting Debt (t=0)</label>
         <input id="debt0" type="number" step="0.01" value="1000000000">
@@ -121,7 +118,35 @@
     <div id="tableWrapper" style="margin-top:12px; overflow:auto;"></div>
   </div>
 
+  <!-- UNDP Data Section -->
+  <div class="form-container">
+    <h2>UNDP Data (SDG Index)</h2>
+
+    <div>
+      <label>Select Country for SDG Data</label>
+      <select id="countrySelectSDG" onchange="fetchSDGDataForCountry()">
+        <option value="South Africa">South Africa</option>
+        <option value="India">India</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Kenya">Kenya</option>
+        <option value="Pakistan">Pakistan</option>
+        <option value="Nigeria">Nigeria</option>
+        <option value="Indonesia">Indonesia</option>
+        <option value="Mexico">Mexico</option>
+        <option value="Egypt">Egypt</option>
+        <option value="Vietnam">Vietnam</option>
+      </select>
+    </div>
+
+    <div id="sdgDataReport" class="out" style="margin-top:12px;"></div>
+  </div>
+
   <script>
+    // Show or hide debt projection form based on selected country
+    function showDebtProjectionForm() {
+      document.getElementById('debtPanel').style.display = 'block';  // Show debt projection section
+    }
+
     // Fetch SDG Data from UNDP API
     async function fetchSDGData(country) {
       const apiUrl = `https://api.open.undp.org/api/sdg-index.json`;  // SDG Index API
@@ -129,34 +154,16 @@
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        
-        // Filtering the data by the selected country (if country name exists in the response)
-        const countryData = data.find(item => item.sdg_name === country);  // You might need to adjust this part
+
+        const countryData = data.find(item => item.sdg_name === country);  // Fetch country-specific data
 
         if (countryData) {
-          return countryData;  // Return country data with SDG progress and other metrics
+          displaySDGData(countryData);  // Display SDG data in the report section
         } else {
           alert('No SDG data found for this country');
-          return null;
         }
       } catch (error) {
         console.error('Error fetching SDG data:', error);
-      }
-    }
-
-    // Format numbers with commas
-    function fmt(num) {
-      return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2 }) : num;
-    }
-
-    // Fetch SDG Data for Selected Country
-    async function fetchSDGDataForCountry() {
-      const country = document.getElementById('countrySelect').value;
-
-      const countryData = await fetchSDGData(country);
-      if (countryData) {
-        console.log('SDG Data:', countryData);  // Display the SDG data in the UI
-        displaySDGData(countryData);
       }
     }
 
@@ -186,16 +193,18 @@
       });
 
       detailsHTML += '</ul>';
-      document.getElementById('summary').innerHTML = detailsHTML;
+      document.getElementById('sdgDataReport').innerHTML = detailsHTML;
+    }
+
+    // Format numbers with commas
+    function fmt(num) {
+      return (typeof num === 'number' && isFinite(num)) ? num.toLocaleString(undefined, { minimumFractionDigits: 2 }) : num;
     }
 
     // Run IMF Debt Projection
     document.getElementById('btnProject').addEventListener('click', async function() {
       const country = document.getElementById('countrySelect').value;
-
-      const countryData = await fetchSDGData(country);
-      if (!countryData) return;
-
+      
       const debt0 = parseFloat(document.getElementById('debt0').value);
       const gdp0 = parseFloat(document.getElementById('gdp0').value);
       const i_nom = parseFloat(document.getElementById('i_nom').value) / 100;
