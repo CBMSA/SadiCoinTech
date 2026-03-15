@@ -126,7 +126,9 @@
       try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        const countryData = data.find(item => item.sdg_name === country);  // Update filter for country (or sdg_code if needed)
+        
+        // Filtering the data by the selected country (if country name exists in the response)
+        const countryData = data.find(item => item.sdg_name === country);  // You might need to adjust this part
 
         if (countryData) {
           return countryData;  // Return country data with SDG progress and other metrics
@@ -150,8 +152,38 @@
 
       const countryData = await fetchSDGData(country);
       if (countryData) {
-        console.log('SDG Data:', countryData);  // You can use this data to display the SDG progress
+        console.log('SDG Data:', countryData);  // Display the SDG data in the UI
+        displaySDGData(countryData);
       }
+    }
+
+    // Display SDG Data
+    function displaySDGData(countryData) {
+      let detailsHTML = `
+        <h3>SDG Data for ${countryData.sdg_name}</h3>
+        <p>Total Projects: ${fmt(countryData.total_projects)}</p>
+        <p>Total Donors: ${fmt(countryData.total_donors)}</p>
+        <p>Total Budget: $${fmt(countryData.total_budget)}</p>
+        <p>Total Expenses: $${fmt(countryData.total_expense)}</p>
+        <p>Progress: ${fmt(countryData.percentage)}%</p>
+        <h4>Target Details:</h4>
+        <ul>
+      `;
+      
+      countryData.target_details.forEach(target => {
+        detailsHTML += `
+          <li>
+            <strong>${target.target_id}:</strong> ${target.description}<br>
+            Target Budget: $${fmt(target.target_budget)}<br>
+            Target Expense: $${fmt(target.target_expense)}<br>
+            Projects: ${fmt(target.total_projects)}<br>
+            Donors: ${fmt(target.total_donors)}<br>
+          </li>
+        `;
+      });
+
+      detailsHTML += '</ul>';
+      document.getElementById('summary').innerHTML = detailsHTML;
     }
 
     // Run IMF Debt Projection
