@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhotoChat Aid Fund</title>
-  
+  <title>PhotoChat Aid Fund - Business Challenge</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -120,7 +121,6 @@
 </head>
 
 <body>
-
   <header>
     <img src="file_00000000edd071f590a2740f51337467.png" alt="Logo">
     <b>PhotoChat Aid Fund</b>
@@ -140,25 +140,47 @@
   </div>
 
   <div id="feed" class="feed"></div>
+
+  <!-- Business Challenge Video Section -->
+  <div id="businessChallengeSection">
+    <h2>Business Challenge Videos</h2>
+
+    <div id="business1" class="business">
+      <h3>Business 1: 15 Votes</h3>
+      <video width="320" height="240" controls>
+        <source src="VID-20260227-WA0015.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p>Votes: 15 (15 SDC = 10 USD)</p>
+      <button onclick="voteForBusiness('business1')">Vote</button>
+    </div>
+
+    <div id="business2" class="business">
+      <h3>Business 2: 13 Votes</h3>
+      <video width="320" height="240" controls>
+        <source src="VID-20260227-WA0015.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p>Votes: 13 (13 SDC = 8.3 USD)</p>
+      <button onclick="voteForBusiness('business2')">Vote</button>
+    </div>
+
+    <div id="business3" class="business">
+      <h3>Business 3: 50 Votes</h3>
+      <video width="320" height="240" controls>
+        <source src="VID-20260227-WA0015.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <p>Votes: 50 (50 SDC = 33.3 USD)</p>
+      <button onclick="voteForBusiness('business3')">Vote</button>
+    </div>
+  </div>
+
   <div class="fab" onclick="openCreate()">+</div>
-
   <nav>🏠 🔍 ➕ 💬 👤</nav>
-
   <footer>© SadiCoin Tech 2026 · PhotoChat Aid Fund</footer>
 
   <!-- Modals -->
-  <div id="liveModal" class="modal">
-    <button onclick="closeLive()">⬅ Back</button>
-    <video id="liveVideo" autoplay muted playsinline></video>
-    <button onclick="startLive()">Go Live</button>
-  </div>
-
-  <div id="createModal" class="modal">
-    <button onclick="closeCreate()">⬅ Back</button>
-    <textarea placeholder="What’s happening?"></textarea>
-    <button onclick="closeCreate()">Post</button>
-  </div>
-
   <div id="paymentModal" class="modal">
     <button onclick="closePayment()">⬅ Back</button>
     <h3>Purchase Votes</h3>
@@ -178,26 +200,10 @@
       "YOUR_SUPABASE_ANON_KEY_HERE"
     );
 
-    const demoPosts = {
-      home: [
-        { u: "Anonymous", t: "Welcome to PhotoChat Aid Fund", img: "https://picsum.photos/600/400?1" },
-        { u: "Marketing", t: "Promoted post", img: "https://picsum.photos/600/400?2" }
-      ],
-      trending: [
-        { u: "🔥 Viral", t: "Trending now", img: "https://picsum.photos/600/400?3" }
-      ],
-      random: [
-        { u: "Random", t: "Just vibes", img: "https://picsum.photos/600/400?4" }
-      ],
-      sports: [
-        { u: "Sports Live", t: "Match highlights", img: "https://picsum.photos/600/400?5" }
-      ],
-      news: [
-        { u: "News", t: "Breaking update", img: "https://picsum.photos/600/400?6" }
-      ],
-      realestate: [
-        { u: "Agent", t: "2 Bed Apartment – R6,500", img: "https://picsum.photos/600/400?7" }
-      ]
+    let businessVotes = {
+      business1: 15, // Example votes
+      business2: 13,
+      business3: 50
     };
 
     function setTab(btn, type) {
@@ -222,70 +228,24 @@
       await supabase.auth.signInWithOAuth({ provider: "google" });
     }
 
-    async function startLive() {
-      const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      liveVideo.srcObject = s;
-    }
-
-    function openLive() { liveModal.style.display = "block"; }
-    function closeLive() { liveModal.style.display = "none"; }
-    function openCreate() { createModal.style.display = "block"; }
-    function closeCreate() { createModal.style.display = "none"; }
-
-    // Payment Modal Functions
-    function openPayment() { paymentModal.style.display = "block"; }
-    function closePayment() { paymentModal.style.display = "none"; }
-
-    function buyVotesFromAgent() {
-      const numVotes = document.getElementById("numVotes").value;
-      const agentId = "agent123"; // Example: Get agent ID from UI or session
-      const receipt = buyVotes(agentId, numVotes);
-      alert(`Vote purchase successful. Receipt generated.`);
-    }
-
-    function buyVotes(agentId, numVotes) {
-      const votePrice = 10; // SDC tokens per vote
+    // Voting system
+    function voteForBusiness(business) {
+      const votePrice = 10; // 10 ZAR per vote (1 SDC)
+      const numVotes = 1;  // Default to 1 vote for simplicity, but this can be adjusted
       const totalCost = numVotes * votePrice;
-      const receipt = generateReceipt({ amount: totalCost, method: "Agent Payment", transactionId: agentId });
-      return receipt;
+
+      // Increment votes
+      businessVotes[business]++;
+      
+      // Update displayed vote count
+      document.querySelector(`#${business} p`).textContent = `Votes: ${businessVotes[business]} (${businessVotes[business] * votePrice} ZAR)`;
+
+      // Process payment (in this case, simulate it)
+      processPayment(totalCost, business);
     }
 
-    function generateReceipt(paymentDetails) {
-        const receipt = {
-          tokenAmount: paymentDetails.amount,
-          transactionId: paymentDetails.transactionId,
-          paymentMethod: paymentDetails.method,
-          receiptDate: new Date().toLocaleString(),
-        };
-        // Display receipt in the console or send to the user's email
-        console.log('Receipt generated:', receipt);
-        return receipt;
-      }
-
-      // SME Video Upload Functionality
-      async function uploadSMEVideo() {
-        const smeId = "sme123"; // Example SME ID
-        const file = document.getElementById("smeVideoFile").files[0];
-        if (file) {
-          const { data, error } = await supabase.storage
-            .from('sme-videos')
-            .upload(`${smeId}/video.mp4`, file);
-          
-          if (error) {
-            console.error('Video upload failed:', error);
-          } else {
-            console.log('Video uploaded:', data);
-          }
-        } else {
-          alert("Please select a video file to upload.");
-        }
-      }
-
-      function closeSMEUpload() { uploadSMEVideoModal.style.display = "none"; }
-
-      // Initialize the page with default Home feed
-      setTab(document.querySelector(".tabs button"), "home");
-  </script>
-  
-</body>
-</html>
+    async function processPayment(totalCost, business) {
+      // Open payment modal and ask for proof of payment
+      alert(`Total payment for voting: ${totalCost} ZAR. Please send proof of payment.`);
+      
+      // Simulate proof of payment submission (whatsapp
