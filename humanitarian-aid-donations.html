@@ -248,4 +248,45 @@
       // Open payment modal and ask for proof of payment
       alert(`Total payment for voting: ${totalCost} ZAR. Please send proof of payment.`);
       
-      // Simulate proof of payment submission (whatsapp
+      // Simulate proof of payment submission (whatsapp or upload system could be added here)
+      const receipt = generateReceipt(totalCost, business);
+      console.log('Payment receipt:', receipt);
+      alert(`Vote for ${business} successful. Proof of payment sent to WhatsApp.`);
+    }
+
+    function generateReceipt(totalCost, business) {
+      return {
+        business: business,
+        totalCost: totalCost,
+        transactionId: Date.now(),
+        receiptDate: new Date().toLocaleString(),
+      };
+    }
+
+    // SME Video Upload Functionality
+    async function uploadSMEVideo() {
+      const smeId = "sme123"; // Example SME ID
+      const file = document.getElementById("smeVideoFile").files[0];
+      if (file) {
+        const { data, error } = await supabase.storage
+          .from('sme-videos')
+          .upload(`${smeId}/video.mp4`, file);
+        
+        if (error) {
+          console.error('Video upload failed:', error);
+        } else {
+          console.log('Video uploaded:', data);
+        }
+      } else {
+        alert("Please select a video file to upload.");
+      }
+    }
+
+    function closeSMEUpload() { uploadSMEVideoModal.style.display = "none"; }
+    
+    // Start with default home feed when the page loads
+    setTab(document.querySelector(".tabs button"), "home");
+  </script>
+
+</body>
+</html>
