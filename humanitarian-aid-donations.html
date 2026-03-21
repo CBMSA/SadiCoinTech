@@ -252,4 +252,41 @@
     }
 
     function generateReceipt(paymentDetails) {
-      const receipt
+        const receipt = {
+          tokenAmount: paymentDetails.amount,
+          transactionId: paymentDetails.transactionId,
+          paymentMethod: paymentDetails.method,
+          receiptDate: new Date().toLocaleString(),
+        };
+        // Display receipt in the console or send to the user's email
+        console.log('Receipt generated:', receipt);
+        return receipt;
+      }
+
+      // SME Video Upload Functionality
+      async function uploadSMEVideo() {
+        const smeId = "sme123"; // Example SME ID
+        const file = document.getElementById("smeVideoFile").files[0];
+        if (file) {
+          const { data, error } = await supabase.storage
+            .from('sme-videos')
+            .upload(`${smeId}/video.mp4`, file);
+          
+          if (error) {
+            console.error('Video upload failed:', error);
+          } else {
+            console.log('Video uploaded:', data);
+          }
+        } else {
+          alert("Please select a video file to upload.");
+        }
+      }
+
+      function closeSMEUpload() { uploadSMEVideoModal.style.display = "none"; }
+
+      // Initialize the page with default Home feed
+      setTab(document.querySelector(".tabs button"), "home");
+  </script>
+  
+</body>
+</html>
