@@ -1,3 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claims and Notifications Web App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f8;
+      font-family: Arial, sans-serif;
+    }
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="text-center my-4">Claims and Notifications Web App</h1>
+
+    <!-- File a Claim Section -->
+    <div class="section" id="fileClaimSection">
+      <h3>File a Claim</h3>
+      <form id="fileClaimForm">
+        <div class="mb-3">
+          <label for="claimTitle" class="form-label">Claim Title</label>
+          <input type="text" class="form-control" id="claimTitle" placeholder="Enter claim title" required>
+        </div>
+        <div class="mb-3">
+          <label for="claimDescription" class="form-label">Claim Description</label>
+          <textarea class="form-control" id="claimDescription" rows="4" placeholder="Enter claim details" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Claim</button>
+      </form>
+    </div>
+
+    <!-- Lodge Return Section -->
+    <div class="section" id="lodgeReturnSection">
+      <h3>Lodge a Return</h3>
+      <form id="lodgeReturnForm">
+        <div class="mb-3">
+          <label for="returnDetails" class="form-label">Return Details</label>
+          <textarea class="form-control" id="returnDetails" rows="4" placeholder="Enter return details" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit Return</button>
+      </form>
+    </div>
+
+    <!-- Submit Request Section -->
+    <div class="section" id="submitRequestSection">
+      <h3>Submit a Request</h3>
+      <form id="submitRequestForm">
+        <div class="mb-3">
+          <label for="requestTitle" class="form-label">Request Title</label>
+          <input type="text" class="form-control" id="requestTitle" placeholder="Enter request title" required>
+        </div>
+        <div class="mb-3">
+          <label for="requestDescription" class="form-label">Request Description</label>
+          <textarea class="form-control" id="requestDescription" rows="4" placeholder="Enter request details" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-info">Submit Request</button>
+      </form>
+    </div>
+
+    <!-- Election Management Section -->
+    <div class="section" id="electionManagementSection">
+      <h3>Manage Elections</h3>
+      <form id="electionForm">
+        <div class="mb-3">
+          <label for="electionAction" class="form-label">Action</label>
+          <select class="form-control" id="electionAction" required>
+            <option value="make">Make Election</option>
+            <option value="cancel">Cancel Election</option>
+            <option value="vary">Vary Election</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-warning">Submit Election Action</button>
+      </form>
+    </div>
+
+    <!-- Submit Objection Section -->
+    <div class="section" id="submitObjectionSection">
+      <h3>Submit an Objection</h3>
+      <form id="submitObjectionForm">
+        <div class="mb-3">
+          <label for="objectionReason" class="form-label">Objection Reason</label>
+          <textarea class="form-control" id="objectionReason" rows="4" placeholder="Enter reason for objection" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger">Submit Objection</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JS and Bootstrap Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Set up the Supabase client for backend interaction
+    const supabase = supabaseJs.createClient(
+      "https://jbhhfzbhcvzxtthhmfhz.supabase.co",
+      "YOUR_SUPABASE_ANON_KEY"
+    );
+
+    // Form submissions for various sections
+    document.getElementById('fileClaimForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const title = document.getElementById('claimTitle').value;
+      const description = document.getElementById('claimDescription').value;
+
+      // Add data to Supabase
+      const { data, error } = await supabase
+        .from('claims')
+        .insert([{ title, description }]);
+
+      if (error) {
+        alert('Error submitting claim: ' + error.message);
+      } else {
+        alert('Claim submitted successfully!');
+      }
+    });
+
+    document.getElementById('lodgeReturnForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const returnDetails = document.getElementById('returnDetails').value;
+
+      // Add data to Supabase
+      const { data, error } = await supabase
+        .from('returns')
+        .insert([{ details: returnDetails }]);
+
+      if (error) {
+        alert('Error lodging return: ' + error.message);
+      } else {
+        alert('Return lodged successfully!');
+      }
+    });
+
+    document.getElementById('submitRequestForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const title = document.getElementById('requestTitle').value;
+      const description = document.getElementById('requestDescription').value;
+
+      // Add data to Supabase
+      const { data, error } = await supabase
+        .from('requests')
+        .insert([{ title, description }]);
+
+      if (error) {
+        alert('Error submitting request: ' + error.message);
+      } else {
+        alert('Request submitted successfully!');
+      }
+    });
+
+    document.getElementById('electionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const action = document.getElementById('electionAction').value;
+      alert(`Election action '${action}' submitted successfully!`);
+    });
+
+    document.getElementById('submitObjectionForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const objectionReason = document.getElementById('objectionReason').value;
+      alert(`Objection submitted: ${objectionReason}`);
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
