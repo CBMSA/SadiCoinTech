@@ -107,6 +107,14 @@
         </div>
     </section>
 
+    <!-- Transaction History Section -->
+    <section class="container">
+        <h3>Your CBDC Transactions</h3>
+        <div id="transaction-history">
+            <!-- Transaction history will go here -->
+        </div>
+    </section>
+
     <!-- Payment Section -->
     <section class="container">
         <h3>Pay with MoMo</h3>
@@ -132,7 +140,12 @@
         <p><strong>Converted Amount (SDC):</strong> <span id="converted-amount"></span></p>
         <p><strong>Transaction Fee (1%):</strong> $<span id="transaction-fee"></span></p>
         <p><strong>Final Amount (SDC):</strong> $<span id="final-amount"></span></p>
-        <p><strong>Source of Funds:</strong> <span id="source-of-funds"></span></p> <!-- Added source of funds -->
+    </section>
+
+    <!-- Withdrawal Section -->
+    <section class="container">
+        <h3>Withdraw Funds</h3>
+        <button id="withdraw-button" class="payment-button">Withdraw</button>
     </section>
 
     <!-- Footer Section -->
@@ -143,6 +156,8 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         // MoMo Payment Request API
         document.getElementById('momo-payment-form').addEventListener('submit', async function(event) {
@@ -187,9 +202,6 @@
                     document.getElementById('converted-amount').textContent = convertedAmount.toFixed(2) + ' SDC';
                     document.getElementById('transaction-fee').textContent = transactionFee.toFixed(2);
                     document.getElementById('final-amount').textContent = finalAmount.toFixed(2);
-                    
-                    // Add Source of Funds (Example)
-                    document.getElementById('source-of-funds').textContent = 'MoMo Wallet'; // Can be dynamically set based on source
                     document.getElementById('transaction-report').style.display = 'block';
                 } else {
                     alert('Payment request failed. Please try again.');
@@ -199,7 +211,7 @@
             }
         });
 
-       // Product Stats Chart
+        // Product Stats Chart
         const ctx = document.getElementById('product-chart').getContext('2d');
         const productChart = new Chart(ctx, {
             type: 'bar',
@@ -222,55 +234,52 @@
             }
         });
 
-        // Function to convert SDG (SDC token) to ZAR using an exchange rate API (EHDOD or any other)
-        async function convertSdgToZar(sdgAmount) {
-            const exchangeRateApiUrl = 'https://api.exchangerate-api.com/v4/latest/ZAR'; // Placeholder API URL for ZAR to USD
-            const response = await fetch(exchangeRateApiUrl);
+        // Handle Withdraw Funds request
+        document.getElementById('withdraw-button').addEventListener('click', async function() {
+            const withdrawalAmount = 100;  // Example value, to be dynamically calculated
+            const withdrawalMethod = prompt("Choose withdrawal method: 'Mobile Wallet', 'Bank Account', or 'Cash at Bank'");
+
+            if (withdrawalMethod && withdrawalAmount > 0) {
+                // Placeholder for the withdrawal logic
+                const withdrawalApiUrl = 'https://your-withdrawal-api-url.com';
+                const response = await fetch(withdrawalApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        method: withdrawalMethod,
+                        amount: withdrawalAmount,
+                    }),
+                });
+
+                if (response.status === 200) {
+                    alert(`Withdrawal of ${withdrawalAmount} SDC completed via ${withdrawalMethod}`);
+                } else {
+                    alert('Withdrawal request failed. Please try again.');
+                }
+            } else {
+                alert('Please select a valid withdrawal method and amount.');
+            }
+        });
+
+        // Function to convert SDG to SDC using ZAR/USD rate (example API integration)
+        async function convertSDGToSDC(sdgAmount) {
+            const exchangeRateUrl = 'https://api.exchangerate-api.com/v4/latest/ZAR'; // Example API for ZAR to USD conversion
+            const response = await fetch(exchangeRateUrl);
             const data = await response.json();
             const usdRate = data.rates.USD;
 
-            // Conversion logic
-            const sdcToZarRate = 10; // Example: 1 SDC = 10 ZAR, adjust accordingly.
-            const sdgAmountInZar = sdgAmount * sdcToZarRate;
-
-            // Calculate USD equivalent
-            const sdgAmountInUsd = sdgAmountInZar * usdRate;
-
-            return {
-                zarAmount: sdgAmountInZar,
-                usdAmount: sdgAmountInUsd
-            };
+            const sdcAmount = sdgAmount * usdRate * 0.065; // Example conversion to SDC (using a rate multiplier)
+            return sdcAmount;
         }
 
-        // Example usage:
-        convertSdgToZar(100).then(({ zarAmount, usdAmount }) => {
-            console.log(`100 SDC = ${zarAmount} ZAR`);
-            console.log(`100 SDC = ${usdAmount} USD`);
+        // Example of calling the conversion function
+        const sdgAmount = 100;  // Example SDG amount to convert
+        convertSDGToSDC(sdgAmount).then(sdcAmount => {
+            console.log(`Converted ${sdgAmount} SDG to ${sdcAmount.toFixed(2)} SDC`);
         });
 
-        // Function to handle withdrawal options (Mobile Wallet, Bank Account, Cash at Bank)
-        function handleWithdrawalOptions(amountInZar) {
-            const withdrawalOptions = prompt("Select withdrawal method:\n1. Mobile Wallet\n2. Bank Account\n3. Cash at Bank");
-            switch (withdrawalOptions) {
-                case '1':
-                    alert(`Your ${amountInZar} ZAR will be transferred to your Mobile Wallet.`);
-                    break;
-                case '2':
-                    alert(`Your ${amountInZar} ZAR will be transferred to your Bank Account.`);
-                    break;
-                case '3':
-                    alert(`You can collect ${amountInZar} ZAR as cash at your bank.`);
-                    break;
-                default:
-                    alert("Invalid option. Please select 1, 2, or 3.");
-            }
-        }
-
-        // Button listener for withdrawal (assuming the final amount in ZAR is ready)
-        document.getElementById('withdraw-button').addEventListener('click', function() {
-            const finalAmountZar = parseFloat(document.getElementById('final-amount').textContent); // Get final ZAR amount
-            handleWithdrawalOptions(finalAmountZar);
-        });
     </script>
 </body>
 </html>
