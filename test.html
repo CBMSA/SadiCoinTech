@@ -1,240 +1,269 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-    <meta charset="UTF-8">  
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>SDC SDG GRANT PROTOTYPE Platform</title>  
-    <style>  
-        body {  
-            font-family: 'Arial', sans-serif;  
-            margin: 0;  
-            padding: 0;  
-            background-color: #121212;  
-            color: #E0E0E0;  
-        }  
-        header {  
-            background-color: #1F1F1F;  
-            color: white;  
-            padding: 20px;  
-            text-align: center;  
-        }  
-        section {  
-            padding: 20px;  
-            margin: 10px;  
-            background-color: #333;  
-            border-radius: 8px;  
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);  
-        }  
-        button {  
-            background-color: #00796b;  
-            color: white;  
-            padding: 10px 20px;  
-            border: none;  
-            border-radius: 5px;  
-            cursor: pointer;  
-        }  
-        button:hover {  
-            background-color: #004d40;  
-        }  
-        input[type="text"], input[type="number"], input[type="password"] {  
-            width: 100%;  
-            padding: 10px;  
-            margin: 10px 0;  
-            border: 1px solid #ddd;  
-            border-radius: 5px;  
-        }  
-        footer {  
-            text-align: center;  
-            padding: 10px;  
-            background-color: #1F1F1F;  
-            color: white;  
-            position: fixed;  
-            bottom: 0;  
-            width: 100%;  
-        }  
-        #balance-section, #transactions-section {  
-            margin-top: 30px;  
-            padding: 20px;  
-            background-color: #444;  
-            border-radius: 8px;  
-        }  
-        #balance-section h3, #transactions-section h3 {  
-            margin-bottom: 20px;  
-        }  
-        .transaction-item {  
-            background-color: #333;  
-            padding: 10px;  
-            margin: 10px 0;  
-            border-radius: 5px;  
-        }  
-    </style>  
-</head>  
-<body>  <header>  
-    <nav>  
-    <h1>SADC CBDC Platform</h1>  
-    <a href="token.html">SDC Digital Coin</a>  
-    <a href="statsdata.html">Stats</a>  
-    </nav>  
-</header>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDC SDG GRANT PROTOTYPE Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #E0E0E0;
+        }
+        header {
+            background-color: #1F1F1F;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+            margin: 10px;
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        button {
+            background-color: #00796b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        input[type="text"], input[type="number"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #1F1F1F;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        #balance-section, #transactions-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #444;
+            border-radius: 8px;
+        }
+        #balance-section h3, #transactions-section h3 {
+            margin-bottom: 20px;
+        }
+        .transaction-item {
+            background-color: #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
 
-<!-- Balance Section -->  
-<section id="balance-section">  
-    <h3>Your CBDC Balance</h3>  
-    <p><strong>Balance (SDC):</strong> <span id="balance-sdc">1000</span> SDC</p>  
-    <p><strong>Balance (ZAR):</strong> <span id="balance-zar">1000</span> ZAR</p>  
-    <p><strong>Digital Bank Account Number:</strong> <span id="account-number">+27 123 456 789</span></p>  
-    <p><strong>Digital Card Number:</strong> <span id="card-number">XXXXXXXXXXXX1234</span></p>  
-    <button onclick="checkBalance()">Check Balance</button>  
-</section>  
+<header>
+    <nav>
+        <h1>SADC CBDC Platform</h1>
+        <a href="token.html">SDC Digital Coin</a>
+        <a href="statsdata.html">Stats</a>
+    </nav>
+</header>
 
-<!-- MoMo Payment Section -->  
-<section id="momo-payment-section" class="card">  
-    <h2>Make MoMo Payment</h2>  
-    <form id="momo-form">  
-        <label for="momo-phone">Phone Number:</label>  
-        <input type="text" id="momo-phone" placeholder="Enter phone number for wallet" required>  
-        <label for="momo-amount">Amount (ZAR):</label>  
-        <input type="number" id="momo-amount" min="0.01" step="0.01" required>  
-        <button type="submit">Make MoMo Payment</button>  
-    </form>  
-</section>  
+<!-- Balance Section -->
+<section id="balance-section">
+    <h3>Your CBDC Balance</h3>
+    <p><strong>Balance (SDC):</strong> <span id="balance-sdc">1000</span> SDC</p>
+    <p><strong>Balance (ZAR):</strong> <span id="balance-zar">1000</span> ZAR</p>
+    <p><strong>Digital Bank Account Number:</strong> <span id="account-number">+27 123 456 789</span></p>
+    <p><strong>Digital Card Number:</strong> <span id="card-number">XXXXXXXXXXXX1234</span></p>
+    <button onclick="checkBalance()">Check Balance</button>
+</section>
 
-<!-- Transaction History Section -->  
-<section id="transactions-section">  
-    <h3>Transaction History</h3>  
-    <div id="transaction-history">  
-        <!-- Transactions will be listed here -->  
-    </div>  
-    <button onclick="downloadCSV()">Download CSV</button>  
-    <button onclick="downloadPDF()">Download PDF</button>  
-</section>  
+<!-- Phone Number Input Section -->
+<section id="phone-number-section">
+    <h3>Enter Your Phone Number</h3>
+    <form id="phone-number-form">
+        <label for="user-phone-number">Phone Number:</label>
+        <input type="text" id="user-phone-number" placeholder="Enter phone number for authentication" required>
+        <button type="submit">Submit</button>
+    </form>
+</section>
 
-<footer>  
-    <p>&copy; 2025 SADC CBDC Platform | All Rights Reserved</p>  
-</footer>  
+<!-- MoMo Payment Section -->
+<section id="momo-payment-section" class="card" style="display:none;">
+    <h2>Make MoMo Payment</h2>
+    <form id="momo-form">
+        <label for="momo-phone">Phone Number:</label>
+        <input type="text" id="momo-phone" placeholder="Enter phone number for wallet" required>
+        <label for="momo-amount">Amount (ZAR):</label>
+        <input type="number" id="momo-amount" min="0.01" step="0.01" required>
+        <button type="submit">Make MoMo Payment</button>
+    </form>
+</section>
 
-<script>  
-    // MoMo API Keys (For local or testing purposes only)  
-    const PRIMARY_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';  // Replace with your actual Primary API Key  
-    const SECONDARY_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // Replace with your actual Secondary API Key  
+<!-- Transaction History Section -->
+<section id="transactions-section">
+    <h3>Transaction History</h3>
+    <div id="transaction-history">
+        <!-- Transactions will be listed here -->
+    </div>
+    <button onclick="downloadCSV()">Download CSV</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+</section>
 
-    // MoMo API URL  
-    const MOMO_API_URL = 'https://api.mtn.com/momo/payment';  
+<footer>
+    <p>&copy; 2025 SADC CBDC Platform | All Rights Reserved</p>
+</footer>
 
-    // Simulated Initial CBDC Balances and Account Information  
-    let balanceSDC = 1000;  // 1000 SDC  
-    let balanceZAR = 1000;  // 1000 ZAR  
-    let accountNumber = '+27 123 456 789'; // Simulated account number  
-    let cardNumber = 'XXXXXXXXXXXX1234'; // Simulated digital card number  
-    let transactions = [];  // Transaction history array  
+<script>
+    // MoMo API Keys (For local or testing purposes only)
+    const PRIMARY_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';  // Replace with your actual Primary API Key
+    const SECONDARY_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // Replace with your actual Secondary API Key
 
-    // Display balance (SDC and ZAR)  
-    function checkBalance() {  
-        document.getElementById('balance-sdc').innerText = balanceSDC;  
-        document.getElementById('balance-zar').innerText = balanceZAR;  
-    }  
+    // MoMo API URL
+    const MOMO_API_URL = 'https://api.mtn.com/momo/payment';
 
-    // Handle MoMo Payment Form Submission  
-    document.getElementById('momo-form').addEventListener('submit', function(e) {  
-        e.preventDefault();  
+    // Simulated Initial CBDC Balances and Account Information
+    let balanceSDC = 1000;  // 1000 SDC
+    let balanceZAR = 1000;  // 1000 ZAR
+    let accountNumber = '+27 123 456 789'; // Simulated account number
+    let cardNumber = 'XXXXXXXXXXXX1234'; // Simulated digital card number
+    let transactions = [];  // Transaction history array
+    let userPhoneNumber = ''; // Store user's phone number after input
 
-        let phoneNumber = document.getElementById('momo-phone').value;  
-        let momoAmount = parseFloat(document.getElementById('momo-amount').value);  
+    // Display balance (SDC and ZAR)
+    function checkBalance() {
+        document.getElementById('balance-sdc').innerText = balanceSDC;
+        document.getElementById('balance-zar').innerText = balanceZAR;
+    }
 
-        if (momoAmount <= 0 || momoAmount > balanceZAR) {  // Ensure the amount does not exceed the balance  
-            alert("Invalid amount for MoMo payment!");  
-            return;  
-        }  
+    // Handle Phone Number Form Submission
+    document.getElementById('phone-number-form').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        let paymentDetails = {  
-            phoneNumber: phoneNumber,  
-            amount: momoAmount,  
-            currency: 'ZAR'  
-        };  
+        // Get the phone number from the form
+        userPhoneNumber = document.getElementById('user-phone-number').value;
 
-        // Send payment request to MoMo API directly from frontend  
-        fetch(MOMO_API_URL, {  
-            method: 'POST',  
-            headers: {  
-                'Authorization': `Bearer ${PRIMARY_KEY}`,  
-                'Content-Type': 'application/json'  
-            },  
-            body: JSON.stringify(paymentDetails)  
-        })  
-        .then(response => response.json())  
-        .then(data => {  
-            if (data.status === 'SUCCESS') {  
-                alert('Payment successful! MoMo transaction ID: ' + data.transactionId);  
-                // Deduct the payment amount from the balance  
-                balanceZAR -= momoAmount;  
-                balanceSDC -= momoAmount * 0.1;  // Assuming 1 ZAR = 0.1 SDC for demo purposes  
-                let transaction = {  
-                    id: data.transactionId,  
-                    amount: momoAmount,  
-                    phone: phoneNumber,  
-                    date: new Date().toLocaleString(),  
-                    type: 'Payment'  
-                };  
-                transactions.push(transaction);  
-                addTransactionToHistory(transaction);  
-                checkBalance();  // Update the displayed balance  
-            } else {  
-                alert('Payment failed: ' + data.message);  
-            }  
-        })  
-        .catch(error => {  
-            console.error('Error:', error);  
-            alert('Error processing MoMo payment.');  
-        });  
-    });  
+        // For demonstration, we simulate storing the phone number
+        alert('Phone Number Registered: ' + userPhoneNumber);
 
-    // Add transaction to the transaction history section  
-    function addTransactionToHistory(transaction) {  
-        const transactionHistory = document.getElementById('transaction-history');  
-        const transactionElement = document.createElement('div');  
-        transactionElement.classList.add('transaction-item');  
-        transactionElement.innerHTML = `  
-            <p><strong>Transaction ID:</strong> ${transaction.id}</p>  
-            <p><strong>Amount:</strong> ${transaction.amount} ZAR</p>  
-            <p><strong>Phone:</strong> ${transaction.phone}</p>  
-            <p><strong>Date:</strong> ${transaction.date}</p>  
-            <p><strong>Type:</strong> ${transaction.type}</p>  
-        `;  
-        transactionHistory.appendChild(transactionElement);  
-    }  
+        // Show the MoMo payment section after phone number is entered
+        document.getElementById('phone-number-section').style.display = 'none';
+        document.getElementById('momo-payment-section').style.display = 'block';
+    });
 
-    // Function to download transaction history as CSV  
-    function downloadCSV() {  
-        let csvContent = "Transaction ID,Amount,Phone,Date,Type\n";  
-        transactions.forEach(function(transaction) {  
-            csvContent += `${transaction.id},${transaction.amount},${transaction.phone},${transaction.date},${transaction.type}\n`;  
-        });  
+    // Handle MoMo Payment Form Submission
+    document.getElementById('momo-form').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });  
-        const link = document.createElement('a');  
-        link.href = URL.createObjectURL(blob);  
-        link.download = 'transaction_history.csv';  
-        link.click();  
-    }  
+        let phoneNumber = document.getElementById('momo-phone').value;
+        let momoAmount = parseFloat(document.getElementById('momo-amount').value);
 
-    // Function to download transaction history as PDF  
-    function downloadPDF() {  
-        const doc = new jsPDF();  
-        doc.text('Transaction History', 10, 10);  
+        if (momoAmount <= 0 || momoAmount > balanceZAR) {  // Ensure the amount does not exceed the balance
+            alert("Invalid amount for MoMo payment!");
+            return;
+        }
 
-        transactions.forEach((transaction, index) => {  
-            doc.text(`Transaction ID: ${transaction.id}`, 10, 20 + (index * 30));  
-            doc.text(`Amount: ${transaction.amount} ZAR`, 10, 30 + (index * 30));  
-            doc.text(`Phone: ${transaction.phone}`, 10, 40 + (index * 30));  
-            doc.text(`Date: ${transaction.date}`, 10, 50 + (index * 30));  
-            doc.text(`Type: ${transaction.type}`, 10, 60 + (index * 30));  
-        });  
+        let paymentDetails = {
+            phoneNumber: phoneNumber,
+            amount: momoAmount,
+            currency: 'ZAR'
+        };
 
-        doc.save('transaction_history.pdf');  
-    }  
+        // Send payment request to MoMo API directly from frontend
+        fetch(MOMO_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${PRIMARY_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(paymentDetails)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'SUCCESS') {
+                alert('Payment successful! MoMo transaction ID: ' + data.transactionId);
+                // Deduct the payment amount from the balance
+                balanceZAR -= momoAmount;
+                balanceSDC -= momoAmount * 0.1;  // Assuming 1 ZAR = 0.1 SDC for demo purposes
+                let transaction = {
+                    id: data.transactionId,
+                    amount: momoAmount,
+                    phone: phoneNumber,
+                    date: new Date().toLocaleString(),
+                    type: 'Payment'
+                };
+                transactions.push(transaction);
+                addTransactionToHistory(transaction);
+                checkBalance();  // Update the displayed balance
+            } else {
+                alert('Payment failed: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing MoMo payment.');
+        });
+    });
 
-    // Initialize the balance on page load  
-    checkBalance();  
+    // Add transaction to the transaction history section
+    function addTransactionToHistory(transaction) {
+        const transactionHistory = document.getElementById('transaction-history');
+        const transactionElement = document.createElement('div');
+        transactionElement.classList.add('transaction-item');
+        transactionElement.innerHTML = `
+            <p><strong>Transaction ID:</strong> ${transaction.id}</p>
+            <p><strong>Amount:</strong> ${transaction.amount} ZAR</p>
+            <p><strong>Phone:</strong> ${transaction.phone}</p>
+            <p><strong>Date:</strong> ${transaction.date}</p>
+            <p><strong>Type:</strong> ${transaction.type}</p>
+        `;
+        transactionHistory.appendChild(transactionElement);
+    }
+
+    // Function to download transaction history as CSV
+    function downloadCSV() {
+        let csvContent = "Transaction ID,Amount,Phone,Date,Type\n";
+        transactions.forEach(function(transaction) {
+            csvContent += `${transaction.id},${transaction.amount},${transaction.phone},${transaction.date},${transaction.type}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'transaction_history.csv';
+        link.click();
+    }
+
+    // Function to download transaction history as PDF
+    function downloadPDF() {
+        const doc = new jsPDF();
+        doc.text('Transaction History', 10, 10);
+
+        transactions.forEach((transaction, index) => {
+            doc.text(`Transaction ID: ${transaction.id}`, 10, 20 + (index * 30));
+            doc.text(`Amount: ${transaction.amount} ZAR`, 10, 30 + (index * 30));
+            doc.text(`Phone: ${transaction.phone}`, 10, 40 + (index * 30));
+            doc.text(`Date: ${transaction.date}`, 10, 50 + (index * 30));
+            doc.text(`Type: ${transaction.type}`, 10, 60 + (index * 30));
+        });
+
+        doc.save('transaction_history.pdf');
+    }
+
+    // Initialize the balance on page load
+    checkBalance();
 </script>
 
-</body>  
+</body>
 </html>
