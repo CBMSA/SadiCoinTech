@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDC SDG GRANT PROTOTYPE Platform</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #E0E0E0;
+        }
+        header {
+            background-color: #1F1F1F;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+            margin: 10px;
+            background-color: #333;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+        button {
+            background-color: #00796b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #004d40;
+        }
+        input[type="text"], input[type="number"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #1F1F1F;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .hidden {
+            display: none;
+        }
+        .card {
+            padding: 20px;
+            margin: 10px;
+            background-color: #444;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+        .card h3 {
+            margin-bottom: 10px;
+        }
+        .transaction-details {
+            background-color: #333;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .transaction-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .transaction-history li {
+            margin: 10px 0;
+        }
+        #crypto-rates {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <nav>
+        <h1>SADC CBDC Platform</h1>
+        <a href="token.html">SDC Digital Coin</a>
+        <a href="statsdata.html">Stats</a>
+        </nav>
+    </header>
+
+    <!-- Subscriptions Section -->
+    <section id="subscriptions-section" class="card">
+        <h2>Your Subscriptions</h2>
+        <div class="subscription">
+            <h3>Collection Widget</h3>
+            <p><strong>Product:</strong> Receive mobile money payments on your website through a USSD or QR code</p>
+            <p><strong>Started on:</strong> 02/26/2026</p>
+            <p><strong>Primary Key:</strong> <span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span> <button onclick="regenerateKey('primary')">Regenerate</button></p>
+            <p><strong>Secondary Key:</strong> <span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span> <button onclick="regenerateKey('secondary')">Regenerate</button></p>
+            <p><strong>State:</strong> Active</p>
+            <button onclick="cancelSubscription()">Cancel</button>
+        </div>
+        <div class="subscription">
+            <h3>Collections</h3>
+            <p><strong>Product:</strong> Enable remote collection of bills, fees or taxes</p>
+            <p><strong>Started on:</strong> 02/26/2026</p>
+            <p><strong>Primary Key:</strong> <span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span> <button onclick="regenerateKey('primary')">Regenerate</button></p>
+            <p><strong>Secondary Key:</strong> <span>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span> <button onclick="regenerateKey('secondary')">Regenerate</button></p>
+            <p><strong>State:</strong> Active</p>
+            <button onclick="cancelSubscription()">Cancel</button>
+        </div>
+    </section>
+
+    <!-- Wallet Section -->
+    <section id="wallet-section" class="card hidden">
+        <h2>Your Wallet</h2>
+        <p id="wallet-balance">Balance: 1000.00 SDC</p>
+        <p id="wallet-balance-rand">Balance in ZAR: 1000.00 ZAR</p>
+        <p id="usd-equivalent">Equivalent in USD: 90.00 USD</p>
+        <button onclick="checkBalance()">Check Balance</button>
+        <button onclick="logout()">Logout</button>
+    </section>
+
+    <!-- MTN SIM Integration Section -->
+    <section id="mtn-integration-section" class="card hidden">
+        <h2>MTN Payment Integration</h2>
+        <p><strong>MTN Number:</strong> <span id="mtn-number">Connected MTN Number</span></p>
+        <p><strong>Balance in MTN:</strong> 1000.00 SDC + 1000 ZAR CBDC</p>
+        <button onclick="connectMtnNumber()">Connect MTN Number</button>
+        <button onclick="disconnectMtnNumber()">Disconnect MTN Number</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 SADC CBDC Platform | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        // Placeholder for actual user data and payment methods
+        let mtnNumberConnected = false;
+
+        // Subscriptions actions
+        function regenerateKey(type) {
+            alert(type + ' key regenerated');
+        }
+
+        function cancelSubscription() {
+            alert("Subscription cancelled");
+        }
+
+        // MTN Number integration
+        function connectMtnNumber() {
+            if (!mtnNumberConnected) {
+                mtnNumberConnected = true;
+                document.getElementById('mtn-integration-section').classList.remove('hidden');
+                document.getElementById('mtn-number').innerText = "MTN Number: 082XXXXXXX"; // Example number
+                alert("MTN number successfully connected! Balance: 1000 SDC + 1000 ZAR CBDC");
+            } else {
+                alert("MTN number is already connected.");
+            }
+        }
+
+        function disconnectMtnNumber() {
+            if (mtnNumberConnected) {
+                mtnNumberConnected = false;
+                document.getElementById('mtn-integration-section').classList.add('hidden');
+                alert("MTN number disconnected.");
+            } else {
+                alert("No MTN number connected.");
+            }
+        }
+
+        // Balance check action (just a placeholder for now)
+        function checkBalance() {
+            alert("Your balance is 1000 SDC + 1000 ZAR CBDC");
+        }
+
+        // Logout action
+        function logout() {
+            alert("You have logged out.");
+            // Perform logout logic (e.g., clearing session)
+        }
+    </script>
+
+</body>
+</html>
