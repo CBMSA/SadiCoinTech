@@ -1,3 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SadiCoin Investment & ETF Platform Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+  <style>
+    /* General CSS */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #1c1c1c;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h3 {
+      font-size: 24px;
+      color: #f1f1f1;
+    }
+    header img {
+      width: 100px;
+      height: auto;
+    }
+    .app {
+      padding: 20px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background-color: #333333;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    h1, h3 {
+      color: #f1f1f1;
+    }
+    label {
+      color: #f1f1f1;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #555555;
+      background-color: #222222;
+      color: #f1f1f1;
+    }
+    button {
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .out {
+      background-color: #444444;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      color: #f1f1f1;
+      font-size: 14px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #1c1c1c;
+      color: #f1f1f1;
+    }
+    .muted {
+      color: #888888;
+    }
+    .row {
+      margin-bottom: 15px;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions button {
+      width: 48%;
+    }
+    .dark-theme {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .security-seal {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      color: #fff;
+      font-size: 12px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body class="dark-theme">
+  <header>
+    <img src="sadicoin_logo.png" alt="SadiCoin Tech Logo" class="logo">
+    <h3>SADC Wallet</h3>
+  </header>
+
+  <div class="app">
+    <header>
+      <h1>SadiCoin Investment & ETF Platform</h1>
+      <p class="muted" style="text-align:center;margin:6px 0 0">Deposit • FX-Aware Yield • Auto Certificate • ETF Trading (Paper)</p>
+    </header>
+
+    <!-- Investor's Personal Details -->
+    <section class="cards">
+      <div class="card">
+        <h3>Investor Details</h3>
+        <div class="row">
+          <label>Investor Name</label>
+          <input id="investor-name" type="text" placeholder="Full Name">
+        </div>
+        <div class="row">
+          <label>ID/Passport Number</label>
+          <input id="investor-id" type="text" placeholder="ID/Passport Number">
+        </div>
+        <div class="row">
+          <label>Contact Information</label>
+          <input id="investor-contact" type="text" placeholder="Email or Phone">
+        </div>
+      </div>
+    </section>
+
+    <!-- Bond Generation and Certificate Download -->
+    <section class="cards">
+      <div class="card">
+        <h3>Bond Investment</h3>
+        <div class="row">
+          <label>Bond Face Value (FV)</label>
+          <input id="bond-fv" type="number" step="0.01" value="1000">
+        </div>
+        <div class="row">
+          <label>Annual Yield (%)</label>
+          <input id="bond-rate" type="number" step="0.01" value="8.25">
+        </div>
+        <div class="row">
+          <label>Years (n)</label>
+          <input id="bond-years" type="number" step="0.01" value="5">
+        </div>
+        <div class="row">
+          <label>Compounding</label>
+          <select id="bond-cmp">
+            <option value="1">Annual</option>
+            <option value="2">Semiannual</option>
+            <option value="4">Quarterly</option>
+            <option value="12">Monthly</option>
+            <option value="365">Daily</option>
+            <option value="cont">Continuous</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button id="btnBondCalc">Calculate Bond Yield</button>
+          <button id="btnDownloadBondCert">Download Bond Certificate</button>
+        </div>
+
+        <div id="bond-result" class="out">Enter bond details and press Calculate.</div>
+      </div>
+
+      <!-- Bond Certificate Download -->
+      <div class="card" id="bond-cert-card" style="display:none;">
+        <h3>Download Bond Certificate</h3>
+        <div id="bond-cert-details">
+          <p>Certificate Number: <span id="cert-num"></span></p>
+          <p>Investor Name: <span id="investor-name-display"></span></p>
+          <p>Bond Face Value: <span id="bond-fv-display"></span></p>
+          <p>Annual Rate: <span id="bond-rate-display"></span>%</p>
+          <p>Years: <span id="bond-years-display"></span></p>
+          <p>Compounding: <span id="bond-cmp-display"></span></p>
+          <p>Purchase Date: <span id="purchase-date"></span></p>
+          <p>Maturity Date: <span id="maturity-date"></span></p>
+          <p>Yield: <span id="yield"></span></p>
+          <p>Ask Price: <span id="ask-price"></span></p>
+          <p>Bid Price: <span id="bid-price"></span></p>
+          <p>Discount Rate: <span id="discount-rate"></span></p>
+          <p>Repo Rate: <span id="repo-rate"></span></p>
+          <p>Price: <span id="price"></span></p>
+        </div>
+        <button id="download-pdf-btn">Download PDF</button>
+        <div id="qrcode" style="margin-top: 10px;"></div>
+      </div>
+    </section>
+
+    <footer>
+      Bond Investment + Crypto Token
+    </footer>
+
+    <div class="security-seal">Security Seal</div>
+  </div>
+
+  <script>
+    // Bond Yield Calculation and Certificate Generation
+    document.getElementById('btnBondCalc').addEventListener('click', function() {
+      const fv = +document.getElementById('bond-fv').value;
+      const rate = +document.getElementById('bond-rate').value / 100;
+      const years = +document.getElementById('bond-years').value;
+      const cmp = document.getElementById('bond-cmp').value;
+
+      let futureValue = fv * Math.pow(1 + rate, years);  // Compound Interest formula
+
+      // Populate bond results
+      document.getElementById('bond-result').textContent = `Future Value of Bond after ${years} years: ZAR ${futureValue.toFixed(2)}`;
+
+    // Save bond data to localStorage
+      localStorage.setItem('bondFV', fv);
+      localStorage.setItem('bondRate', rate);
+      localStorage.setItem('bondYears', years);
+      localStorage.setItem('bondCmp', cmp);
+      localStorage.setItem('bondFutureValue', futureValue.toFixed(2));
+
+      // Display bond details for certificate
+      document.getElementById('bond-fv-display').textContent = fv.toFixed(2);
+      document.getElementById('bond-rate-display').textContent = rate * 100;
+      document.getElementById('bond-years-display').textContent = years;
+      document.getElementById('bond-cmp-display').textContent = cmp;
+
+      // Display investor details for certificate
+      document.getElementById('investor-name-display').textContent = document.getElementById('investor-name').value;
+
+      // Generate certificate number, purchase date, maturity date, and other details
+      const certNum = Math.floor(Math.random() * 1000000);  // Random certificate number
+      document.getElementById('cert-num').textContent = certNum;
+      document.getElementById('purchase-date').textContent = new Date().toLocaleDateString();
+      document.getElementById('maturity-date').textContent = new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString();
+      document.getElementById('yield').textContent = rate * 100;
+      document.getElementById('ask-price').textContent = (fv * 1.05).toFixed(2); // Example calculation for ask price
+      document.getElementById('bid-price').textContent = (fv * 0.95).toFixed(2); // Example calculation for bid price
+      document.getElementById('discount-rate').textContent = "5"; // Example discount rate
+      document.getElementById('repo-rate').textContent = "3"; // Example repo rate
+      document.getElementById('price').textContent = futureValue.toFixed(2);
+
+      // Generate a QR Code for the certificate
+      const certificateData = {
+        certNum,
+        fv,
+        rate: rate * 100,
+        years,
+        purchaseDate: new Date().toLocaleDateString(),
+        maturityDate: new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString(),
+      };
+
+      const qrCodeData = JSON.stringify(certificateData);
+      QRCode.toCanvas(document.getElementById('qrcode'), qrCodeData, function (error) {
+        if (error) console.error(error);
+      });
+
+      document.getElementById('bond-cert-card').style.display = 'block';
+    });
+
+    // Download Bond Certificate as PDF
+    document.getElementById('download-pdf-btn').addEventListener('click', function() {
+      const doc = new jsPDF();
+
+      // Add content to PDF
+      doc.text('Bond Investment Certificate', 20, 20);
+      doc.text(`Certificate Number: ${document.getElementById('cert-num').textContent}`, 20, 30);
+      doc.text(`Investor Name: ${document.getElementById('investor-name-display').textContent}`, 20, 40);
+      doc.text(`Bond Face Value: ZAR ${document.getElementById('bond-fv-display').textContent}`, 20, 50);
+      doc.text(`Annual Rate: ${document.getElementById('bond-rate-display').textContent}%`, 20, 60);
+      doc.text(`Years: ${document.getElementById('bond-years-display').textContent}`, 20, 70);
+      doc.text(`Compounding: ${document.getElementById('bond-cmp-display').textContent}`, 20, 80);
+      doc.text(`Purchase Date: ${document.getElementById('purchase-date').textContent}`, 20, 90);
+      doc.text(`Maturity Date: ${document.getElementById('maturity-date').textContent}`, 20, 100);
+      doc.text(`Yield: ${document.getElementById('yield').textContent}%`, 20, 110);
+      doc.text(`Ask Price: ZAR ${document.getElementById('ask-price').textContent}`, 20, 120);
+      doc.text(`Bid Price: ZAR ${document.getElementById('bid-price').textContent}`, 20, 130);
+      doc.text(`Discount Rate: ${document.getElementById('discount-rate').textContent}%`, 20, 140);
+      doc.text(`Repo Rate: ${document.getElementById('repo-rate').textContent}%`, 20, 150);
+      doc.text(`Price: ZAR ${document.getElementById('price').textContent}`, 20, 160);
+
+      // Download the PDF
+      doc.save('Bond_Investment_Certificate.pdf');
+
+      // Auto download the receipt
+      const receiptData = [
+        ['Certificate Number', document.getElementById('cert-num').textContent],
+        ['Investor Name', document.getElementById('investor-name-display').textContent],
+        ['Bond Face Value', document.getElementById('bond-fv-display').textContent],
+        ['Annual Rate', document.getElementById('bond-rate-display').textContent],
+        ['Years', document.getElementById('bond-years-display').textContent],
+        ['Compounding', document.getElementById('bond-cmp-display').textContent],
+        ['Purchase Date', document.getElementById('purchase-date').textContent],
+        ['Maturity Date', document.getElementById('maturity-date').textContent],
+        ['Yield', document.getElementById('yield').textContent],
+        ['Ask Price', document.getElementById('ask-price').textContent],
+        ['Bid Price', document.getElementById('bid-price').textContent],
+        ['Discount Rate', document.getElementById('discount-rate').textContent],
+        ['Repo Rate', document.getElementById('repo-rate').textContent],
+        ['Price', document.getElementById('price').textContent]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(receiptData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Investment Receipt');
+
+      // Auto download the receipt as an Excel file
+      XLSX.writeFile(wb, 'Investment_Receipt.xlsx');
+    });
+
+    // Bond Yield Calculation Export to Excel
+    document.getElementById('btnDownloadBondCert').addEventListener('click', function() {
+      const bondData = [
+        ['Certificate Number', document.getElementById('cert-num').textContent],
+        ['Investor Name', document.getElementById('investor-name-display').textContent],
+        ['Bond Face Value', document.getElementById('bond-fv-display').textContent],
+        ['Annual Rate', document.getElementById('bond-rate-display').textContent],
+        ['Years', document.getElementById('bond-years-display').textContent],
+        ['Compounding', document.getElementById('bond-cmp-display').textContent],
+        ['Purchase Date', document.getElementById('purchase-date').textContent],
+        ['Maturity Date', document.getElementById('maturity-date').textContent],
+        ['Yield', document.getElementById('yield').textContent],
+        ['Ask Price', document.getElementById('ask-price').textContent],
+        ['Bid Price', document.getElementById('bid-price').textContent],
+        ['Discount Rate', document.getElementById('discount-rate').textContent],
+        ['Repo Rate', document.getElementById('repo-rate').textContent],
+        ['Price', document.getElementById('price').textContent]
+      ];
+
+      const ws = XLSX.utils.aoa_to_sheet(bondData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Bond Investment');
+
+      XLSX.writeFile(wb, 'Bond_Investment_Details.xlsx');
+    });
+  </script>
+</body>
+</html>
+
+
+add the above file to the file below ,that the page can instance aid cbdc buy cash over the counter ,and send cbdc to mobile wallet /bank account ( cbdc yield according to the maturity date . Make sure that the formulas are correct . 
+auto download Cbdc Certificate with invester details
+both cbdc value must reflect in the wallet 1 ( SDC 1000 +100Rand )2(securities purchased yield 
+value) 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,68 +363,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SDC SDG GRANT PROTOTYPE Platform</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #121212;
-            color: #E0E0E0;
-        }
-        header {
-            background-color: #1F1F1F;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        section {
-            padding: 20px;
-            margin: 10px;
-            background-color: #333;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        button {
-            background-color: #00796b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #004d40;
-        }
-        input[type="text"], input[type="number"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #1F1F1F;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-        #balance-section, #transactions-section {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #444;
-            border-radius: 8px;
-        }
-        #balance-section h3, #transactions-section h3 {
-            margin-bottom: 20px;
-        }
-        .transaction-item {
-            background-color: #333;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
+        
     </style>
 </head>
 <body>
@@ -84,8 +381,8 @@
     <h3>Your CBDC Balance</h3>
     <p><strong>Balance (SDC):</strong> <span id="balance-sdc">1000</span> SDC</p>
     <p><strong>Balance (ZAR):</strong> <span id="balance-zar">1000</span> ZAR</p>
-    <p><strong>Digital Bank Account Number:</strong> <span id="account-number">+27 123 456 789</span></p>
-    <p><strong>Digital Card Number:</strong> <span id="card-number">XXXXXXXXXXXX1234</span></p>
+    <p><strong>Digital Bank Account Number:</strong> <span id="account-number">+27 123 456 789</span></p> ( here it must add the connected number)
+    <p><strong>Digital Card Number:</strong> <span id="card-number">XXXXXXXXXXXX1234</span></p> ( auto generate and save)
     <button onclick="checkBalance()">Check Balance</button>
 </section>
 
