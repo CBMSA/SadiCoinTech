@@ -217,17 +217,14 @@
       const fv = +document.getElementById('bond-fv').value;
       const rate = +document.getElementById('bond-rate').value / 100;
       const years = +document.getElementById('bond-years').value;
-Here is the remaining part of the code where the bond yield calculation, certificate generation, and PDF download functionality are handled:
-Html
-Copy code
-const cmp = document.getElementById('bond-cmp').value;
+      const cmp = document.getElementById('bond-cmp').value;
 
       let futureValue = fv * Math.pow(1 + rate / cmp, years * cmp);  // Compound Interest formula
 
       // Populate bond results
       document.getElementById('bond-result').textContent = `Future Value of Bond after ${years} years: ZAR ${futureValue.toFixed(2)}`;
 
-      // Save bond data to localStorage
+ // Save bond data to localStorage
       localStorage.setItem('bondFV', fv);
       localStorage.setItem('bondRate', rate);
       localStorage.setItem('bondYears', years);
