@@ -1,92 +1,311 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Coin Token</title>
+  <meta charset="utf-8" />
+  <title>SadiCoin Investment & CBDC Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-      padding: 50px;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
     }
-
-    .coin {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: #ffcc00;
+    header {
+      background-color: #1c1c1c;
+      padding: 20px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 30px;
-      font-weight: bold;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      margin-bottom: 30px;
     }
-
+    header h3 {
+      font-size: 24px;
+      color: #f1f1f1;
+    }
+    header img {
+      width: 100px;
+      height: auto;
+    }
+    .app {
+      padding: 20px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background-color: #333333;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    h1, h3 {
+      color: #f1f1f1;
+    }
+    label {
+      color: #f1f1f1;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #555555;
+      background-color: #222222;
+      color: #f1f1f1;
+    }
     button {
+      cursor: pointer;
       background-color: #007BFF;
       color: white;
       border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 5px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-
     button:hover {
       background-color: #0056b3;
     }
+    .out {
+      background-color: #444444;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      color: #f1f1f1;
+      font-size: 14px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #1c1c1c;
+      color: #f1f1f1;
+    }
+    .muted {
+      color: #888888;
+    }
+    .row {
+      margin-bottom: 15px;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+    }
+    .actions button {
+      width: 48%;
+    }
+    .dark-theme {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .security-seal {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      color: #fff;
+      font-size: 12px;
+      border-radius: 5px;
+    }
   </style>
 </head>
-<body>
+<body class="dark-theme">
+  <header>
+    <img src="sadicoin_logo.png" alt="SadiCoin Tech Logo" class="logo">
+    <h3>SADC Wallet</h3>
+  </header>
 
-  <h1>Digital Coin Token</h1>
-  <div class="coin">
-    SDC
+  <div class="app">
+    <header>
+      <h1>SadiCoin Investment & CBDC Platform</h1>
+      <p class="muted" style="text-align:center;margin:6px 0 0">Deposit • FX-Aware Yield • Auto Certificate • ETF Trading (Paper)</p>
+    </header>
+
+    <!-- Investor's Personal Details -->
+    <section class="cards">
+      <div class="card">
+        <h3>Investor Details</h3>
+        <div class="row">
+          <label>Investor Name</label>
+          <input id="investor-name" type="text" placeholder="Full Name">
+        </div>
+        <div class="row">
+          <label>ID/Passport Number</label>
+          <input id="investor-id" type="text" placeholder="ID/Passport Number">
+        </div>
+        <div class="row">
+          <label>Contact Information</label>
+          <input id="investor-contact" type="text" placeholder="Email or Phone">
+        </div>
+      </div>
+    </section>
+
+    <!-- Bond Investment and CBDC Generation -->
+    <section class="cards">
+      <div class="card">
+        <h3>Bond Investment</h3>
+        <div class="row">
+          <label>Bond Face Value (FV)</label>
+          <input id="bond-fv" type="number" step="0.01" value="1000">
+        </div>
+        <div class="row">
+          <label>Annual Yield (%)</label>
+          <input id="bond-rate" type="number" step="0.01" value="8.25">
+        </div>
+        <div class="row">
+          <label>Years (n)</label>
+          <input id="bond-years" type="number" step="0.01" value="5">
+        </div>
+        <div class="row">
+          <label>Compounding</label>
+          <select id="bond-cmp">
+            <option value="1">Annual</option>
+            <option value="2">Semiannual</option>
+            <option value="4">Quarterly</option>
+            <option value="12">Monthly</option>
+            <option value="365">Daily</option>
+            <option value="cont">Continuous</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button id="btnBondCalc">Calculate Bond Yield</button>
+          <button id="btnDownloadBondCert">Download Bond Certificate</button>
+        </div>
+
+        <div id="bond-result" class="out">Enter bond details and press Calculate.</div>
+      </div>
+
+      <!-- Bond Certificate Download -->
+      <div class="card" id="bond-cert-card" style="display:none;">
+        <h3>Download Bond Certificate</h3>
+        <div id="bond-cert-details">
+          <p>Certificate Number: <span id="cert-num"></span></p>
+          <p>Investor Name: <span id="investor-name-display"></span></p>
+          <p>Bond Face Value: <span id="bond-fv-display"></span></p>
+          <p>Annual Rate: <span id="bond-rate-display"></span>%</p>
+          <p>Years: <span id="bond-years-display"></span></p>
+          <p>Compounding: <span id="bond-cmp-display"></span></p>
+          <p>Purchase Date: <span id="purchase-date"></span></p>
+          <p>Maturity Date: <span id="maturity-date"></span></p>
+          <p>Yield: <span id="yield"></span></p>
+          <p>Ask Price: <span id="ask-price"></span></p>
+          <p>Bid Price: <span id="bid-price"></span></p>
+          <p>Discount Rate: <span id="discount-rate"></span></p>
+          <p>Repo Rate: <span id="repo-rate"></span></p>
+          <p>Price: <span id="price"></span></p>
+        </div>
+        <button id="download-pdf-btn">Download PDF</button>
+        <div id="qrcode" style="margin-top: 10px;"></div>
+      </div>
+    </section>
+
+    <footer>
+        Bond Investment + Crypto Token
+    </footer>
+    
+    <div class="security-seal">Security Seal</div>
+
   </div>
-  <button id="download-btn">Download Certificate</button>
 
   <script>
-    // PDF Certificate Generation
-    document.getElementById('download-btn').addEventListener('click', function() {
-      const { jsPDF } = window.jspdf;
+    // Bond Yield Calculation and Certificate Generation
+    document.getElementById('btnBondCalc').addEventListener('click', function() {
+      const fv = +document.getElementById('bond-fv').value;
+      const rate = +document.getElementById('bond-rate').value / 100;
+      const years = +document.getElementById('bond-years').value;
+Here is the remaining part of the code where the bond yield calculation, certificate generation, and PDF download functionality are handled:
+Html
+Copy code
+const cmp = document.getElementById('bond-cmp').value;
 
+      let futureValue = fv * Math.pow(1 + rate / cmp, years * cmp);  // Compound Interest formula
+
+      // Populate bond results
+      document.getElementById('bond-result').textContent = `Future Value of Bond after ${years} years: ZAR ${futureValue.toFixed(2)}`;
+
+      // Save bond data to localStorage
+      localStorage.setItem('bondFV', fv);
+      localStorage.setItem('bondRate', rate);
+      localStorage.setItem('bondYears', years);
+      localStorage.setItem('bondCmp', cmp);
+      localStorage.setItem('bondFutureValue', futureValue.toFixed(2));
+
+      // Display bond details for certificate
+      document.getElementById('bond-fv-display').textContent = fv.toFixed(2);
+      document.getElementById('bond-rate-display').textContent = (rate * 100).toFixed(2);
+      document.getElementById('bond-years-display').textContent = years;
+      document.getElementById('bond-cmp-display').textContent = cmp;
+
+      // Display investor details for certificate
+      document.getElementById('investor-name-display').textContent = document.getElementById('investor-name').value;
+
+      // Generate certificate number, purchase date, maturity date, and other details
+      const certNum = Math.floor(Math.random() * 1000000);  // Random certificate number
+      document.getElementById('cert-num').textContent = certNum;
+      document.getElementById('purchase-date').textContent = new Date().toLocaleDateString();
+      document.getElementById('maturity-date').textContent = new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString();
+      document.getElementById('yield').textContent = (rate * 100).toFixed(2);
+      document.getElementById('ask-price').textContent = (fv * 1.05).toFixed(2); // Example calculation for ask price
+      document.getElementById('bid-price').textContent = (fv * 0.95).toFixed(2); // Example calculation for bid price
+      document.getElementById('discount-rate').textContent = "5"; // Example discount rate
+      document.getElementById('repo-rate').textContent = "3"; // Example repo rate
+      document.getElementById('price').textContent = futureValue.toFixed(2);
+
+      // Generate a QR Code for the certificate
+      const certificateData = {
+        certNum,
+        fv,
+        rate: rate * 100,
+        years,
+        purchaseDate: new Date().toLocaleDateString(),
+        maturityDate: new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString(),
+      };
+
+      const qrCodeData = JSON.stringify(certificateData);
+      QRCode.toCanvas(document.getElementById('qrcode'), qrCodeData, function (error) {
+        if (error) console.error(error);
+      });
+
+      document.getElementById('bond-cert-card').style.display = 'block';
+    });
+
+    // Download Bond Certificate as PDF
+    document.getElementById('download-pdf-btn').addEventListener('click', function() {
       const doc = new jsPDF();
 
-      // Set PDF title and content
+      // Add certificate header and title
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(20);
-      doc.text('SadiCoin Digital Token Certificate', 20, 20);
-
-      // Add token details
+      doc.setFontSize(18);
+      doc.text('SadiCoin Investment Certificate', 20, 20);
       doc.setFontSize(12);
-      doc.text('Token Name: SadiCoin (SDC)', 20, 40);
-      doc.text('Token Value: 1 SDC = 100 ZAR', 20, 50);
-      doc.text('Token ID: 123456789', 20, 60);
-      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 70);
-      doc.text('Validity: Lifetime', 20, 80);
+      
+      // Add Transaction Details
+      doc.text(`Transaction ID: ${document.getElementById('cert-num').textContent}`, 20, 40);
+      doc.text(`Investor Name: ${document.getElementById('investor-name-display').textContent}`, 20, 50);
+      doc.text(`Amount Invested: ZAR ${document.getElementById('bond-fv-display').textContent}`, 20, 60);
+      doc.text(`Maturity Period: ${document.getElementById('bond-years-display').textContent} years`, 20, 70);
+      doc.text(`Annual Rate: ${document.getElementById('bond-rate-display').textContent}%`, 20, 80);
+      doc.text(`Projected Yield: ZAR ${document.getElementById('yield').textContent}`, 20, 90);
+      doc.text(`Projected Value at Maturity: ZAR ${document.getElementById('price').textContent}`, 20, 100);
+      doc.text(`Discount Rate (Ask): ${document.getElementById('discount-rate').textContent}%`, 20, 110);
+      doc.text(`Issuer: SADC CBDC Department`, 20, 120);
+      doc.text(`Date of Issue: ${document.getElementById('purchase-date').textContent}`, 20, 130);
+      doc.text(`Date of Maturity: ${document.getElementById('maturity-date').textContent}`, 20, 140);
 
-      // Add digital coin image (logo or graphic)
-      doc.setFillColor(255, 204, 0);
-      doc.circle(120, 140, 50, 'FD'); // Draw circle
-      doc.setTextColor(255, 255, 255);
-      doc.text('SDC', 110, 140); // Text inside circle
-
-      // Footer text
+      // Add SADC watermark and footer
       doc.setTextColor(180, 180, 180);
-      doc.text('This certificate is for demonstration purposes only.', 20, 250);
+      doc.text('SADC', 120, 180);
+      doc.setFontSize(10);
+      doc.text('This certificate is a simulated document for demonstration purposes only and does not constitute financial advice.', 20, 250);
 
-      // Save PDF
-      doc.save('SadiCoin_Token_Certificate.pdf');
+      // Save the generated certificate as a PDF
+      doc.save('SadiCoin_Investment_Certificate.pdf');
     });
   </script>
-
 </body>
 </html>
 
