@@ -1,6 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Coin Token</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      padding: 50px;
+    }
+
+    .coin {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: #ffcc00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 30px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Digital Coin Token</h1>
+  <div class="coin">
+    SDC
+  </div>
+  <button id="download-btn">Download Certificate</button>
+
+  <script>
+    // PDF Certificate Generation
+    document.getElementById('download-btn').addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+
+      const doc = new jsPDF();
+
+      // Set PDF title and content
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text('SadiCoin Digital Token Certificate', 20, 20);
+
+      // Add token details
+      doc.setFontSize(12);
+      doc.text('Token Name: SadiCoin (SDC)', 20, 40);
+      doc.text('Token Value: 1 SDC = 100 ZAR', 20, 50);
+      doc.text('Token ID: 123456789', 20, 60);
+      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 70);
+      doc.text('Validity: Lifetime', 20, 80);
+
+      // Add digital coin image (logo or graphic)
+      doc.setFillColor(255, 204, 0);
+      doc.circle(120, 140, 50, 'FD'); // Draw circle
+      doc.setTextColor(255, 255, 255);
+      doc.text('SDC', 110, 140); // Text inside circle
+
+      // Footer text
+      doc.setTextColor(180, 180, 180);
+      doc.text('This certificate is for demonstration purposes only.', 20, 250);
+
+      // Save PDF
+      doc.save('SadiCoin_Token_Certificate.pdf');
+    });
+  </script>
+
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sadicoin Tech | Secure Digital Infrastructure</title>
