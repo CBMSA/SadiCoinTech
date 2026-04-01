@@ -1,308 +1,733 @@
+<!Sample 1
+
+
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>Digital Banknote</title>  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
+  <style>  
+    body {  
+      font-family: Arial, sans-serif;  
+      text-align: center;  
+      background-color: #e0e0e0;  
+      padding: 50px;  
+    }  .banknote {  
+  width: 600px;  
+  height: 300px;  
+  border-radius: 15px;  
+  background: #009966;  
+  color: white;  
+  font-size: 30px;  
+  font-weight: bold;  
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);  
+  margin: 50px auto;  
+  padding: 20px;  
+  position: relative;  
+}  
+
+.denomination {  
+  font-size: 50px;  
+  font-weight: bold;  
+}  
+
+.serial-number {  
+  position: absolute;  
+  bottom: 20px;  
+  right: 20px;  
+  font-size: 12px;  
+  font-family: monospace;  
+}  
+
+button {  
+  background-color: #007BFF;  
+  color: white;  
+  border: none;  
+  padding: 10px 20px;  
+  cursor: pointer;  
+  font-size: 16px;  
+  border-radius: 5px;  
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  
+}  
+
+button:hover {  
+  background-color: #0056b3;  
+}
+
+  </style>  
+</head>  
+<body>    <h1>Digital Banknote</h1>  
+  <div class="banknote">  
+    <div class="denomination">100 ZAR</div>  
+    <div>Digital Banknote</div>  
+    <div class="serial-number">Serial No: 1234567890</div>  
+  </div>  <button id="download-btn">Download Banknote</button>
+
+  <script>  
+    // PDF Banknote Generation  
+    document.getElementById('download-btn').addEventListener('click', function() {  
+      const { jsPDF } = window.jspdf;  
+  
+      const doc = new jsPDF();  
+  
+      // Set PDF title and content  
+      doc.setFont("helvetica", "bold");  
+      doc.setFontSize(20);  
+      doc.text('Digital Banknote Certificate', 20, 20);  
+  
+      // Add banknote details  
+      doc.setFontSize(16);  
+      doc.text('Denomination: 100 ZAR', 20, 40);  
+      doc.text('Serial Number: 1234567890', 20, 50);  
+      doc.text('Issued By: SadiCoin Tech', 20, 60);  
+      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 70);  
+  
+      // Add banknote image (designs or patterns)  
+      doc.setFillColor(0, 153, 102); // Banknote background color  
+      doc.rect(10, 20, 190, 100, 'F'); // Simple rectangle design  
+      doc.setTextColor(255, 255, 255); // Text color for contrast  
+      doc.text('100 ZAR', 20, 80); // Denomination text  
+  
+      // Serial number and QR code-like feature (optional)  
+      doc.setTextColor(180, 180, 180);  
+      doc.text('Serial No: 1234567890', 150, 150);  
+      // You could add a QR code here if needed, using `doc.addImage(qrCodeImage, ...)`  
+  
+      // Footer text  
+      doc.setTextColor(180, 180, 180);  
+      doc.text('This is a digital representation for demonstration purposes.', 20, 250);  
+  
+      // Save PDF  
+      doc.save('Digital_Banknote.pdf');  
+    });  
+  </script>  </body>  
+</html> 
+
+Sample 2
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>SadiCoin Investment & CBDC Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Banknote</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-      margin: 0;
-      padding: 0;
+      text-align: center;
+      background-color: #e0e0e0;
+      padding: 50px;
     }
-    header {
-      background-color: #1c1c1c;
+
+    .banknote {
+      width: 600px;
+      height: 300px;
+      border-radius: 15px;
+      background: #009966;
+      color: white;
+      font-size: 30px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      margin: 50px auto;
       padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      position: relative;
     }
-    header h3 {
-      font-size: 24px;
-      color: #f1f1f1;
+
+    .denomination {
+      font-size: 50px;
+      font-weight: bold;
     }
-    header img {
-      width: 100px;
-      height: auto;
+
+    .serial-number {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      font-size: 12px;
+      font-family: monospace;
     }
-    .app {
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Digital Banknote</h1>
+  <div class="banknote">
+    <div class="denomination">100 ZAR</div>
+    <div>Digital Banknote</div>
+    <div class="serial-number">Serial No: 1234567890</div>
+  </div>
+
+  <button id="download-btn">Download Banknote</button>
+
+  <script>
+    // PDF Banknote Generation
+    document.getElementById('download-btn').addEventListener('click', function() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Set PDF title and content
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text('Digital Banknote Certificate', 20, 20);
+
+      // Add detailed banknote information
+      doc.setFontSize(16);
+      doc.text('Denomination: 100 ZAR', 20, 40);
+      doc.text('Serial Number: 1234567890', 20, 50);
+      doc.text('Issued By: SadiCoin Tech', 20, 60);
+      doc.text('Issuer Address: 123 Blockchain Rd, Crypto City', 20, 70);
+      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 80);
+      doc.text('Validity: Lifetime', 20, 90);
+      
+      // Add QR Code for Security Feature
+      const qrCodeData = "https://www.sadicoin.com/verify?serial=1234567890"; // Example link for validation
+      doc.text('Scan QR Code for Verification:', 150, 120);
+      doc.addImage('https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=' + encodeURIComponent(qrCodeData), 'PNG', 150, 130, 40, 40);
+
+      // Add banknote image (designs or patterns)
+      doc.setFillColor(0, 153, 102); // Banknote background color
+      doc.rect(10, 20, 190, 100, 'F'); // Simple rectangle design
+      doc.setTextColor(255, 255, 255); // Text color for contrast
+      doc.text('100 ZAR', 20, 80); // Denomination text
+
+      // Serial number and QR code-like feature (optional)
+      doc.setTextColor(180, 180, 180);
+      doc.text('Serial No: 1234567890', 150, 150);
+
+      // Add watermark
+      doc.setTextColor(200, 200, 200);
+      doc.setFontSize(40);
+      doc.text('SadiCoin', 120, 200, null, null, 'center'); // Watermark text, placed at the center of the page, faint text
+
+      // Footer text with security disclaimer
+      doc.setTextColor(180, 180, 180);
+      doc.text('This is a digital representation for demonstration purposes.', 20, 250);
+
+      // Save PDF
+      doc.save('Digital_Banknote.pdf');
+    });
+  </script>
+
+</body>
+</html>
+
+Sample 3
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBDC Admin Portal</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-code-generator/3.1.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2C3E50;
+    }
+
+    .admin-panel {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 10px;
       padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+
+    .form-group {
+      margin-bottom: 15px;
     }
-    .card {
-      background-color: #333333;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    }
-    h1, h3 {
-      color: #f1f1f1;
-    }
+
     label {
-      color: #f1f1f1;
-      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
     }
+
     input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border-radius: 5px;
-      border: 1px solid #555555;
-      background-color: #222222;
-      color: #f1f1f1;
-    }
-    button {
-      cursor: pointer;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .out {
-      background-color: #444444;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      color: #f1f1f1;
       font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
     }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background-color: #1c1c1c;
-      color: #f1f1f1;
+
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .muted {
-      color: #888888;
+
+    button:hover {
+      background-color: #218838;
     }
-    .row {
-      margin-bottom: 15px;
+
+    .issued-notes {
+      margin-top: 30px;
+      border-top: 2px solid #ddd;
+      padding-top: 20px;
     }
-    .actions {
+
+    .note-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .note-list li {
+      padding: 10px;
+      background-color: #f9f9f9;
+      margin-bottom: 10px;
+      border-radius: 5px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
-    .actions button {
-      width: 48%;
-    }
-    .dark-theme {
-      background-color: #121212;
-      color: #ffffff;
-    }
-    .security-seal {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 10px;
-      color: #fff;
-      font-size: 12px;
-      border-radius: 5px;
+
+    .note-list li .qr-code {
+      margin-left: 10px;
+      width: 50px;
+      height: 50px;
     }
   </style>
 </head>
-<body class="dark-theme">
-  <header>
-    <img src="sadicoin_logo.png" alt="SadiCoin Tech Logo" class="logo">
-    <h3>SADC Wallet</h3>
-  </header>
+<body>
 
-  <div class="app">
-    <header>
-      <h1>SadiCoin Investment & CBDC Platform</h1>
-      <p class="muted" style="text-align:center;margin:6px 0 0">Deposit • FX-Aware Yield • Auto Certificate • ETF Trading (Paper)</p>
-    </header>
+  <h1>CBDC Admin / Issuer Portal</h1>
+  
+  <div class="admin-panel">
+    <h2>Issue New Digital CBDC Banknote</h2>
+    <div class="form-group">
+      <label for="denomination">Denomination (ZAR):</label>
+      <select id="denomination">
+        <option value="100">100 ZAR</option>
+        <option value="50">50 ZAR</option>
+        <option value="20">20 ZAR</option>
+        <option value="10">10 ZAR</option>
+      </select>
+    </div>
 
-    <!-- Investor's Personal Details -->
-    <section class="cards">
-      <div class="card">
-        <h3>Investor Details</h3>
-        <div class="row">
-          <label>Investor Name</label>
-          <input id="investor-name" type="text" placeholder="Full Name">
-        </div>
-        <div class="row">
-          <label>ID/Passport Number</label>
-          <input id="investor-id" type="text" placeholder="ID/Passport Number">
-        </div>
-        <div class="row">
-          <label>Contact Information</label>
-          <input id="investor-contact" type="text" placeholder="Email or Phone">
-        </div>
-      </div>
-    </section>
+    <div class="form-group">
+      <label for="serialNumber">Serial Number:</label>
+      <input type="text" id="serialNumber" placeholder="Enter serial number">
+    </div>
 
-    <!-- Bond Investment and CBDC Generation -->
-    <section class="cards">
-      <div class="card">
-        <h3>Bond Investment</h3>
-        <div class="row">
-          <label>Bond Face Value (FV)</label>
-          <input id="bond-fv" type="number" step="0.01" value="1000">
-        </div>
-        <div class="row">
-          <label>Annual Yield (%)</label>
-          <input id="bond-rate" type="number" step="0.01" value="8.25">
-        </div>
-        <div class="row">
-          <label>Years (n)</label>
-          <input id="bond-years" type="number" step="0.01" value="5">
-        </div>
-        <div class="row">
-          <label>Compounding</label>
-          <select id="bond-cmp">
-            <option value="1">Annual</option>
-            <option value="2">Semiannual</option>
-            <option value="4">Quarterly</option>
-            <option value="12">Monthly</option>
-            <option value="365">Daily</option>
-            <option value="cont">Continuous</option>
-          </select>
-        </div>
+    <div class="form-group">
+      <label for="issuer">Issuer Name:</label>
+      <input type="text" id="issuer" placeholder="Enter issuer name (e.g., SadiCoin Tech)">
+    </div>
 
-        <div class="row">
-          <button id="btnBondCalc">Calculate Bond Yield</button>
-          <button id="btnDownloadBondCert">Download Bond Certificate</button>
-        </div>
+    <button id="issueBtn">Issue CBDC Note</button>
+  </div>
 
-        <div id="bond-result" class="out">Enter bond details and press Calculate.</div>
-      </div>
-
-      <!-- Bond Certificate Download -->
-      <div class="card" id="bond-cert-card" style="display:none;">
-        <h3>Download Bond Certificate</h3>
-        <div id="bond-cert-details">
-          <p>Certificate Number: <span id="cert-num"></span></p>
-          <p>Investor Name: <span id="investor-name-display"></span></p>
-          <p>Bond Face Value: <span id="bond-fv-display"></span></p>
-          <p>Annual Rate: <span id="bond-rate-display"></span>%</p>
-          <p>Years: <span id="bond-years-display"></span></p>
-          <p>Compounding: <span id="bond-cmp-display"></span></p>
-          <p>Purchase Date: <span id="purchase-date"></span></p>
-          <p>Maturity Date: <span id="maturity-date"></span></p>
-          <p>Yield: <span id="yield"></span></p>
-          <p>Ask Price: <span id="ask-price"></span></p>
-          <p>Bid Price: <span id="bid-price"></span></p>
-          <p>Discount Rate: <span id="discount-rate"></span></p>
-          <p>Repo Rate: <span id="repo-rate"></span></p>
-          <p>Price: <span id="price"></span></p>
-        </div>
-        <button id="download-pdf-btn">Download PDF</button>
-        <div id="qrcode" style="margin-top: 10px;"></div>
-      </div>
-    </section>
-
-    <footer>
-        Bond Investment + Crypto Token
-    </footer>
-    
-    <div class="security-seal">Security Seal</div>
-
+  <div class="issued-notes">
+    <h2>Issued CBDC Notes</h2>
+    <ul class="note-list" id="noteList">
+      <!-- Issued notes will be listed here -->
+    </ul>
   </div>
 
   <script>
-    // Bond Yield Calculation and Certificate Generation
-    document.getElementById('btnBondCalc').addEventListener('click', function() {
-      const fv = +document.getElementById('bond-fv').value;
-      const rate = +document.getElementById('bond-rate').value / 100;
-      const years = +document.getElementById('bond-years').value;
-      const cmp = document.getElementById('bond-cmp').value;
+    document.getElementById('issueBtn').addEventListener('click', function() {
+      const denomination = document.getElementById('denomination').value;
+      const serialNumber = document.getElementById('serialNumber').value;
+      const issuer = document.getElementById('issuer').value;
 
-      let futureValue = fv * Math.pow(1 + rate / cmp, years * cmp);  // Compound Interest formula
+      if (!serialNumber || !issuer) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-      // Populate bond results
-      document.getElementById('bond-result').textContent = `Future Value of Bond after ${years} years: ZAR ${futureValue.toFixed(2)}`;
+      // Generate the QR code for verification
+      const qrCodeData = `https://www.sadicoin.com/verify?serial=${serialNumber}`;
+      const qrCodeUrl = generateQRCode(qrCodeData);
 
- // Save bond data to localStorage
-      localStorage.setItem('bondFV', fv);
-      localStorage.setItem('bondRate', rate);
-      localStorage.setItem('bondYears', years);
-      localStorage.setItem('bondCmp', cmp);
-      localStorage.setItem('bondFutureValue', futureValue.toFixed(2));
+      // Create a new list item for the issued note
+      const noteItem = document.createElement('li');
+      noteItem.innerHTML = `
+        <div>
+          <strong>${denomination} ZAR</strong><br>
+          Serial Number: ${serialNumber}<br>
+          Issued By: ${issuer}
+        </div>
+        <div class="qr-code">
+          <img src="${qrCodeUrl}" alt="QR Code">
+        </div>
+        <button onclick="downloadPDF('${denomination}', '${serialNumber}', '${issuer}', '${qrCodeData}')">Download PDF</button>
+      `;
 
-      // Display bond details for certificate
-      document.getElementById('bond-fv-display').textContent = fv.toFixed(2);
-      document.getElementById('bond-rate-display').textContent = (rate * 100).toFixed(2);
-      document.getElementById('bond-years-display').textContent = years;
-      document.getElementById('bond-cmp-display').textContent = cmp;
+      // Add the issued note to the list
+      document.getElementById('noteList').appendChild(noteItem);
 
-      // Display investor details for certificate
-      document.getElementById('investor-name-display').textContent = document.getElementById('investor-name').value;
-
-      // Generate certificate number, purchase date, maturity date, and other details
-      const certNum = Math.floor(Math.random() * 1000000);  // Random certificate number
-      document.getElementById('cert-num').textContent = certNum;
-      document.getElementById('purchase-date').textContent = new Date().toLocaleDateString();
-      document.getElementById('maturity-date').textContent = new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString();
-      document.getElementById('yield').textContent = (rate * 100).toFixed(2);
-      document.getElementById('ask-price').textContent = (fv * 1.05).toFixed(2); // Example calculation for ask price
-      document.getElementById('bid-price').textContent = (fv * 0.95).toFixed(2); // Example calculation for bid price
-      document.getElementById('discount-rate').textContent = "5"; // Example discount rate
-      document.getElementById('repo-rate').textContent = "3"; // Example repo rate
-      document.getElementById('price').textContent = futureValue.toFixed(2);
-
-      // Generate a QR Code for the certificate
-      const certificateData = {
-        certNum,
-        fv,
-        rate: rate * 100,
-        years,
-        purchaseDate: new Date().toLocaleDateString(),
-        maturityDate: new Date(new Date().setFullYear(new Date().getFullYear() + years)).toLocaleDateString(),
-      };
-
-      const qrCodeData = JSON.stringify(certificateData);
-      QRCode.toCanvas(document.getElementById('qrcode'), qrCodeData, function (error) {
-        if (error) console.error(error);
-      });
-
-      document.getElementById('bond-cert-card').style.display = 'block';
+      // Clear input fields
+      document.getElementById('serialNumber').value = '';
+      document.getElementById('issuer').value = '';
     });
 
-    // Download Bond Certificate as PDF
-    document.getElementById('download-pdf-btn').addEventListener('click', function() {
+    // Generate QR Code URL
+    function generateQRCode(data) {
+      const qrCodeCanvas = document.createElement('canvas');
+      QRCode.toCanvas(qrCodeCanvas, data);
+      return qrCodeCanvas.toDataURL();
+    }
+
+    // PDF generation for issued notes
+    function downloadPDF(denomination, serialNumber, issuer, qrCodeData) {
+      const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Add certificate header and title
+      // Set PDF title and content
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
-      doc.text('SadiCoin Investment Certificate', 20, 20);
-      doc.setFontSize(12);
-      
-      // Add Transaction Details
-      doc.text(`Transaction ID: ${document.getElementById('cert-num').textContent}`, 20, 40);
-      doc.text(`Investor Name: ${document.getElementById('investor-name-display').textContent}`, 20, 50);
-      doc.text(`Amount Invested: ZAR ${document.getElementById('bond-fv-display').textContent}`, 20, 60);
-      doc.text(`Maturity Period: ${document.getElementById('bond-years-display').textContent} years`, 20, 70);
-      doc.text(`Annual Rate: ${document.getElementById('bond-rate-display').textContent}%`, 20, 80);
-      doc.text(`Projected Yield: ZAR ${document.getElementById('yield').textContent}`, 20, 90);
-      doc.text(`Projected Value at Maturity: ZAR ${document.getElementById('price').textContent}`, 20, 100);
-      doc.text(`Discount Rate (Ask): ${document.getElementById('discount-rate').textContent}%`, 20, 110);
-      doc.text(`Issuer: SADC CBDC Department`, 20, 120);
-      doc.text(`Date of Issue: ${document.getElementById('purchase-date').textContent}`, 20, 130);
-      doc.text(`Date of Maturity: ${document.getElementById('maturity-date').textContent}`, 20, 140);
+      doc.setFontSize(20);
+      doc.text('CBDC Digital Banknote Certificate', 20, 20);
 
-      // Add SADC watermark and footer
-      doc.setTextColor(180, 180, 180);
-      doc.text('SADC', 120, 180);
-      doc.setFontSize(10);
-      doc.text('This certificate is a simulated document for demonstration purposes only and does not constitute financial advice.', 20, 250);
+      // Add banknote details
+      doc.setFontSize(16);
+      doc.text(`Denomination: ${denomination} ZAR`, 20, 40);
+      doc.text(`Serial Number: ${serialNumber}`, 20, 50);
+      doc.text(`Issuer: ${issuer}`, 20, 60);
+      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 70);
+      doc.text('Validity: Lifetime', 20, 80);
 
-      // Save the generated certificate as a PDF
-      doc.save('SadiCoin_Investment_Certificate.pdf');
-    });
+      // Add QR code
+      doc.text('Scan QR Code for Verification:', 20, 100);
+      doc.addImage(generateQRCode(qrCodeData), 'PNG', 20, 110, 40, 40);
+
+      // Save PDF
+      doc.save(`${serialNumber}_CBDC_Banknote.pdf`);
+    }
   </script>
+
+</body>
+</html>
+
+Sample 4 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBDC Admin Portal</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-code-generator/3.1.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2C3E50;
+    }
+
+    .admin-panel {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .wallet-info {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .wallet-info img {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    .wallet-info h3 {
+      margin-bottom: 15px;
+    }
+
+    .wallet-info .balance {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .transaction-history {
+      margin-top: 30px;
+      border-top: 2px solid #ddd;
+      padding-top: 20px;
+    }
+
+    .transaction-history ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .transaction-history li {
+      padding: 10px;
+      background-color: #f9f9f9;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CBDC Admin / Issuer Portal</h1>
+  
+  <div class="admin-panel">
+    <h2>Issue New Digital CBDC Banknote</h2>
+    <div class="form-group">
+      <label for="denomination">Denomination (ZAR):</label>
+      <select id="denomination">
+        <option value="100">100 ZAR</option>
+        <option value="50">50 ZAR</option>
+        <option value="20">20 ZAR</option>
+        <option value="10">10 ZAR</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="serialNumber">Serial Number:</label>
+      <input type="text" id="serialNumber" placeholder="Enter serial number">
+    </div>
+
+    <div class="form-group">
+      <label for="issuer">Issuer Name:</label>
+      <input type="text" id="issuer" placeholder="Enter issuer name (e.g., SadiCoin Tech)">
+    </div>
+
+    <button id="issueBtn">Issue CBDC Note</button>
+  </div>
+
+  <div class="wallet-info">
+    <h3>Firm CBDC Wallet</h3>
+    <div class="balance">
+      <span>Total Balance: <strong>80 ZAR</strong></span>
+    </div>
+    <div class="wallet-notes">
+      <div>
+        <img src="https://via.placeholder.com/50x50?text=50" alt="50 ZAR">
+        <img src="https://via.placeholder.com/50x50?text=20" alt="20 ZAR">
+        <img src="https://via.placeholder.com/50x50?text=10" alt="10 ZAR">
+      </div>
+      <p>CBDC in Physical Banknote Form</p>
+    </div>
+    <h4>Send CBDC to Firm's Wallet</h4>
+    <div class="form-group">
+      <label for="sendAmount">Amount to Send (ZAR):</label>
+      <input type="number" id="sendAmount" placeholder="Enter amount to send">
+    </div>
+    <button id="sendCBDCBtn">Send CBDC</button>
+  </div>
+
+  <div class="transaction-history">
+    <h2>Transaction History</h2>
+    <ul id="transactionList">
+      <!-- Transaction records will be displayed here -->
+    </ul>
+  </div>
+
+  <script>
+    const transactionList = document.getElementById("transactionList");
+    const sendCBDCBtn = document.getElementById("sendCBDCBtn");
+
+    // Issuing CBDC Note
+    document.getElementById('issueBtn').addEventListener('click', function() {
+      const denomination = document.getElementById('denomination').value;
+      const serialNumber = document.getElementById('serialNumber').value;
+      const issuer = document.getElementById('issuer').value;
+
+      if (!serialNumber || !issuer) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      // Generate the QR code for verification
+      const qrCodeData = `https://www.sadicoin.com/verify?serial=${serialNumber}`;
+      const qrCodeUrl = generateQRCode(qrCodeData);
+
+      // Add transaction record to history
+      const transactionItem = document.createElement('li');
+      transactionItem.innerHTML = `
+        <div>
+          <strong>${denomination} ZAR</strong><br>
+          Serial Number: ${serialNumber}<br>
+          Issued By: ${issuer}
+        </div>
+        <div class="qr-code">
+          <img src="${qrCodeUrl}" alt="QR Code">
+        </div>
+        <button onclick="downloadPDF('${denomination}', '${serialNumber}', '${issuer}', '${qrCodeData}')">Download PDF</button>
+      `;
+      transactionList.appendChild(transactionItem);
+
+      // Clear input fields
+      document.getElementById('serialNumber').value = '';
+      document.getElementById('issuer').value = '';
+    });
+
+    // Generate QR Code URL
+    function generateQRCode(data) {
+      const qrCodeCanvas = document.createElement('canvas');
+      QRCode.toCanvas(qrCodeCanvas, data);
+      return qrCodeCanvas.toDataURL();
+    }
+
+    // PDF generation for issued notes
+    function downloadPDF(denomination, serialNumber, issuer, qrCodeData) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      // Set PDF title and content
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(20);
+      doc.text('CBDC Digital Banknote Certificate', 20, 20);
+
+      // Add banknote details
+      doc.setFontSize(16);
+      doc.text(`Denomination: ${denomination} ZAR`, 20, 40);
+      doc.text(`Serial Number: ${serialNumber}`, 20, 50);
+      doc.text(`Issuer: ${issuer}`, 20, 60);
+      doc.text('Issue Date: ' + new Date().toLocaleDateString(), 20, 70);
+      doc.text('Validity: Lifetime', 20, 80);
+
+      // Add QR code
+      doc.text('Scan QR Code for Verification:', 20, 100);
+      Here is the remaining part of the code:
+Html
+Copy code
+doc.addImage(generateQRCode(qrCodeData), 'PNG', 20, 110, 40, 40);
+
+      // Save PDF
+      doc.save(`${serialNumber}_CBDC_Banknote.pdf`);
+    }
+
+    // Sending CBDC to Firm's Wallet
+    sendCBDCBtn.addEventListener('click', function() {
+      const sendAmount = document.getElementById('sendAmount').value;
+
+      if (!sendAmount || sendAmount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+
+      // Record the transaction
+      const transactionItem = document.createElement('li');
+      transactionItem.innerHTML = `
+        <div>
+          <strong>Sent ${sendAmount} ZAR</strong><br>
+          Sent to Firm CBDC Wallet<br>
+          Date: ${new Date().toLocaleString()}
+        </div>
+      `;
+      transactionList.appendChild(transactionItem);
+
+      // Clear the amount input field
+      document.getElementById('sendAmount').value = '';
+      
+      // Simulate update in the wallet balance
+      updateWalletBalance(sendAmount);
+    });
+
+    // Update wallet balance
+    function updateWalletBalance(amountSent) {
+      const currentBalance = 80; // Initial wallet balance in ZAR
+      const newBalance = currentBalance - amountSent;
+
+      // Update the balance in the UI (wallet balance)
+      const balanceElement = document.querySelector(".balance");
+      balanceElement.innerHTML = `Total Balance: <strong>${newBalance} ZAR</strong>`;
+
+      // Simulate CBDC in physical banknote form
+      const notes = {
+        '50': 1,
+        '20': 1,
+        '10': 1
+      };
+
+      const walletNotesDiv = document.querySelector('.wallet-notes');
+      walletNotesDiv.innerHTML = '';
+      for (const denomination in notes) {
+        for (let i = 0; i < notes[denomination]; i++) {
+          const noteImage = document.createElement('img');
+          noteImage.src = `https://via.placeholder.com/50x50?text=${denomination}`;
+          walletNotesDiv.appendChild(noteImage);
+        }
+      }
+
+      // Log the transaction in the history
+      const transactionItem = document.createElement('li');
+      transactionItem.innerHTML = `
+        <div>
+          <strong>${amountSent} ZAR</strong><br>
+          Sent to Firm Wallet<br>
+          Date: ${new Date().toLocaleString()}
+        </div>
+      `;
+      transactionList.appendChild(transactionItem);
+    }
+  </script>
+
 </body>
 </html>
 
