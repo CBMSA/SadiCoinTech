@@ -1,3 +1,314 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client-side Photo Chat Pay with CBDC</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qr-code-generator/3.1.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2C3E50;
+    }
+
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .chat-bubble {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 5px 0;
+      max-width: 80%;
+    }
+
+    .chat-bubble.client {
+      align-self: flex-end;
+      background-color: #28a745;
+    }
+
+    .send-btn {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border: none;
+      margin-top: 10px;
+    }
+
+    .send-btn:hover {
+      background-color: #218838;
+    }
+
+    .send-amount {
+      margin-top: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .wallet-info {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .wallet-info .banknote {
+      width: 120px;
+      height: 250px;
+      background-color: transparent;
+      color: white;
+      text-align: center;
+      border-radius: 10px;
+      margin-right: 10px;
+      display: inline-block;
+      position: relative;
+      padding: 10px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .banknote .denomination {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .balance {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .transaction-history {
+      margin-top: 20px;
+      border-top: 2px solid #ddd;
+      padding-top: 20px;
+    }
+
+    .transaction-history ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .transaction-history li {
+      padding: 10px;
+      background-color: #f9f9f9;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .purchase-airtime {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #fff3e0;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Client-side Photo Chat Pay</h1>
+
+  <!-- Chat Box -->
+  <div class="chat-box">
+    <div id="chatWindow"></div>
+
+    <div class="form-group">
+      <label for="messageInput">Send Message (Optional):</label>
+      <input type="text" id="messageInput" placeholder="Enter your message here" />
+    </div>
+
+    <div class="form-group send-amount">
+      <label for="sendAmount">Amount to Send (ZAR):</label>
+      <input type="number" id="sendAmount" placeholder="Enter amount to send" />
+    </div>
+
+    <button id="sendBtn" class="send-btn">Send CBDC</button>
+  </div>
+
+  <!-- Wallet Information -->
+  <div class="wallet-info">
+    <h3>Your CBDC Wallet</h3>
+    <div class="balance">
+      <span>Total Balance: <strong id="walletBalance">1000 ZAR</strong></span>
+    </div>
+    <div class="wallet-notes">
+      <!-- Visual representation of digital banknotes with real designs -->
+      <div id="walletBanknotes">
+        <div class="banknote" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e9/100_ZAR_Obverse.jpg');">
+          <div class="denomination">100 ZAR</div>
+        </div>
+        <div class="banknote" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/3/3d/South_African_50_Rand_2012.jpg');">
+          <div class="denomination">50 ZAR</div>
+        </div>
+        <div class="banknote" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/c2/200_Rand_note.jpg');">
+          <div class="denomination">200 ZAR</div>
+        </div>
+      </div>
+      <p>CBDC in Digital Banknote Form</p>
+    </div>
+  </div>
+
+  <!-- Airtime Purchase Section -->
+  <div class="purchase-airtime">
+    <h3>Buy Airtime Using CBDC</h3>
+    <div class="form-group">
+      <label for="mtnNumber">MTN Mobile Number:</label>
+      <input type="text" id="mtnNumber" placeholder="Enter MTN number">
+    </div>
+
+    <div class="form-group">
+      <label for="airtimeAmount">Amount (ZAR):</label>
+      <input type="number" id="airtimeAmount" placeholder="Enter amount to purchase">
+    </div>
+
+    <button id="purchaseAirtimeBtn" class="send-btn">Buy Airtime</button>
+  </div>
+
+  <!-- Transaction History -->
+  <div class="transaction-history">
+    <h2>Transaction History</h2>
+    <ul id="transactionHistory">
+      <!-- Transaction records will be displayed here -->
+    </ul>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = document.getElementById('messageInput');
+    const sendAmount = document.getElementById('sendAmount');
+    const chatWindow = document.getElementById('chatWindow');
+    const walletBalance = document.getElementById('walletBalance');
+    const transactionHistory = document.getElementById('transactionHistory');
+    const walletBanknotes = document.getElementById('walletBanknotes');
+
+    let balance = 1000;
+
+    // Send CBDC and Chat Message
+    sendBtn.addEventListener('click', () => {
+      const amountToSend = sendAmount.value;
+      const message = messageInput.value;
+
+      if (amountToSend <= 0 || amountToSend > balance) {
+        alert('Please enter a valid amount.');
+        return;
+      }
+
+      // Update Wallet Balance
+      balance -= amountToSend;
+      walletBalance.innerText = `${balance} ZAR`;
+
+      // Update Digital Banknotes
+      updateDigitalBanknotes(amountToSend);
+
+      // Log the transaction in history
+      const transactionItem = document.createElement('li');
+      transactionItem.innerHTML = `
+        <div>
+          <span>Sent ${amountToSend} ZAR</span><br>
+          Message: ${message || 'No message'}<br>
+          Date: ${new Date().toLocaleString()}
+        </div>
+      `;
+      transactionHistory.appendChild(transactionItem);
+
+      // Simulate Chat Conversation
+      const clientMessage = document.createElement('div');
+      clientMessage.classList.add('chat-bubble', 'client');
+      clientMessage.innerHTML = `Sent: ${amountToSend} ZAR, Message: ${message || 'No message'}`;
+      chatWindow.appendChild(clientMessage);
+
+      // Clear Inputs
+      sendAmount.value = '';
+      messageInput.value = '';
+    });
+
+    // Airtime Purchase Function
+    document.getElementById('purchaseAirtimeBtn').addEventListener('click', () => {
+      const mtnNumber = document.getElementById('mtnNumber').value;
+      const airtimeAmount = document.getElementById('airtimeAmount').value;
+
+      // Basic validation for airtime purchase
+      if (!mtnNumber || airtimeAmount <= 0 || airtimeAmount > balance) {
+        alert('Please enter a valid MTN number and amount.');
+        return;
+      }
+
+      // Deduct the airtime purchase amount from the CBDC balance
+      balance -= airtimeAmount;
+      walletBalance.innerText = `${balance} ZAR`;
+
+      // Simulate Airtime Purchase API Integration (e.g., Momo, EcoCash, etc.)
+      // This is where you'd integrate the actual mobile payment system (like Momo API)
+      const transactionItem = document.createElement('li');
+      transactionItem.innerHTML = `
+        <div>
+          <span>Purchased ${airtimeAmount} ZAR of airtime for ${mtnNumber}</span><br>
+          Date: ${new Date().toLocaleString()}
+        </div>
+      `;
+      transactionHistory.appendChild(transactionItem);
+
+      // Simulate Chat Conversation for Airtime Purchase
+      const clientMessage = document.createElement('div');
+      clientMessage.classList.add('chat-bubble', 'client');
+      clientMessage.innerHTML = `Purchased: ${airtimeAmount} ZAR of airtime for ${mtnNumber}`;
+      chatWindow.appendChild(clientMessage);
+
+      // Clear Inputs
+      document.getElementById('mtnNumber').value = '';
+      document.getElementById('airtimeAmount').value = '';
+    });
+
+    // Update Digital Banknotes based on transaction
+    function updateDigitalBanknotes(amountSent) {
+      const banknote100 = document.querySelector('.banknote:nth-child(1)');
+      const banknote50 = document.querySelector('.banknote:nth-child(2)');
+      const banknote200 = document.querySelector('.banknote:nth-child(3)');
+
+      // Adjust the banknotes visually after the transaction
+      if (amountSent >= 100) {
+        banknote100.style.opacity = 0.5; // Simulate CBDC being deducted
+      } else if (amountSent >= 50) {
+        banknote50.style.opacity = 0.5; // Simulate CBDC being deducted
+      } else if (amountSent >= 200) {
+        banknote200.style.opacity = 0.5; // Simulate CBDC being deducted
+      }
+    }
+  </script>
+
+</body>
+</html>
+
+❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤💟💌💌💌💌💌💌
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
