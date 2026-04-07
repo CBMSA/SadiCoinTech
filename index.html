@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -125,11 +125,32 @@
       text-align: center;
     }
 
+    .card-details {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #e0f7fa;
+      border-radius: 8px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <h1>Client-side Photo Chat Pay</h1>
+
+  <!-- Virtual Card Information -->
+  <div class="card-details">
+    <h3>Virtual Card Details - Issuer: MyCbdc Wallet</h3>
+    <p><strong>Card Number:</strong> 1234 5678 9012 3456</p>
+    <p><strong>CVV:</strong> 123</p>
+    <p><strong>Expiry Date:</strong> 12/2028</p>
+    <p><strong>Issuer:</strong> MyCbdc Wallet</p>
+    <p><strong>Account Name:</strong> John Doe</p>
+    <p><strong>Shared Secret:</strong> <em>Secret Key For OTP Generation</em></p>
+    <p><strong>OTP Type:</strong> TOTP</p>
+    <p><strong>OTP Algorithm:</strong> SHA-256</p>
+    <p><strong>Counter:</strong> 0 (For HOTP)</p>
+  </div>
 
   <!-- Chat Box -->
   <div class="chat-box">
@@ -208,8 +229,6 @@
 
     // Simulating Visa Direct API Call for Fund Transfer
     const transferFunds = (amount) => {
-      // In a real-world scenario, this is where you'd interact with Visa API.
-      // Here we mock the response for demonstration.
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve({ success: true, transactionId: 'TX123456789' });
@@ -236,7 +255,7 @@
 
       // Simulate Chat Conversation
       const clientMessage = document.createElement('div');
-      clientMessage.classList.add('chat-bubble', 'client');
+clientMessage.classList.add('chat-bubble', 'client');
       clientMessage.innerHTML = `Sent: ${amountToSend} ZAR, Message: ${message || 'No message'}`;
       chatWindow.appendChild(clientMessage);
 
@@ -255,7 +274,7 @@
       try {
         const response = await transferFunds(amountToSend);
         if (response.success) {
-      // Log the Visa transaction ID after successful transfer
+          // Log the Visa transaction ID after successful transfer
           const visaTransactionItem = document.createElement('li');
           visaTransactionItem.innerHTML = `
             <div>
@@ -296,7 +315,6 @@
       walletBalance.innerText = `${balance} ZAR`;
 
       // Simulate Airtime Purchase API Integration (e.g., Momo, EcoCash, etc.)
-      // This is where you'd integrate the actual mobile payment system (like Momo API)
       const transactionItem = document.createElement('li');
       transactionItem.innerHTML = `
         <div>
