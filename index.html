@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,8 +206,19 @@
 
     let balance = 1000;
 
+    // Simulating Visa Direct API Call for Fund Transfer
+    const transferFunds = (amount) => {
+      // In a real-world scenario, this is where you'd interact with Visa API.
+      // Here we mock the response for demonstration.
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ success: true, transactionId: 'TX123456789' });
+        }, 1000); // Simulate a network delay
+      });
+    };
+
     // Send CBDC and Chat Message
-    sendBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', async () => {
       const amountToSend = sendAmount.value;
       const message = messageInput.value;
 
@@ -227,6 +234,12 @@
       // Update Digital Banknotes
       updateDigitalBanknotes(amountToSend);
 
+      // Simulate Chat Conversation
+      const clientMessage = document.createElement('div');
+      clientMessage.classList.add('chat-bubble', 'client');
+      clientMessage.innerHTML = `Sent: ${amountToSend} ZAR, Message: ${message || 'No message'}`;
+      chatWindow.appendChild(clientMessage);
+
       // Log the transaction in history
       const transactionItem = document.createElement('li');
       transactionItem.innerHTML = `
@@ -238,11 +251,29 @@
       `;
       transactionHistory.appendChild(transactionItem);
 
-      // Simulate Chat Conversation
-      const clientMessage = document.createElement('div');
-      clientMessage.classList.add('chat-bubble', 'client');
-      clientMessage.innerHTML = `Sent: ${amountToSend} ZAR, Message: ${message || 'No message'}`;
-      chatWindow.appendChild(clientMessage);
+      // Call Visa Direct for transferring funds
+      try {
+        const response = await transferFunds(amountToSend);
+        if (response.success) {
+      // Log the Visa transaction ID after successful transfer
+          const visaTransactionItem = document.createElement('li');
+          visaTransactionItem.innerHTML = `
+            <div>
+              <span>Transaction ID: ${response.transactionId}</span><br>
+              Status: Successful<br>
+              Amount Sent: ${amountToSend} ZAR<br>
+              Date: ${new Date().toLocaleString()}
+            </div>
+          `;
+          transactionHistory.appendChild(visaTransactionItem);
+        } else {
+          // Handle failure (optional)
+          alert('Transaction failed with Visa API.');
+        }
+      } catch (error) {
+        console.error('Error processing transaction:', error);
+        alert('There was an error processing the transaction.');
+      }
 
       // Clear Inputs
       sendAmount.value = '';
@@ -293,19 +324,20 @@
       const banknote200 = document.querySelector('.banknote:nth-child(3)');
 
       // Adjust the banknotes visually after the transaction
+      if (amountSent >= 200) {
+        banknote200.style.opacity = 0.5; // Simulate CBDC being deducted
+      }
       if (amountSent >= 100) {
         banknote100.style.opacity = 0.5; // Simulate CBDC being deducted
-      } else if (amountSent >= 50) {
+      }
+      if (amountSent >= 50) {
         banknote50.style.opacity = 0.5; // Simulate CBDC being deducted
-      } else if (amountSent >= 200) {
-        banknote200.style.opacity = 0.5; // Simulate CBDC being deducted
       }
     }
   </script>
 
 </body>
 </html>
-
 ❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤💟💌💌💌💌💌💌
 
 
