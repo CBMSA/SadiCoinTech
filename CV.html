@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .cv-container {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #000;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .profile p, .skills ul, .references ul {
+            margin: 0;
+            padding: 0;
+        }
+        .skills li, .references li {
+            margin-bottom: 5px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cv-container">
+        <div class="section">
+            <h1>Full Name: _________________________</h1>
+            <p>Email: _________________________ | Phone: _________________________ | Location: _________________________</p>
+            <p>DOB: _________________________ | Gender: _________________________</p>
+        </div>
+
+        <div class="section profile">
+            <h2>Profile</h2>
+            <p>Committed to delivering high-quality, compassionate, and ethical care, while consistently demonstrating responsibility, reliability, and respect for the dignity of others. Dedicated to fostering a supportive and humane environment, and contributing positively through diligent, attentive, and principled work.</p>
+        </div>
+
+        <div class="section education">
+            <h2>Education</h2>
+            <ul>
+                <li><strong>Year:</strong> ____________________ - <strong>Course Name:</strong> ____________________, <strong>Institution:</strong> ____________________</li>
+                <li><strong>Year:</strong> ____________________ - <strong>Grade/Certification:</strong> ____________________, <strong>School Name:</strong> ____________________</li>
+            </ul>
+        </div>
+
+        <div class="section professional-experience">
+            <h2>Professional Experience</h2>
+            <h3>Present: <strong>Job Title:</strong> ____________________, <strong>Company Name:</strong> ____________________</h3>
+            <ul>
+                <li>Task/Responsibility: ________________________________</li>
+                <li>Task/Responsibility: ________________________________</li>
+                <li>Task/Responsibility: ________________________________</li>
+            </ul>
+        </div>
+
+        <div class="section key-skills">
+            <h2>Key Skills & Competencies</h2>
+            <ul>
+                <li>Skill/Competency: ________________________________</li>
+                <li>Skill/Competency: ________________________________</li>
+                <li>Skill/Competency: ________________________________</li>
+            </ul>
+        </div>
+
+        <div class="section languages">
+            <h2>Languages</h2>
+            <ul>
+                <li><strong>Language:</strong> ____________________ - <strong>Proficiency Level:</strong> ____________________</li>
+            </ul>
+        </div>
+
+        <div class="section skills">
+            <h2>Skills</h2>
+            <ul>
+                <li><strong>Skill:</strong> ____________________</li>
+                <li><strong>Skill:</strong> ____________________</li>
+                <li><strong>Skill:</strong> ____________________</li>
+            </ul>
+        </div>
+
+        <div class="section references">
+            <h2>References</h2>
+            <ul>
+                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
+                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
+                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <a href="#" class="download-btn" id="downloadBtn">Download CV</a>
+        </div>
+    </div>
+
+    <script>
+        // Function to download the CV as a PDF
+        document.getElementById("downloadBtn").addEventListener("click", function() {
+            var doc = new jsPDF();
+            doc.html(document.querySelector('.cv-container'), {
+                callback: function (doc) {
+                    doc.save('Generated_CV.pdf');
+                },
+                x: 10,
+                y: 10
+            });
+        });
+    </script>
+
+    <!-- jsPDF script for PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</body>
+</html>
