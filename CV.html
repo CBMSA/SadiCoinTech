@@ -8,6 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f4f4f4;
         }
         .cv-container {
             width: 100%;
@@ -15,6 +16,7 @@
             margin: auto;
             padding: 20px;
             border: 1px solid #000;
+            background-color: #fff;
         }
         .section {
             margin-bottom: 20px;
@@ -23,13 +25,16 @@
             font-size: 1.5em;
             margin-bottom: 10px;
             text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
         }
-        .profile p, .skills ul, .references ul {
-            margin: 0;
-            padding: 0;
-        }
-        .skills li, .references li {
-            margin-bottom: 5px;
+        input[type="text"], input[type="email"], input[type="tel"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
         }
         .footer {
             text-align: center;
@@ -51,66 +56,68 @@
 
     <div class="cv-container">
         <div class="section">
-            <h1>Full Name: _________________________</h1>
-            <p>Email: _________________________ | Phone: _________________________ | Location: _________________________</p>
-            <p>DOB: _________________________ | Gender: _________________________</p>
+            <h1>Full Name:</h1>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+            
+            <h2>Email:</h2>
+            <input type="email" id="email" placeholder="Enter your email">
+            
+            <h2>Phone:</h2>
+            <input type="tel" id="phone" placeholder="Enter your phone number">
+            
+            <h2>Location:</h2>
+            <input type="text" id="location" placeholder="Enter your location">
+            
+            <h2>Date of Birth:</h2>
+            <input type="text" id="dob" placeholder="Enter your date of birth">
+            
+            <h2>Gender:</h2>
+            <select id="gender">
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+            </select>
         </div>
 
         <div class="section profile">
             <h2>Profile</h2>
-            <p>Committed to delivering high-quality, compassionate, and ethical care, while consistently demonstrating responsibility, reliability, and respect for the dignity of others. Dedicated to fostering a supportive and humane environment, and contributing positively through diligent, attentive, and principled work.</p>
+            <textarea id="profile" rows="4" placeholder="Enter your profile description"></textarea>
         </div>
 
         <div class="section education">
             <h2>Education</h2>
-            <ul>
-                <li><strong>Year:</strong> ____________________ - <strong>Course Name:</strong> ____________________, <strong>Institution:</strong> ____________________</li>
-                <li><strong>Year:</strong> ____________________ - <strong>Grade/Certification:</strong> ____________________, <strong>School Name:</strong> ____________________</li>
-            </ul>
+            <input type="text" id="eduYear1" placeholder="Year of Education (e.g., 2024)">
+            <input type="text" id="eduCourse1" placeholder="Course Name (e.g., Elderly Care)">
+            <input type="text" id="eduInstitution1" placeholder="Institution Name (e.g., Briann Care Helpers)">
+            
+            <input type="text" id="eduYear2" placeholder="Year of Education (e.g., 2023)">
+            <input type="text" id="eduGrade2" placeholder="Grade/Certification (e.g., Grade 12)">
+            <input type="text" id="eduSchool2" placeholder="School Name (e.g., Terence Cecil Hardy High School)">
         </div>
 
         <div class="section professional-experience">
             <h2>Professional Experience</h2>
-            <h3>Present: <strong>Job Title:</strong> ____________________, <strong>Company Name:</strong> ____________________</h3>
-            <ul>
-                <li>Task/Responsibility: ________________________________</li>
-                <li>Task/Responsibility: ________________________________</li>
-                <li>Task/Responsibility: ________________________________</li>
-            </ul>
+            <textarea id="jobDescription" rows="4" placeholder="Describe your current or past job responsibilities"></textarea>
         </div>
 
         <div class="section key-skills">
             <h2>Key Skills & Competencies</h2>
-            <ul>
-                <li>Skill/Competency: ________________________________</li>
-                <li>Skill/Competency: ________________________________</li>
-                <li>Skill/Competency: ________________________________</li>
-            </ul>
+            <textarea id="keySkills" rows="4" placeholder="List your key skills and competencies"></textarea>
         </div>
 
         <div class="section languages">
             <h2>Languages</h2>
-            <ul>
-                <li><strong>Language:</strong> ____________________ - <strong>Proficiency Level:</strong> ____________________</li>
-            </ul>
+            <input type="text" id="language" placeholder="Enter languages and proficiency (e.g., English - C2)">
         </div>
 
         <div class="section skills">
             <h2>Skills</h2>
-            <ul>
-                <li><strong>Skill:</strong> ____________________</li>
-                <li><strong>Skill:</strong> ____________________</li>
-                <li><strong>Skill:</strong> ____________________</li>
-            </ul>
+            <textarea id="skills" rows="4" placeholder="List your skills"></textarea>
         </div>
 
         <div class="section references">
             <h2>References</h2>
-            <ul>
-                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
-                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
-                <li><strong>Name:</strong> ____________________ | <strong>Position:</strong> ____________________ | <strong>Contact:</strong> ____________________</li>
-            </ul>
+            <textarea id="references" rows="4" placeholder="List your references"></textarea>
         </div>
 
         <div class="footer">
@@ -118,22 +125,50 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
-        // Function to download the CV as a PDF
         document.getElementById("downloadBtn").addEventListener("click", function() {
             var doc = new jsPDF();
-            doc.html(document.querySelector('.cv-container'), {
-                callback: function (doc) {
-                    doc.save('Generated_CV.pdf');
-                },
-                x: 10,
-                y: 10
-            });
+            var fullName = document.getElementById("fullName").value;
+            var email = document.getElementById("email").value;
+            var phone = document.getElementById("phone").value;
+            var location = document.getElementById("location").value;
+            var dob = document.getElementById("dob").value;
+            var gender = document.getElementById("gender").value;
+            var profile = document.getElementById("profile").value;
+            var eduYear1 = document.getElementById("eduYear1").value;
+            var eduCourse1 = document.getElementById("eduCourse1").value;
+            var eduInstitution1 = document.getElementById("eduInstitution1").value;
+            var eduYear2 = document.getElementById("eduYear2").value;
+            var eduGrade2 = document.getElementById("eduGrade2").value;
+            var eduSchool2 = document.getElementById("eduSchool2").value;
+            var jobDescription = document.getElementById("jobDescription").value;
+            var keySkills = document.getElementById("keySkills").value;
+            var language = document.getElementById("language").value;
+            var skills = document.getElementById("skills").value;
+            var references = document.getElementById("references").value;
+
+            doc.setFontSize(16);
+            doc.text("Full Name: " + fullName, 10, 20);
+            doc.text("Email: " + email, 10, 30);
+            doc.text("Phone: " + phone, 10, 40);
+            doc.text("Location: " + location, 10, 50);
+            doc.text("DOB: " + dob, 10, 60);
+            doc.text("Gender: " + gender, 10, 70);
+            doc.text("Profile: " + profile, 10, 80);
+            doc.text("Education:", 10, 100);
+            doc.text(eduYear1 + " - " + eduCourse1 + " - " + eduInstitution1, 10, 110);
+            doc.text(eduYear2 + " - " + eduGrade2 + " - " + eduSchool2, 10, 120);
+            doc.text("Professional Experience: " + jobDescription, 10, 130);
+            doc.text("Key Skills: " + keySkills, 10, 140);
+            doc.text("Languages: " + language, 10, 150);
+            doc.text("Skills: " + skills, 10, 160);
+            doc.text("References: " + references, 10, 170);
+
+            doc.save(fullName + "_CV.pdf");
         });
     </script>
-
-    <!-- jsPDF script for PDF download -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
