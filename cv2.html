@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .cv-container {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #000;
+            background-color: #fff;
+        }
+        .header {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+        input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cv-container">
+        <!-- Header -->
+        <div class="header">
+            <p>Curriculum Virtue</p>
+            <p>Of</p>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="section">
+            <h1>Full Name:</h1>
+            <input type="text" id="fullName" placeholder="Enter your full name">
+
+            <h2>Email:</h2>
+            <input type="email" id="email" placeholder="Enter your email">
+
+            <h2>Phone:</h2>
+            <input type="tel" id="phone" placeholder="Enter your phone number">
+
+            <h2>Location:</h2>
+            <input type="text" id="location" placeholder="Enter your location">
+
+            <h2>Date of Birth:</h2>
+            <input type="text" id="dob" placeholder="Enter your date of birth">
+
+            <h2>Gender:</h2>
+            <select id="gender">
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="section profile">
+            <h2>Profile</h2>
+            <textarea id="profile" rows="4" placeholder="Enter your profile description"></textarea>
+        </div>
+
+        <!-- Education Section -->
+        <div class="section education">
+            <h2>Education</h2>
+            <input type="text" id="eduYear1" placeholder="Year of Education (e.g., 2024)">
+            <input type="text" id="eduCourse1" placeholder="Course Name (e.g., Elderly Care)">
+            <input type="text" id="eduInstitution1" placeholder="Institution Name (e.g., Briann Care Helpers)">
+
+            <input type="text" id="eduYear2" placeholder="Year of Education (e.g., 2023)">
+            <input type="text" id="eduGrade2" placeholder="Grade/Certification (e.g., Grade 12)">
+            <input type="text" id="eduSchool2" placeholder="School Name (e.g., Terence Cecil Hardy High School)">
+        </div>
+
+        <!-- Professional Experience Section -->
+        <div class="section professional-experience">
+            <h2>Professional Experience</h2>
+            <textarea id="jobDescription" rows="4" placeholder="Describe your current or past job responsibilities"></textarea>
+        </div>
+
+        <!-- Key Skills Section -->
+        <div class="section key-skills">
+            <h2>Key Skills & Competencies</h2>
+            <textarea id="keySkills" rows="4" placeholder="List your key skills and competencies"></textarea>
+        </div>
+
+        <!-- Languages Section -->
+        <div class="section languages">
+            <h2>Languages</h2>
+            <input type="text" id="language" placeholder="Enter languages and proficiency (e.g., English - C2)">
+        </div>
+
+        <!-- Skills Section -->
+        <div class="section skills">
+            <h2>Skills</h2>
+            <textarea id="skills" rows="4" placeholder="List your skills"></textarea>
+        </div>
+
+        <!-- References Section -->
+        <div class="section references">
+            <h2>References</h2>
+            <textarea id="references" rows="4" placeholder="List your references"></textarea>
+        </div>
+
+        <div class="footer">
+            <a href="#" class="download-btn" id="downloadBtn">Download CV</a>
+        </div>
+    </div>
+
+    <!-- jsPDF script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // Load data from localStorage when the page loads
+        window.onload = function() {
+            document.getElementById("fullName").value = localStorage.getItem("fullName") || "";
+            document.getElementById("email").value = localStorage.getItem("email") || "";
+            document.getElementById("phone").value = localStorage.getItem("phone") || "";
+            document.getElementById("location").value = localStorage.getItem("location") || "";
+            document.getElementById("dob").value = localStorage.getItem("dob") || "";
+            document.getElementById("gender").value = localStorage.getItem("gender") || "Female";
+            document.getElementById("profile").value = localStorage.getItem("profile") || "";
+            document.getElementById("eduYear1").value = localStorage.getItem("eduYear1") || "";
+            document.getElementById("eduCourse1").value = localStorage.getItem("eduCourse1") || "";
+            document.getElementById("eduInstitution1").value = localStorage.getItem("eduInstitution1") || "";
+            document.getElementById("eduYear2").value = localStorage.getItem("eduYear2") || "";
+            document.getElementById("eduGrade2").value = localStorage.getItem("eduGrade2") || "";
+            document.getElementById("eduSchool2").value = localStorage.getItem("eduSchool2") || "";
+            document.getElementById("jobDescription").value = localStorage.getItem("jobDescription") || "";
+            document.getElementById("keySkills").value = localStorage.getItem("keySkills") || "";
+            document.getElementById("language").value = localStorage.getItem("language") || "";
+            document.getElementById("skills").value = localStorage.getItem("skills") || "";
+            document.getElementById("references").value = localStorage.getItem("references") || "";
+        }
+
+        // Save data to localStorage whenever an input field changes
+        const inputs = document.querySelectorAll("input, textarea, select");
+        inputs.forEach(input => {
+            input.addEventListener("input", function() {
+                localStorage.setItem(input.id, input.value);
+            });
+        });
+
+        // Generate and download the CV as a PDF
+        document.getElementById("downloadBtn").addEventListener("click", function() {
+            const { jsPDF } = window.jspdf;
+            var doc = new jsPDF();
+
+            // Retrieve values from the form
+            var fullName = document.getElementById("fullName").value;
+            var email = document.getElementById("email").value;
+            var phone = document.getElementById("phone").value;
+            var location = document.getElementById("location").value;
+            var dob = document.getElementById("dob").value;
+            var gender = document.getElementById("gender").value;
+            var profile = document.getElementById("profile").value;
+            var eduYear1 = document.getElementById("eduYear1").value;
+            var eduCourse1 = document.getElementById("eduCourse1").value;
+            var eduInstitution1 = document.getElementById("eduInstitution1").value;
+            var eduYear2 = document.getElementById("eduYear2").value;
+            var eduGrade2 = document.getElementById("eduGrade2").value;
+            var eduSchool2 = document.getElementById("eduSchool2").value;
+            var jobDescription = document.getElementById("jobDescription").value;
+            var keySkills = document.getElementById("keySkills").value;
+            var language = document.getElementById("language").value;
+            var skills = document.getElementById("skills").value;
+            var references = document.getElementById("references").value;
+
+            // Generate PDF content
+            doc.setFontSize(16);
+            doc.text("Curriculum Virtue", 105, 20, { align: "center" });
+            doc.text("Of", 105, 30, { align: "center" });
+
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Full Name: " + fullName, 10, 40);
+            doc.setFont("helvetica", "normal");
+            doc.text("Email: " + email, 10, 50);
+            doc.text("Phone: " + phone, 10, 60);
+            doc.text("Location: " + location, 10, 70);
+            doc.text("DOB: " + dob, 10, 80);
+            doc.text("Gender: " + gender, 10, 90);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Profile:", 10, 110);
+            doc.setFont("helvetica", "normal");
+            doc.text(profile, 10, 120);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Education:", 10, 140);
+            doc.setFont("helvetica", "normal");
+            doc.text(eduYear1 + " - " + eduCourse1 + " - " + eduInstitution1, 10, 150);
+            doc.text(eduYear2 + " - " + eduGrade2 + " - " + eduSchool2, 10, 160);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Professional Experience:", 10, 180);
+            doc.setFont("helvetica", "normal");
+            doc.text(jobDescription, 10, 190);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Key Skills & Competencies:", 10, 210);
+            doc.setFont("helvetica", "normal");
+            doc.text(keySkills, 10, 220);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Languages:", 10, 240);
+            doc.setFont("helvetica", "normal");
+            doc.text(language, 10, 250);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("Skills:", 10, 270);
+            doc.setFont("helvetica", "normal");
+            doc.text(skills, 10, 280);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("References:", 10, 300);
+            doc.setFont("helvetica", "normal");
+            doc.text(references, 10, 310);
+
+            doc.save(fullName + "_CV.pdf");
+        });
+    </script>
+
+</body>
+</html>
