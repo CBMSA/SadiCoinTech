@@ -37,46 +37,46 @@
         .button:hover {
             background-color: #228b57;
         }
-        .coin-image {
-            width: 80%;
-            max-width: 400px;
-            margin-top: 20px;
-            position: relative;
-        }
-        .coin-image img {
-            width: 100%;
-        }
-        .blank-space {
-            position: absolute;
-            top: 30%;
-            left: 30%;
-            width: 40%;
-            height: 40%;
-            border: 3px dashed #2d9d6b;
-            background-color: rgba(255, 255, 255, 0.6);
-            text-align: center;
-            padding-top: 20px;
-            font-size: 18px;
-            color: #2d9d6b;
-        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>SDG Art Competition</h1>
-        <p>Download the PDF to learn more about the SDG Art Competition and how to participate.</p>
-
-        <a href="sdg_art_competition.pdf" class="button" download>Download PDF</a>
-
-        <div class="coin-image">
-            <!-- Replace with the image of your coin -->
-            <img src="coin_image.png" alt="SDG Coin">
-            <div class="blank-space">
-                <p>Upload Your Design Here</p>
-            </div>
-        </div>
+        <p>Click the button below to download the coin template for your SDG Art competition.</p>
+        
+        <button class="button" id="download-pdf">Download Template PDF</button>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        document.getElementById('download-pdf').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add the coin image (replace with your own coin image file if needed)
+            const coinImage = 'coin_image.png'; // Placeholder image path
+
+            // Create the coin template with blank space for drawing
+            doc.setFontSize(22);
+            doc.text('SDG Art Competition - Coin Template', 20, 20);
+
+            // Placeholder for the coin with a blank space in the middle
+            doc.setFillColor(255, 255, 255);
+            doc.rect(20, 40, 170, 170, 'F'); // White rectangle for the blank space
+            doc.setDrawColor(45, 157, 107); // SDG green color
+            doc.setLineWidth(2);
+            doc.rect(20, 40, 170, 170); // Drawing border for coin
+            doc.setFontSize(16);
+            doc.text('Draw Your Design Here', 50, 150); // Placeholder text
+
+            // Add the coin background image
+            // doc.addImage(coinImage, 'PNG', 20, 40, 170, 170); // Uncomment if you have an image
+
+            // Save the PDF
+            doc.save('sdg_art_competition_coin_template.pdf');
+        });
+    </script>
 
 </body>
 </html>
